@@ -1,0 +1,33 @@
+# Variáveis de ambiente e segredos
+.env
+.env.local
+.env.*.local
+.envrc
+
+# Dependências
+node_modules/
+vendor/
+
+# Build e dist
+dist/
+build/
+out/
+*.log
+
+# Editores e IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Cache e temporários
+.cache/
+tmp/
+temp/
+
+# Cobertura de testes
+coverage/
