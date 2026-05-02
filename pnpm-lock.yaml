@@ -29,6 +29,9 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(tsx@4.21.0)
+      zod-prisma-types:
+        specifier: ^3.2.4
+        version: 3.3.11(@prisma/client@6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(typescript@5.9.3))(zod@4.4.2)
 
   apps/api:
     dependencies:
@@ -3207,6 +3210,17 @@ snapshots:
       lodash: 4.18.1
       prisma: 6.19.3(typescript@5.9.3)
       zod: 3.25.76
+
+  zod-prisma-types@3.3.11(@prisma/client@6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(typescript@5.9.3))(zod@4.4.2):
+    dependencies:
+      '@prisma/client': 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils': 7.8.0
+      '@prisma/dmmf': 7.8.0
+      '@prisma/generator-helper': 7.8.0
+      code-block-writer: 13.0.3
+      lodash: 4.18.1
+      prisma: 6.19.3(typescript@5.9.3)
+      zod: 4.4.2
 
   zod-to-json-schema@3.25.2(zod@3.25.76):
     dependencies:
