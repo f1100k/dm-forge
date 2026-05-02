@@ -1,4 +1,8 @@
-import { prisma } from './client.js'
+import { loadEnv } from '@dm-forge/shared'
+
+loadEnv()
+
+const { prisma } = await import('./client.js')
 
 // Seed inicial — vazio até a primeira feature. O comando existe para que
 // `pnpm db:seed` faça parte do contrato desde o dia 1.

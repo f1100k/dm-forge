@@ -3,16 +3,19 @@ services:
     image: postgres:16-alpine
     container_name: dm-forge-postgres
     restart: unless-stopped
+    # Compose carrega o .env da raiz automaticamente. Estas variáveis vivem
+    # uma única vez lá — trocar a senha em um lugar reflete no banco e na
+    # DATABASE_URL (esta última é montada via dotenv-expand).
     environment:
-      POSTGRES_USER: dmforge
-      POSTGRES_PASSWORD: dmforge
-      POSTGRES_DB: dmforge
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - dm-forge-postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dmforge -d dmforge"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10

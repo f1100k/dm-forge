@@ -14,6 +14,12 @@ importers:
       '@types/node':
         specifier: ^22.10.5
         version: 22.19.17
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
+      dotenv-expand:
+        specifier: ^12.0.1
+        version: 12.0.3
       prisma:
         specifier: ^6.1.0
         version: 6.19.3(typescript@5.9.3)
@@ -195,6 +201,12 @@ importers:
 
   packages/shared:
     dependencies:
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
+      dotenv-expand:
+        specifier: ^12.0.1
+        version: 12.0.3
       zod:
         specifier: ^3.24.1
         version: 3.25.76
@@ -1389,6 +1401,10 @@ packages:
 
   dom-accessibility-api@0.5.16:
     resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
+
+  dotenv-expand@12.0.3:
+    resolution: {integrity: sha512-uc47g4b+4k/M/SeaW1y4OApx+mtLWl92l5LMPP0GNXctZqELk+YGgOPIIC5elYmUH4OuoK3JLhuRUYegeySiFA==}
+    engines: {node: '>=12'}
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
@@ -2756,6 +2772,10 @@ snapshots:
   diff-match-patch@1.0.5: {}
 
   dom-accessibility-api@0.5.16: {}
+
+  dotenv-expand@12.0.3:
+    dependencies:
+      dotenv: 16.6.1
 
   dotenv@16.6.1: {}
 
