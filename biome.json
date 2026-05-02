@@ -1,0 +1,88 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignore": [
+      "**/dist/**",
+      "**/build/**",
+      "**/.turbo/**",
+      "**/node_modules/**",
+      "**/coverage/**",
+      "**/.vite/**",
+      "**/.routeTree.gen.ts",
+      "**/prisma/migrations/**",
+      "**/generated/**",
+      ".claude/settings.local.json",
+      ".claude/**/*.local.json"
+    ]
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "asNeeded",
+      "trailingCommas": "all",
+      "arrowParentheses": "always"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "noDefaultExport": "warn",
+        "useImportType": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "error"
+      },
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "include": [
+        "**/vite.config.*",
+        "**/vitest.config.*",
+        "**/tsup.config.*",
+        "**/*.config.ts",
+        "**/*.config.js",
+        "**/biome.json",
+        "**/turbo.json"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["apps/web/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -31,3 +31,16 @@ temp/
 
 # Cobertura de testes
 coverage/
+
+# Turborepo
+.turbo/
+
+# Vite
+.vite/
+
+# Geração automática (Prisma client, route tree)
+**/generated/
+**/.routeTree.gen.ts
+
+# pnpm
+.pnpm-store/
