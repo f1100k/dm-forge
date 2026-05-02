@@ -17,6 +17,13 @@
         "-c",
         "set -a; . /home/fpestelato/projects/dm-forge/.env; set +a; exec npx -y @upstash/context7-mcp"
       ]
+    },
+    "github": {
+      "command": "sh",
+      "args": [
+        "-c",
+        "set -a; . /home/fpestelato/projects/dm-forge/.env; set +a; exec npx -y @modelcontextprotocol/server-github"
+      ]
     }
   }
 }

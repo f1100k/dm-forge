@@ -1,6 +1,6 @@
 ---
-description: Use quando o usuário pedir para criar um Tech Design, desenhar a arquitetura de uma feature, ou documentar a abordagem técnica antes de implementar. Triggers incluem "tech design", "design técnico", "como vamos implementar X", "arquitetura da feature Y". Requer Spec aprovada como pré-requisito. Cria Tech Designs no Notion com diagramas via tldraw.
+description: Use when the user asks to create a Tech Design, design the architecture of a feature, or document the technical approach before implementing. Triggers include "tech design", "technical design", "how to implement X", "architecture for feature Y". Requires an approved Spec as a prerequisite. Creates Tech Designs in Notion with diagrams via tldraw.
 alwaysApply: false
 ---
 
-Siga rigorosamente as instruções em @.ai/skills/tech-design-writer.md.
+Strictly follow the instructions in @.ai/skills/tech-design-writer.md.

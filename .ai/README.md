@@ -1,154 +1,211 @@
-# /.ai — Configuração compartilhada dos agentes
+# /.ai — Shared Agent Configuration
 
-Esta pasta é a **fonte da verdade** da configuração técnica usada pelos agentes de IA do projeto (Claude Code, Cursor, e qualquer outro que vier no futuro).
+This folder is the **source of truth** for the technical configuration used by the project's AI agents (Claude Code, Cursor, and any others added in the future).
 
-## Estrutura
+## Structure
 
 ```
 .ai/
-├── README.md                     ← este arquivo
-├── constitution.md               ← princípios técnicos do projeto
-├── mcp.json                      ← config dos servidores MCP (compartilhada via symlink)
+├── README.md                     ← this file
+├── constitution.md               ← non-negotiable principles
+├── engineering.md                ← stack, structure, standards (high-level)
+├── mcp.json                      ← MCP server config (shared via symlink)
 └── skills/
-    ├── spec-writer.md            ← orquestrador (delega para Playbook no Notion)
-    ├── tech-design-writer.md     ← orquestrador (delega para Playbook no Notion)
-    └── [skill-puramente-tecnica].md  ← conteúdo completo (sem Playbook humano)
+    ├── spec-writer.md            ← full content
+    ├── tech-design-writer.md     ← full content
+    ├── tasks-writer.md           ← full content
+    └── spec-implementer.md       ← full content
 
-CLAUDE.md                         ← instruções globais do Claude Code (aponta para .ai/)
-.claude/skills/                   ← adaptadores finos do Claude Code (apontam para .ai/skills/)
-.cursor/rules/                    ← adaptadores finos do Cursor + rule da Constitution
+docs/
+├── architecture-overview.md      ← bootstrap, BYOK, Tiptap, FTS, public wiki
+├── coding-patterns.md            ← IDs, auto-save, optimistic, soft delete, snapshots
+├── modular-principles.md         ← package boundaries, LLM via packages/ai
+├── state-isolation.md            ← Zustand store, per-campaign scoping
+├── resilience-observability.md   ← logs, errors, SSE, rate limits
+├── implementation-checklist.md   ← pre-PR checklist
+└── adr/                          ← Architecture Decision Records
+
+.claude/skills/                   ← Claude Code thin adapters (point to .ai/skills/)
+.cursor/rules/                    ← Cursor thin adapters + Constitution rule
 .mcp.json                         ← symlink → .ai/mcp.json
 .cursor/mcp.json                  ← symlink → ../.ai/mcp.json
 ```
 
+Detail files in `docs/` are loaded **on demand** — only when the task touches their topic. The lookup table is in `engineering.md` ("When to dive deeper").
+
 ---
 
-## Onde mora cada documento
+## Where each document lives
 
-A divisão entre Notion e repositório segue um critério mais refinado que apenas "humanos editam":
+Two splits at once:
 
-> **Se o documento é parte do processo que envolve gente além dos devs (PM, design, stakeholders), vai pro Notion.
-> Se é configuração técnica ou regra de código que só devs e agentes consultam, vai pro repo.**
+> **Artifact vs. process.** Specs, Tech Designs, Kanban cards, PRD, Research are *artifacts* that get reviewed and commented by the team — they live in **Notion**. The *process* of producing them (templates, checklists, gates) is technical configuration consumed by the agent — it lives in the **repo** (`.ai/skills/`).
 
-Aplicação:
+> **Technical config vs. shared knowledge.** Constitution, engineering rules, ADRs, code, MCP config are technical truth that only devs and agents consult — they live in the **repo**. Anything PM, design, or stakeholders need to read or edit lives in **Notion**.
 
-| Documento | Onde mora | Por quê |
+In practice the agent (skill) creates artifacts in Notion as the primary author; humans review and comment there. Process changes happen in the repo.
+
+Application:
+
+| Document | Lives in | Why |
 |---|---|---|
-| PRD | Notion | PM lidera, stakeholders comentam |
-| Specs | Notion | PM, design, eng colaboram |
-| Tech Designs | Notion | Predominantemente devs, mas pode envolver discussão |
-| Playbooks de processo (Como criar Spec, etc.) | Notion | Regras de processo do time |
-| Research | Notion | PM, UX produzem |
-| **Constitution** | **`.ai/constitution.md`** | **Regra técnica, só devs e agentes consultam** |
-| ADRs | `docs/adr/` | Decisões técnicas, atreladas ao código |
-| MCP config, Skills | `.ai/` | Configuração técnica dos agentes |
-| README, código | repo | Óbvio |
+| PRD | Notion | PM leads, stakeholders comment |
+| Specs | Notion | PM, design, eng collaborate |
+| Tech Designs | Notion | Mostly devs, but may involve discussion |
+| Tasks (Kanban cards) | Notion | Execution tracking, visible to the team |
+| **SDD process (Spec/Tech Design/Tasks creation)** | **`.ai/skills/`** | **Process lives in skills (full-content); Notion holds artifacts** |
+| Research | Notion | PM, UX produce |
+| **Constitution** | **`.ai/constitution.md`** | **Non-negotiable principles, devs and agents consult** |
+| **Engineering rules** | **`.ai/engineering.md`** | **Stack, structure, standards — read alongside Constitution** |
+| **Detail docs** | **`docs/*.md`** | **Loaded on demand when the task touches the topic** |
+| ADRs | `docs/adr/` | Technical decisions tied to code |
+| MCP config, Skills | `.ai/` | Agent technical configuration |
+| README, code | repo | Obvious |
 
 ---
 
-## Constitution
+## Constitution and engineering rules
 
-A `constitution.md` define os princípios e regras inegociáveis do projeto. Toda Spec, Tech Design, ADR e implementação deve respeitar.
+`constitution.md` defines the project's non-negotiable principles. `engineering.md` defines stack, structure, and standards — the operational layer that follows from the principles. Both are read together; every Spec, Tech Design, ADR, and implementation must respect them.
 
-**Garantia de leitura:** os agentes leem a Constitution em **toda interação** via:
+Detail docs in `docs/` carry deeper rules per topic and are loaded **only when the task touches them**, following the lookup table at the bottom of `engineering.md`.
 
-- `CLAUDE.md` na raiz (Claude Code)
-- `.cursor/rules/constitution.mdc` com `alwaysApply: true` (Cursor)
+**Reading guarantee:** agents read the Constitution on **every interaction** via:
 
-Esses adaptadores apontam pro `.ai/constitution.md` — a fonte da verdade. Quando a Constitution mudar, ambos os agentes pegam a nova versão automaticamente.
+- `.cursor/rules/constitution.mdc` with `alwaysApply: true` (Cursor)
+- The Claude Code adapter that points to `.ai/constitution.md`
+
+These adapters point to `.ai/constitution.md` — the source of truth. When the Constitution changes, both agents pick up the new version automatically.
 
 ---
 
-## Configuração do Notion (contrato)
+## Notion configuration (contract)
 
-**Esta seção é o contrato que as skills consultam.** Se a estrutura do Notion mudar, atualize aqui.
+**This section is the contract the skills consult.** If the Notion structure changes, update it here.
 
-### Workspace e teamspace
+### Workspace and teamspace
 
 - **Teamspace:** `DM Forge HQ`
 
 ### Databases
 
 #### Docs
-Database principal de documentação textual.
+Main textual documentation database.
 
-**Propriedades:**
+**Properties:**
 - `Doc name` (title)
-- `Category` (select): `Product`, `Research`, `Spec`, `Playbook`
+- `Category` (**multi_select**): `Product`, `Research`, `Spec`, `Tech Design`, `Playbook`
 - `Status` (status): `Not started`, `In progress`, `In review`, `Done`
 - `Owner` (person)
 
-**Documentos canônicos referenciados pelas skills:**
-- Playbook "Como criar uma Spec" → `Category = Playbook`
-- Playbook "Como criar um Tech Design" → `Category = Playbook`
-- PRD do projeto → `Category = Product`
+> **Verified against Notion (2026-05-02):** `Category` is `multi_select`, not `select` — filters and writes must use the multi-select API shape. `Tech Design` is now its own category value. `Status` values confirmed (`Done` is green).
 
-**Convenção de nomenclatura:**
-- Specs: `Spec - [Nome da feature]`
-- Tech Designs: `Tech Design - [Nome da feature]`
-- Playbooks: `[Nome do processo]` (ex: "Como criar uma Spec")
+**Canonical documents referenced by skills:**
+- Project PRD → `Category` contains `Product`
+- Specs → `Category` contains `Spec`, naming `Spec - [Feature]`
+- Tech Designs → `Category` contains `Tech Design`, naming `Tech Design - [Feature]`
 
-> **Observação:** o select `Category` atualmente não tem `Tech Design` como valor próprio. Tech Designs entram como `Category = Spec`, diferenciados pelo prefixo no `Doc name`. Quando criar a categoria `Tech Design` no Notion, atualizar este contrato.
+> **Process Playbooks deprecated.** Process for creating Specs, Tech Designs, and Tasks lives in the skills under `.ai/skills/`, not in Notion. Existing Notion Playbooks ("Como criar uma Spec", "Como criar um Tech Design") can be archived or kept as historical reference. Skills no longer fetch them.
+
+**Naming convention:**
+- Specs: `Spec - [Feature name]`
+- Tech Designs: `Tech Design - [Feature name]`
 
 #### Kanban
-Tarefas e execução. Skills criam cards aqui derivados do "Plano de Execução" de Tech Designs.
+Tasks and execution. Skills create cards here derived from the "Plano de execução" of Tech Designs.
+
+**Database ID:** `3510ea46-68e8-80a5-bcb3-c6c9fc054517`
+**Data source ID:** `3510ea46-68e8-8055-a15f-000b5660109f`
+
+**Properties:**
+- `Task name` (title) — name of the task
+- `Status` (status): `Not started`, `In progress`, `Review`, `Done`
+  - Groups: `To-do` (`Not started`), `In progress` (`In progress`, `Review`), `Complete` (`Done`)
+- `Description` (rich_text) — short summary; full body goes in the page content
+- `Assignee` (people) — who owns it
+- `Priority` (select): `High`, `Medium`, `Low`
+- `Effort level` (select): `Small`, `Medium`, `Large`
+- `Due date` (date)
+- `Task type` (multi_select): `🐞 Bug`, `💬 Feature request`, `💅 Polish`, `ADR`
+- `Attach file` (files)
+
+> **Verified against Notion (2026-05-02).**
+>
+> Status differs from `Docs`: Kanban uses `Review` (not `In review`). When a skill moves a card to "in review", use `Review`.
+>
+> Cards created by `tasks-writer` from Tech Design execution plans default to: `Status = Not started`, `Task type = 💬 Feature request`. `Priority`, `Effort level`, `Due date`, `Assignee` left blank for the user to fill (or filled if the user provides).
 
 #### Meetings
-Atas. Skills geralmente apenas leem, não criam.
+Meeting notes. Skills usually only read, don't create.
 
-### Linkage entre documentos
+### Linkage between documents
 
-Atualmente: **colar o link da página do Notion no corpo da página alvo**, na seção apropriada do template.
+Currently: **paste the Notion page link in the body of the target page**, in the appropriate template section.
 
-Formato de link aceito (ambos funcionam):
+Accepted link formats (both work):
 - `https://app.notion.com/p/[id]?...`
-- Link curto via "Copy link"
+- Short link via "Copy link"
 
-> **Melhoria futura:** adicionar propriedade do tipo Relation no database `Docs` para relação estruturada e bidirecional. Atualizar este contrato quando implementar.
+> **Future improvement:** add a Relation property in the `Docs` database for structured and bidirectional relationships. Update this contract when implemented.
 
 ---
 
-## Princípio dos adaptadores
+## Adapter principle
 
-Os adaptadores em `.claude/skills/` e `.cursor/rules/` são **finos**:
+The adapters in `.claude/skills/` and `.cursor/rules/` are **thin**:
 
-1. Frontmatter no formato que cada ferramenta exige
-2. Uma única linha apontando para `.ai/skills/[skill].md` ou `.ai/constitution.md`
+1. Frontmatter in the format each tool requires
+2. A single line pointing to `.ai/skills/[skill].md` or `.ai/constitution.md`
 
-**Description idêntica** entre os dois adaptadores. **Nada de conteúdo extra** — se aparecer, mover pra `.ai/`.
+**Identical description** across both adapters. **No extra content** — if any appears, move it to `.ai/`.
 
-## Tipos de Skills
+## Skill model
 
-### Tipo 1: Orquestradora (delega para Playbook no Notion)
+All skills are **full content**: process, template, checklist, antipatterns, and error handling live inside each skill file in `.ai/skills/`. There is no Notion Playbook to fetch — to change a process, edit the skill file (the adapter for Cursor reads the same source automatically).
 
-Quando existe um Playbook humano no Notion, a Skill **não duplica** esse conteúdo. Ela busca o Playbook, lê, e segue rigorosamente.
+Skills consume the **artifacts** stored in Notion (PRD, Specs, Tech Designs, Kanban cards), but the **process** lives in the repo.
 
-Exemplos: `spec-writer`, `tech-design-writer`.
+## Available skills
 
-### Tipo 2: Conteúdo completo (workflow técnico)
+| Skill | When to use |
+|---|---|
+| `spec-writer` | Create a feature Spec (no prerequisite) |
+| `tech-design-writer` | Create a Tech Design (requires Spec `Done`) |
+| `tasks-writer` | Break a Tech Design's Execution Plan into Kanban cards (requires Tech Design `Done`) |
+| `spec-implementer` | Implement a single Kanban card end-to-end (one task per invocation) |
 
-Quando não há Playbook humano correspondente, o conteúdo vive na própria Skill.
+## SDD workflow
 
-Exemplos futuros: `spec-implementer`, `adr-writer`.
+```
+PRD (Notion)
+  │
+  ▼  spec-writer
+Spec (Notion)              gate: Status = Done
+  │
+  ▼  tech-design-writer
+Tech Design (Notion)       gate: Status = Done
+  │
+  ▼  tasks-writer
+Kanban cards (Notion)      gate: card ready for implementation
+  │
+  ▼  spec-implementer (one card per invocation)
+Code + PR
+```
 
-## Skills disponíveis
+## Resources available to agents
 
-| Skill | Tipo | Quando usar |
-|---|---|---|
-| `spec-writer` | Orquestradora | Criar Spec de feature |
-| `tech-design-writer` | Orquestradora | Criar Tech Design (requer Spec aprovada) |
+- **Notion MCP** — read/create pages in `Docs`, move `Kanban` cards, retrieve database schemas
+- **tldraw MCP** — diagrams (flow, architecture, sequence, state)
+- **context7 MCP** — current library/framework docs (preferred over web search for SDK/API references)
+- **GitHub MCP** — create/comment on PRs and issues, read files via API. Code push still via `git` + SSH (the MCP does not replace `git push`).
+- **Filesystem** — code, ADRs in `docs/adr/`, Constitution in `.ai/constitution.md`, Engineering rules in `.ai/engineering.md`, detail docs in `docs/*.md`
 
-## Recursos disponíveis para os agentes
+> **GitHub MCP setup** — server: `@modelcontextprotocol/server-github`. Auth: `GITHUB_PERSONAL_ACCESS_TOKEN` in `.env` (fine-grained PAT, scoped to `f1100k/dm-forge`, with at minimum `Pull requests: read/write`, `Contents: read`, `Issues: read/write`, `Metadata: read`).
 
-- **MCP do Notion** — ler/criar páginas no `Docs`, movimentar `Kanban`, buscar Playbooks
-- **MCP do tldraw** — diagramas (fluxos, arquitetura, sequência, estados)
-- **Sistema de arquivos** — código, ADRs em `docs/adr/`, Constitution em `.ai/constitution.md`
+## Principles
 
-## Princípios
-
-- **Constitution acima de tudo** — qualquer documento ou código que contradiz a Constitution está errado
-- **Notion = documentação humana** com colaboração além dos devs
-- **Repo = configuração técnica e código** que só devs e agentes consultam
-- Skills devem **buscar contexto antes de agir**: Constitution, contrato deste README, Playbook, PRD, ADRs existentes
-- Skills devem **perguntar quando faltar informação crítica**, nunca inventar
-- Skills orquestradoras **nunca duplicam conteúdo de Playbook** — sempre delegam
+- **Constitution above all** — any document or code that contradicts the Constitution is wrong
+- **Notion = artifacts** (PRD, Specs, Tech Designs, Kanban cards); **repo = process and rules** (skills, Constitution, engineering rules, ADRs)
+- Skills must **gather context before acting**: Constitution, `engineering.md`, the contract in this README, PRD, related Spec/Tech Design, existing ADRs
+- Skills must **ask when critical information is missing** — never invent
+- Skills must **stop and surface** any conflict with the Constitution, `engineering.md`, or existing ADRs — never proceed silently against a higher source of truth (see hierarchy in `constitution.md`)

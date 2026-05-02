@@ -1,158 +1,347 @@
-# Skill: Criação de Tech Design
+# Skill: Tech Design writer
 
-## Quando usar esta skill
+This Skill is **full-content**: it carries the entire process for creating a Tech Design. It does not delegate to a human Playbook in Notion. To change the process, edit this file (the Cursor adapter picks it up automatically).
 
-Use quando o usuário pedir para:
-- Criar um Tech Design para uma feature
-- Desenhar a arquitetura de uma feature
-- Documentar a abordagem técnica antes de implementar
-- "Como vamos implementar X", "design técnico de Y"
+## When to use
 
-**Não use quando:**
-- A Spec relacionada ainda não está aprovada
-- For uma feature trivial sem necessidade de Tech Design
-- O usuário pedir só para implementar código (use spec-implementer)
+Use when the user asks to:
+- Create a Tech Design for a feature
+- Design the technical architecture of a feature
+- Document the approach before implementing
+- "How are we going to implement X", "tech design for Y"
 
-## Princípio fundamental
+**Create a Tech Design when:**
+- The Spec is approved (`Status = Done`) and the feature needs to be implemented
+- The technical solution is not obvious or has more than one possible approach
+- The feature involves more than one dev or more than one system
+- Architectural decisions need to be discussed before coding
+- The feature impacts critical areas (auth, sensitive data, performance)
 
-O processo completo de criação de Tech Design é definido no **Playbook "Como criar um Tech Design"** que vive no Notion. Esse Playbook é a fonte da verdade — mantido pelo time, editado por qualquer pessoa com acesso ao Notion sem necessidade de MCP.
+**Heuristic:** if more than one person needs to understand the technical approach before starting, a Tech Design is worth it.
 
-Esta Skill **não duplica o conteúdo do Playbook**. Ela orquestra a execução.
+**Don't use when:**
+- The related Spec is not `Done`
+- It's a trivial fix, simple bug, isolated change to a single function, or small feature (1-2 days) one dev can solve alone
+- The user asks to implement code (use `spec-implementer`)
 
-## Contrato do Notion
+## What a Tech Design is
 
-Os parâmetros estruturais (nome do database, propriedades, valores de select) seguem o **contrato definido em `.ai/README.md`** (seção "Configuração do Notion"). Sempre consulte esse contrato antes de criar ou buscar qualquer documento.
+> While the **Spec** describes *what* and *why*, the **Tech Design** describes *how*.
 
-> **Atenção:** atualmente o select `Category` não possui valor `Tech Design` separado. Tech Designs usam `Category = Spec`, sendo diferenciados pelo prefixo no `Doc name` (`Tech Design - X`). Verifique o contrato em `.ai/README.md` caso isso tenha sido atualizado.
+A Tech Design answers:
+- What's the architecture?
+- Which components will change?
+- How does data flow?
+- Which technical decisions do we need to make?
 
-## Fluxo de execução
+## Prerequisites
 
-### 1. Ler a Constitution
+Before starting:
 
-Leia `.ai/constitution.md` no repositório. O Tech Design deve respeitar todos os princípios técnicos definidos lá. Decisões de arquitetura, stack, padrões de código e qualidade não podem contrariar a Constitution.
+1. **Spec approved** — search Notion `Docs` for `Doc name` starting with `Spec - [Feature name]`, `Category` containing `Spec`, `Status = Done`. **If not `Done`, stop immediately** and instruct the user to finalize the Spec first.
+2. **Tech Design not duplicated** — search for `Doc name` starting with `Tech Design - [Feature name]`, `Category` containing `Tech Design`. If it exists, ask whether to update the existing one.
+3. **Existing ADRs consulted** — list files under `docs/adr/`. Past decisions constrain what can be proposed.
 
-### 2. Buscar o Playbook no Notion
+## Notion contract
 
-Via MCP do Notion, busque no database `Docs` (teamspace `DM Forge HQ`) por:
-- `Category = Playbook`
-- `Doc name` contendo "Como criar um Tech Design"
+See `.ai/README.md`, section "Notion configuration (contract)". In particular: `Docs` database, `Category` is `multi_select`, value `Tech Design`.
 
-Leia o Playbook **completo** antes de começar.
+## Execution flow
 
-Se não encontrar, ou encontrar múltiplos resultados ambíguos, **pergunte ao usuário**. Não improvise.
+### 1. Read principles and technical context
 
-### 3. Verificar pré-requisitos
+Read, in order:
 
-**Crítico — Spec aprovada:**
-Busque a Spec relacionada no `Docs`:
-- `Category = Spec`
-- `Doc name` começando com `Spec - [Nome da feature]`
-- `Status = Done` (ou o status que o Playbook indicar como "aprovada")
+1. `.ai/constitution.md` — non-negotiable principles.
+2. `.ai/engineering.md` — stack, allowed dependencies, standards. **Pay attention to the "When to dive deeper" table** at the end.
+3. **Specific docs in `docs/*.md`** that match the feature scope, per the table in `engineering.md`.
+4. **Applicable ADRs** in `docs/adr/`.
 
-**Se a Spec não estiver com status `Done`, pare imediatamente** e oriente o usuário a finalizar a Spec antes de prosseguir com o Tech Design.
+### 2. Read the Spec
 
-**Outros pré-requisitos do Playbook:**
-- **ADRs existentes** — listar arquivos em `docs/adr/` no repo. Decisões prévias restringem o que pode ser proposto.
-- **Tech Design não duplicado** — buscar no `Docs` por título começando com `Tech Design - [Nome da feature]`
+Via Notion MCP, read the approved Spec in full. In particular:
+- **User stories** with their priorities and Independent Tests — they shape the Execution Plan
+- **Acceptance scenarios** (Given/When/Then) — define "done" per story
+- **Success Criteria** — drivers of architecture (perf, scale)
+- **Functional + Non-Functional Requirements**
+- **Out of scope** — bounds the Tech Design
+- Any remaining `[NEEDS CLARIFICATION]` markers — must be resolved before proceeding (escalate to user)
 
-### 4. Coletar contexto técnico
+### 3. Gather additional technical context
 
-Conforme o Playbook indicar:
-- Spec da feature (já buscada via MCP do Notion)
-- Constitution (já lida do arquivo local)
-- Stack atual (leitura de README, package.json, ou pergunta ao usuário)
-- Código relevante que será tocado
-- ADRs aplicáveis em `docs/adr/`
+As needed:
+- Relevant code that will be touched (read snippets in the repo)
+- Current stack via `engineering.md`
+- Infrastructure constraints (recall Constitution principle 7: lazy infrastructure)
 
-### 5. Executar o Playbook
+### 4. Clarification protocol
 
-Siga rigorosamente:
-- O **passo a passo** do Playbook
-- O **template** definido no Playbook
-- As **boas práticas** descritas
-- Evite os **antipadrões** listados
-- **Princípios da Constitution** prevalecem sobre qualquer outra orientação
+When the design has gaps, **don't ask blindly**. Apply this rule:
 
-Se algo não estiver claro, **pergunte em vez de improvisar**.
+**Do not ask if there's a reasonable default.** Make an informed choice and document it in section "Alternatives considered" (rejected alternatives) or "Trade-offs and risks" (chosen path implications). Use existing patterns in the codebase as defaults.
 
-### 6. Criar o Tech Design no Notion
+**Ask only when** the choice meaningfully impacts:
+- **Architecture** (changes the dependency graph or introduces new infra — highest priority)
+- **Security/privacy** (BYOK, encryption, retention)
+- **Performance** (hot path, latency budget)
+- **Migration risk** (breaking changes, data backfill)
 
-Use o MCP do Notion para criar uma página no database `Docs` com:
+**Limit: max 3 questions per round.** Format as a table:
 
-- **`Doc name`:** `Tech Design - [Nome da feature]` (mesmo nome da Spec, trocando o prefixo)
-- **`Category`:** `Spec` (até que a categoria `Tech Design` seja criada — ver contrato no README)
-- **`Status`:** `Not started` (a menos que o Playbook indique outro)
-- **`Owner`:** dev responsável (pergunte se não souber)
+```
+Question 1: [Crisp question, ≤15 words]
+| Option | Approach | Implication |
+|---|---|---|
+| A | ... | ... |
+| B | ... | ... |
+| C | ... | ... |
+| Custom | (the user writes it) | (the user describes) |
+```
 
-Preencha o corpo seguindo o template do Playbook.
+Number the questions (Q1, Q2, Q3). After answers, update the design and continue.
 
-### 7. Linkagem com a Spec
+If a question can't be answered now, mark the Tech Design with `[NEEDS CLARIFICATION: short question]` (max 3 markers total) and proceed. Surface these in the handoff so they can be resolved before implementation.
 
-Cole o link da Spec relacionada no corpo do Tech Design, na seção apropriada do template (geralmente no topo ou em "Referências").
+### 5. Constitution check — pre-design gate
 
-Use o link da página da Spec obtido via MCP do Notion.
+**Before proposing the architecture**, check the rough approach against the Constitution and `engineering.md`:
 
-### 8. Diagramas via tldraw
+- Does the approach assume new infra (Redis, queue, vectors, WS)? → Constitution principle 7 — needs ADR justification
+- Does it bypass `packages/ai`? → forbidden by `modular-principles.md`
+- Does it touch the dependency graph? → check `engineering.md`
+- Does it duplicate a coding pattern instead of reusing? → check `coding-patterns.md`
+- Does it propose hard delete on campaign entities? → forbidden — see `coding-patterns.md`
 
-Tech Design tipicamente se beneficia de diagramas. Conforme o Playbook orientar (arquitetura, sequência, estados, modelo de dados), use o **MCP do tldraw** e cole os links nas seções apropriadas do corpo do Tech Design.
+**If any check fails, you have three options** (in this order of preference):
 
-Diagrame apenas quando agregar valor — siga o critério do Playbook.
+1. **Adjust the approach** to comply (prefer this).
+2. **Justify the violation** in section "12. Complexity Tracking" of the template — only if the simpler alternative was actually evaluated and is worse for this case.
+3. **Propose an ADR** that changes the Constitution/engineering rule (only if the rule itself is the problem, not this feature).
 
-### 9. Identificar decisões que viram ADR
+Don't proceed with a hidden violation.
 
-Conforme orientação do Playbook, identifique decisões arquiteturais relevantes que devem virar **ADRs separados em `docs/adr/`** no repositório.
+### 6. Create the page in Notion
 
-Liste essas decisões claramente para o usuário, mas **não crie os ADRs automaticamente** — isso é responsabilidade de outra Skill ou do próprio dev.
+Via Notion MCP, create a page in `Docs` with:
+- **`Doc name`:** `Tech Design - [Feature name]` (same name as the Spec, swapped prefix)
+- **`Category`:** contains `Tech Design`
+- **`Status`:** `Not started`
+- **`Owner`:** the dev responsible (ask if ambiguous)
+- **Spec link** in the template header
 
-**Atenção especial:** se uma decisão proposta for grande o suficiente pra contradizer a Constitution, ela precisa virar não só um ADR, mas também uma proposta de atualização da Constitution. Aponte isso explicitamente ao usuário.
+### 7. Fill the template
 
-### 10. Validar contra o checklist e Constitution
+Use the full template below. Start with **Proposed Architecture** — it orients everything else.
 
-Antes de finalizar, percorra:
-- O **checklist final** do Playbook
-- Os **princípios da Constitution** — confirme que a abordagem técnica não contraria nenhum princípio
-- **ADRs existentes** — confirme que a abordagem não contraria silenciosamente decisões anteriores
+### 8. Diagrams
 
-Se algum item falhar, ajuste antes de entregar.
+Use the **tldraw MCP** for diagrams in **Proposed Architecture** (section 3). Suggested types: flowchart, sequence, architecture. Criterion: only when they help.
 
-### 11. Entregar e orientar próximos passos
+Paste the links in section 3 of the Tech Design body.
 
-Conforme orientação do Playbook (geralmente: link da página criada, resumo da abordagem, diagramas criados, decisões que devem virar ADR, trade-offs principais e próximos passos — revisão técnica, criação de ADRs, quebra do plano de execução em cards no `Kanban`).
+### 9. Identify decisions for ADR
 
-## Recursos disponíveis
+Identify decisions that should become standalone ADRs in `docs/adr/`. Qualitative criterion:
 
-- **MCP do Notion** — buscar Playbook, Spec, Tech Designs existentes; criar o Tech Design no `Docs`
-- **MCP do tldraw** — diagramas de arquitetura, sequência, estados, modelo de dados
-- **Sistema de arquivos** — leitura de Constitution em `.ai/constitution.md`, ADRs em `docs/adr/` e código relevante
+> Big decisions that will last a long time. The Tech Design describes the complete solution; an ADR records a specific decision that persists.
 
-## Em caso de erro
+List those decisions in **section 11** of the template. **Don't create the ADRs automatically.**
 
-**Se não conseguir acessar o Playbook no Notion:**
-- Avise o usuário explicitamente
-- **Não invente o processo de memória nem improvise**
+**Special attention:** if a decision is big enough to contradict the Constitution, it must become an ADR **and** a proposed Constitution update.
 
-**Se a Spec relacionada não estiver com status `Done`:**
-- Pare e oriente o usuário a finalizar a Spec primeiro
-- Não prossiga com Tech Design sobre Spec em rascunho ou em revisão
+### 10. Constitution check — post-design re-check
 
-**Se o contrato em `.ai/README.md` divergir da realidade do Notion:**
-- Pare e avise o usuário
-- Peça para atualizar o contrato antes de prosseguir
+After the template is fully filled, re-evaluate against Constitution and `engineering.md`:
 
-**Se a Constitution e a abordagem proposta entrarem em conflito:**
-- Aponte o conflito específico ao usuário
-- Pergunte se é para ajustar a abordagem ou se é caso de atualizar a Constitution (com ADR)
-- Não prossiga silenciosamente contrariando a Constitution
+- Did any pattern emerge during design that violates a principle?
+- Did the data model break the canonical structure (`apps/web` → `packages/db` import, etc.)?
+- Did the rollout strategy require unstated infra?
+- Are all violations declared in section 12 (Complexity Tracking) with justification?
 
-**Se ADRs existentes contrariarem a abordagem proposta:**
-- Aponte o conflito ao usuário
-- Pergunte se é para propor um novo ADR substituindo o anterior, ou ajustar a abordagem
+If new violations appear and aren't declared, fix or declare before moving to review.
 
-**Se o Playbook estiver incompleto, ambíguo ou contraditório:**
-- Aponte a parte específica que está confusa
-- Pergunte como proceder
-- Sugira atualizar o Playbook se for o caso
+### 11. Move to review
 
-## Princípio de não-duplicação
+When complete (passes the final checklist), set `Status` to `In review` via Notion MCP. Define a comment window (reference: 2-3 business days).
 
-Esta Skill é intencionalmente enxuta. **Toda regra de processo, template e critério vive no Playbook do Notion.** Se você se pegar adicionando passos, templates ou critérios aqui que não estão no Playbook, pare e atualize o Playbook — não esta Skill.
+A Tech Design has more "back and forth" than a Spec. **Decisions must live in the document, not in comment threads.**
+
+### 12. Approve
+
+After review and iteration, set `Status` to `Done`. Criterion: reviewed by tech lead + involved devs.
+
+### 13. Keep alive during implementation
+
+If something changes significantly during coding, **update the Tech Design**. A document that becomes a lie is an antipattern.
+
+### 14. Hand off and orient next steps
+
+Report to the user in up to 7 lines:
+- Link to the created Tech Design
+- Current status
+- Approach summary (1 sentence)
+- Diagrams created (if any)
+- Decisions that should become ADRs
+- Declared complexity violations (section 12) and unresolved `[NEEDS CLARIFICATION]`
+- Next steps: create tasks via `tasks-writer` (from the Execution Plan)
+
+## Tech Design template (fill in on creation)
+
+````markdown
+# Tech Design - [Feature name]
+
+**Related Spec:** [Notion link]
+**Status:** Not started | In progress | In review | Done
+**Owner:** [responsible dev]
+**Reviewers:** [names]
+**Last updated:** [YYYY-MM-DD]
+
+## 1. Summary
+2-3 sentences describing what we'll build and how, at a high level.
+
+## 2. Technical context
+Relevant current state: what already exists, which systems will be touched, which limitations we must respect. Refer to the Constitution and the `docs/*.md` that apply.
+
+## 3. Proposed architecture
+Solution overview. Components involved and how they communicate.
+(Include diagrams via tldraw if they help — flowchart, sequence, architecture.)
+
+## 4. Data model
+- New tables/collections
+- Changes to existing schemas
+- Required migrations
+- Client-generated IDs (cuid2), no Prisma `@default` — see `docs/coding-patterns.md`
+
+## 5. APIs and contracts
+- New endpoints (method, route, payload, response)
+- Changes to existing endpoints
+- Events published/consumed
+- tRPC for authenticated traffic; REST under `/api/public/*` for the public wiki
+
+## 6. Main flows
+Step-by-step of critical scenarios:
+- Happy path
+- Relevant error flows
+- Edge cases
+
+## 7. Alternatives considered
+Other approaches evaluated and why each was not chosen. Prevents the discussion from repeating in the future.
+
+## 8. Trade-offs and risks
+- What we're giving up with this approach
+- Technical risks and mitigations
+- Attention points for performance, security, scalability
+
+## 9. Execution plan
+Break into phases or main tasks (becomes the basis of cards in the Kanban via `tasks-writer`). **Mirror the user-story priority from the Spec** — group items by which user story they unblock.
+
+**Foundational** (blocking prerequisites — must complete before user stories can start):
+- [ ] Foundational task A
+- [ ] Foundational task B
+
+**User Story 1 (P1) — [title from Spec]:**
+- [ ] Task for US1
+- [ ] Task for US1
+
+**User Story 2 (P2) — [title from Spec]:**
+- [ ] Task for US2
+
+**Polish (cross-cutting, post-MVP):**
+- [ ] Polish task
+
+For each task, when known, mark **`[P]`** if it can run in parallel with other `[P]` tasks of the same group (different files, no shared mutation). The `tasks-writer` will use this to coordinate parallel work.
+
+## 10. Observability and rollout
+- How we'll monitor (structured logs, metrics) — see `docs/resilience-observability.md`
+- Deploy strategy (feature flag, gradual rollout, big bang)
+- Rollback plan if something goes wrong
+
+## 11. Decisions that become ADRs
+Architectural decisions worth a separate ADR in `docs/adr/`.
+- [ ] Decision X → ADR to create
+- [ ] Decision Y → ADR to create
+
+## 12. Complexity tracking (only if any Constitution/engineering rule is intentionally violated)
+Each row is a justified violation. If empty, delete this section.
+
+| Violation | Why needed | Simpler alternative rejected because |
+|---|---|---|
+| ... | ... | ... |
+
+## 13. References
+Links to: Spec, related ADRs, external docs, PoCs, loaded `docs/*.md` files.
+````
+
+## Best practices
+
+- **Start with architecture, not details.** If the architecture is wrong, no detail saves it. Sketch first, refine later.
+- **Always list considered alternatives.** Even if the choice seems obvious, recording prevents the discussion from coming back in 3 months.
+- **Trade-offs are mandatory.** Every technical decision has a cost. If you can't list trade-offs, you haven't thought enough.
+- **Mirror the Spec's user-story structure in section 9.** Foundational → P1 → P2 → P3 → Polish. Implementer can ship MVP after P1 alone.
+- **Mark parallelism in section 9.** `[P]` on tasks that touch different files and have no shared mutation. The `tasks-writer` consumes this.
+- **Diagrams are worth a thousand words.** But only when they help. Use **tldraw**.
+- **Stay focused on "how", not "what".** Behavior is Spec — go back and adjust there.
+- **Big decisions become ADRs.** The Tech Design describes the full solution; the ADR records a specific decision that lasts.
+- **Declare Constitution violations openly in section 12.** Hidden violations rot the system. Visible ones with a justification are tracked debt.
+
+## Antipatterns
+
+- ❌ **Tech Design became a Spec** — describing what the feature does instead of how. Go back to the Spec.
+- ❌ **Tech Design without alternatives** — picked an approach without recording what was discarded.
+- ❌ **Exhaustive Tech Design** — every line of code described. Direction, not transcription.
+- ❌ **Tech Design ignored during implementation** — code went elsewhere and no one updated. Document becomes a lie.
+- ❌ **Tech Design for a trivial feature** — 2 days documenting something that codes in 4 hours.
+- ❌ **Architectural decision hidden in the Tech Design** — promote to ADR.
+- ❌ **Hidden Constitution violation** — pretending the rule doesn't apply. Either comply, declare in section 12, or open an ADR.
+- ❌ **Execution plan as a flat TODO list** — without user-story grouping, the implementer can't ship MVP early.
+
+## Final checklist before approving
+
+- [ ] Related Spec is approved and linked
+- [ ] All `[NEEDS CLARIFICATION]` from the Spec are resolved
+- [ ] Proposed architecture is clear (with diagram if needed)
+- [ ] Data model changes described
+- [ ] APIs and contracts defined
+- [ ] Happy path and main errors mapped
+- [ ] At least 1-2 considered alternatives listed
+- [ ] Trade-offs explicit
+- [ ] Execution plan grouped by user story (Foundational → P1 → P2 → ... → Polish), with `[P]` markers where applicable
+- [ ] Rollout and observability strategy defined
+- [ ] Decisions that become ADRs identified
+- [ ] Section 12 (Complexity Tracking) is either empty or filled with justification for every Constitution/engineering rule violated
+- [ ] Doesn't contradict the Constitution, `engineering.md`, loaded detail docs, or existing ADRs (silently)
+- [ ] Reviewed by tech lead + involved devs
+
+If any item fails, fix it before moving to `Done`.
+
+## Available resources
+
+- **Notion MCP** — search Spec, existing Tech Designs; create the Tech Design in `Docs`; move status
+- **tldraw MCP** — architecture, sequence, flowchart diagrams
+- **context7 MCP** — current library/SDK/CLI docs when designing approaches that use external APIs
+- **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`, relevant `docs/*.md`, ADRs in `docs/adr/`, code
+
+## On error
+
+**If the related Spec is not `Done`:**
+- Stop and instruct the user to finalize the Spec first
+
+**If the Spec has unresolved `[NEEDS CLARIFICATION]`:**
+- Stop and either resolve them via the clarification protocol (with the user) or send the user back to update the Spec
+- Don't paper over with assumptions in the Tech Design
+
+**If the Constitution and the proposed approach conflict:**
+- Apply the pre-design gate (step 5): adjust, justify in section 12, or propose ADR
+- Don't proceed silently
+
+**If existing ADRs contradict the proposed approach:**
+- Point out the conflict
+- Ask whether to propose a new ADR superseding the previous one, or adjust the approach
+
+**If the Spec doesn't cover a behavior the Tech Design needs to decide on:**
+- Stop and point out the gap
+- Suggest updating the Spec first (principle: the Spec is the source of truth for behavior)
+
+**If the contract in `.ai/README.md` diverges from Notion's actual state:**
+- Stop and warn the user
+- Ask to update the contract before proceeding

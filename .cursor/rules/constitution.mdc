@@ -1,10 +1,10 @@
 ---
-description: Princípios fundamentais do projeto - sempre considerados antes de qualquer decisão técnica ou geração de código
+description: Project fundamental principles — always considered before any technical decision or code generation
 alwaysApply: true
 ---
 
-Antes de gerar código, criar Spec, criar Tech Design ou tomar qualquer decisão técnica, leia e respeite os princípios em @.ai/constitution.md.
+Before generating code, creating a Spec, creating a Tech Design, or making any technical decision, read and respect the principles in @.ai/constitution.md.
 
-Se uma instrução do usuário contradisser a Constitution, aponte o conflito antes de prosseguir e pergunte como proceder.
+If a user instruction contradicts the Constitution, surface the conflict before proceeding and ask how to proceed.
 
-A configuração e princípios completos do projeto estão documentados em @.ai/README.md.
+The complete project configuration and principles are documented in @.ai/README.md.

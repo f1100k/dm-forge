@@ -1,6 +1,6 @@
 ---
 name: spec-writer
-description: Use quando o usuário pedir para criar uma Spec, escrever uma especificação de feature, ou documentar uma feature antes de implementar. Triggers incluem "criar spec", "escrever spec", "nova feature", "especificar X". Cria Specs no Notion seguindo o padrão SDD do projeto, com diagramas via tldraw quando útil.
+description: Use when the user asks to create a Spec, write a feature specification, or document a feature before implementing. Triggers include "create spec", "write spec", "new feature", "spec out X". Creates Specs in Notion following the project SDD pattern. A Spec focuses on behavior (what/why), not architecture.
 ---
 
-Siga rigorosamente as instruções em @.ai/skills/spec-writer.md.
+Strictly follow the instructions in @.ai/skills/spec-writer.md.

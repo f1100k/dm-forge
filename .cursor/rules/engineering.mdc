@@ -1,0 +1,10 @@
+---
+description: Project engineering rules — stack, structure, standards. Read alongside the Constitution on every interaction.
+alwaysApply: true
+---
+
+Before generating code, creating a Spec, creating a Tech Design, or making any technical decision, read and respect what's in @.ai/engineering.md.
+
+If a topic requires deeper context (touches mutations, local store, BYOK, LLM, logs, SSE, etc.), consult the "When to dive deeper" table at the end of `engineering.md` to identify which `docs/*.md` to load.
+
+If a user instruction or proposed approach contradicts the rules in `engineering.md`, surface the conflict before proceeding and ask how to proceed.

@@ -1,0 +1,6 @@
+---
+name: tasks-writer
+description: Use when the user asks to break a Tech Design into tasks, create cards in the Kanban from the Execution Plan, or start the execution phase of an already-designed feature. Triggers include "create tasks", "break into tasks", "prepare implementation of X", "tasks for feature Y". Requires an approved Tech Design as a prerequisite. Creates cards in the Notion Kanban.
+---
+
+Strictly follow the instructions in @.ai/skills/tasks-writer.md.

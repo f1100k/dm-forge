@@ -1,130 +1,266 @@
-# Skill: Criação de Spec
+# Skill: Spec writer
 
-## Quando usar esta skill
+This Skill is **full-content**: it carries the entire process for creating a Spec. It does not delegate to a human Playbook in Notion. To change the process, edit this file (the Cursor adapter picks it up automatically).
 
-Use quando o usuário pedir para:
-- Criar uma Spec nova
-- Escrever uma especificação de feature
-- Documentar uma feature antes de implementar
-- "Vamos começar a feature X" ou "preciso especificar Y"
+## When to use
 
-**Não use quando:**
-- O usuário pedir para implementar código (use spec-implementer)
-- For criação de Tech Design (use tech-design-writer)
-- For ajuste trivial / bug pequeno (não precisa de Spec)
+Use when the user asks to:
+- Create a new Spec
+- Write a feature specification
+- Document a feature before implementing
+- "Let's start feature X" or "I need to spec Y"
 
-## Princípio fundamental
+**Create a Spec when:**
+- The feature is described in the **PRD or roadmap**
+- There's more than one plausible way to solve the problem
+- The feature impacts more than one product area
+- Behavior alignment with other stakeholders is needed (design, PM, eng)
 
-O processo completo de criação de Spec é definido no **Playbook "Como criar uma Spec"** que vive no Notion. Esse Playbook é a fonte da verdade — mantido pelo time, editado por qualquer pessoa com acesso ao Notion sem necessidade de MCP.
+**Don't use when:**
+- It's a trivial fix, bug, copy change, or small visual polish
+- The user asks to create a Tech Design (use `tech-design-writer`)
+- The user asks to implement code (use `spec-implementer`)
 
-Esta Skill **não duplica o conteúdo do Playbook**. Ela orquestra a execução: busca o Playbook, segue o que está lá, e usa os recursos disponíveis (MCPs, sistema de arquivos) para executar.
+## What a Spec is
 
-## Contrato do Notion
+> A Spec describes **what** a feature does and **why** it exists. It does not describe *how* to implement it — that's the Tech Design.
 
-Os parâmetros estruturais (nome do database, propriedades, valores de select) seguem o **contrato definido em `.ai/README.md`** (seção "Configuração do Notion"). Sempre consulte esse contrato antes de criar ou buscar qualquer documento. Se ele estiver desatualizado em relação à realidade do Notion, **avise o usuário** em vez de improvisar.
+Every significant feature must have a Spec before it becomes code.
 
-## Fluxo de execução
+## Prerequisites
 
-### 1. Ler a Constitution
+Before starting:
 
-Leia `.ai/constitution.md` no repositório. A Spec deve respeitar todos os princípios definidos lá.
+1. **PRD exists** — search Notion `Docs` for `Category` containing `Product`. If missing, warn the user and ask whether to proceed anyway.
+2. **Spec not duplicated** — search `Docs` for `Doc name` starting with `Spec - [Feature name]`. If it exists, ask whether to update the existing one instead of creating a new one.
+3. **Problem and Goal are clear** — if the user can't describe each in 2-3 sentences, it's not yet time to write the Spec. Ask before continuing.
 
-### 2. Buscar o Playbook no Notion
+## Notion contract
 
-Via MCP do Notion, busque no database `Docs` (teamspace `DM Forge HQ`) por:
-- `Category = Playbook`
-- `Doc name` contendo "Como criar uma Spec"
+See `.ai/README.md`, section "Notion configuration (contract)". In particular: `Docs` database, `Category` is `multi_select`, value `Spec`.
 
-Leia o Playbook **completo** antes de começar.
+## Execution flow
 
-Se não encontrar, ou encontrar múltiplos resultados ambíguos, **pergunte ao usuário** qual usar. Não improvise.
+### 1. Read principles and context
 
-### 3. Verificar pré-requisitos
+Read, in order:
+1. `.ai/constitution.md` — the Spec must respect every principle.
+2. `.ai/engineering.md` — to ensure the Spec doesn't assume behavior incompatible with the canonical stack.
 
-Conforme o Playbook orientar, verifique:
+A Spec is about **behavior**, not implementation. Don't load `docs/*.md` files here — those belong to the Tech Design.
 
-- **PRD existe?** Busque no `Docs` por `Category = Product`. Se não houver PRD, avise o usuário.
-- **Spec já existe para essa feature?** Busque no `Docs` por `Category = Spec` e título contendo o nome da feature. Se existir, pergunte ao usuário se é para atualizar a existente em vez de criar nova.
+### 2. Gather context from the user
 
-### 4. Coletar contexto do usuário
+Before writing, confirm with the user:
+- **Problem** the feature solves (1-2 sentences)
+- **Goal** desired (1-2 sentences)
+- **Target users** and **at least one real usage scenario**
+- Are there known **dependencies** or **risks**?
+- Which **PRD or PRD section** originates this Spec?
 
-Se o Playbook indicar informações necessárias (problema, usuário-alvo, cenários, etc.) que ainda não foram fornecidas, **pergunte ao usuário antes de prosseguir**. Não invente.
+Use the **clarification protocol** below for anything ambiguous.
 
-### 5. Executar o Playbook
+### 3. Clarification protocol
 
-Siga rigorosamente:
-- O **passo a passo** do Playbook
-- O **template** definido no Playbook (estrutura de seções, ordem, nomenclatura)
-- As **boas práticas** descritas
-- Evite os **antipadrões** listados
+When the description has gaps, **don't ask blindly**. Apply this rule:
 
-Se algo no Playbook não estiver claro ou parecer contraditório, **pergunte ao usuário em vez de improvisar**.
+**Do not ask if there's a reasonable default.** Make an informed guess and document it in section "Assumptions". Reasonable defaults:
+- **Data retention**: industry-standard practices for the domain
+- **Performance targets**: standard web/mobile expectations
+- **Error handling**: user-friendly messages
+- **Auth method**: standard session-based or OAuth2 for web
+- **Integration patterns**: REST/tRPC for app, REST for public API
 
-### 6. Criar a Spec no Notion
+**Ask only when** the choice meaningfully impacts:
+- **Scope** (what's in/out — highest priority)
+- **Security/privacy** (BYOK, encryption, retention)
+- **User experience** (visible flows, paywalls, limits)
+- **Technical architecture** (only if it changes the Spec's behavior contract)
 
-Use o MCP do Notion para criar uma página no database `Docs` com:
+**Limit: max 3 questions per round.** When you ask, format as a table with options:
 
-- **`Doc name`:** `Spec - [Nome da feature]` (seguindo a convenção do contrato)
-- **`Category`:** `Spec`
-- **`Status`:** `Not started` (a menos que o Playbook indique outro status inicial)
-- **`Owner`:** o usuário (pergunte se não souber)
+```
+Question 1: [Crisp question, ≤15 words]
+| Option | Description | Implication |
+|---|---|---|
+| A | ... | ... |
+| B | ... | ... |
+| C | ... | ... |
+| Custom | (the user writes it) | (the user describes) |
+```
 
-Preencha o corpo da página seguindo o template do Playbook.
+Number the questions (Q1, Q2, Q3) so the user can answer "Q1: A; Q2: Custom: ...".
 
-### 7. Diagramas (quando o Playbook indicar)
+After answers, update the Spec and continue. **If the user can't answer or the answer is ambiguous, mark the Spec with `[NEEDS CLARIFICATION: short question]` (max 3 markers total) and proceed — don't loop forever.**
 
-Se o Playbook orientar uso de diagramas, use o **MCP do tldraw** para criar e cole o link na seção apropriada do corpo da Spec.
+### 4. Create the page in Notion
 
-### 8. Linkagem entre documentos
+Via the Notion MCP, create a page in the `Docs` database with:
+- **`Doc name`:** `Spec - [Feature name]`
+- **`Category`:** contains `Spec`
+- **`Status`:** `Not started`
+- **`Owner`:** the user (ask if ambiguous)
 
-Quando precisar referenciar outro documento (ex: PRD relacionado, Research):
+### 5. Fill the template
 
-- Busque o link da página alvo via MCP do Notion
-- Cole o link no corpo da Spec, na seção apropriada do template (geralmente "Referências")
+Use the full template below. Start with **Problem** and **Goal** — if those two can't be written clearly, stop and talk to the user.
 
-### 9. Validar contra o checklist e Constitution
+### 6. Move to review
 
-Antes de finalizar, percorra:
-- O **checklist final** do Playbook
-- Os **princípios da Constitution** — confirme que nenhum requisito da Spec contraria a Constitution
+When content is complete (passes the final checklist below), set `Status` to `In review` via Notion MCP. Suggest the user define a comment window (reference: 3 business days).
 
-Se algum item falhar, ajuste antes de entregar ao usuário.
+### 7. Approve
 
-### 10. Entregar e orientar próximos passos
+After review and adjustments, set `Status` to `Done`. **Who moves it:** the owner, after absorbing comments (decisions live in the document, not in comment threads).
 
-Conforme orientação do Playbook (geralmente: confirmar criação com link da página, listar suposições feitas, sugerir mover status para `In review` quando pronta para revisão e indicar próximos passos do fluxo SDD).
+### 8. Hand off and orient next steps
 
-## Recursos disponíveis
+Report to the user in up to 5 lines:
+- Link to the created Spec
+- Current status
+- Assumptions made (if any) and `[NEEDS CLARIFICATION]` markers (if any)
+- Next steps: Tech Design via `tech-design-writer`, then Tasks via `tasks-writer`, then implementation via `spec-implementer`
 
-- **MCP do Notion** — buscar Playbook, PRD, Specs existentes; criar a Spec no `Docs`
-- **MCP do tldraw** — diagramas que o Playbook indicar
-- **Sistema de arquivos** — leitura de Constitution em `.ai/constitution.md` e ADRs em `docs/adr/`
+## Spec template (fill in on creation)
 
-## Em caso de erro
+````markdown
+# Spec - [Feature name]
 
-**Se não conseguir acessar o Playbook no Notion:**
-- Avise o usuário explicitamente
-- **Não invente o processo de memória nem improvise**
-- Peça para verificar a conexão do MCP do Notion ou os nomes dos documentos
+**Status:** Not started | In progress | In review | Done
+**Owner:** [your name]
+**Reviewers:** [names]
+**Last updated:** [YYYY-MM-DD]
 
-**Se o contrato em `.ai/README.md` divergir da realidade do Notion:**
-- Pare e avise o usuário
-- Peça para atualizar o contrato antes de prosseguir
+## 1. Context and Problem
+What problem does this feature solve? Why now?
 
-**Se a Constitution e a Spec proposta entrarem em conflito:**
-- Aponte o conflito específico ao usuário
-- Pergunte se é para ajustar a Spec ou se é caso de atualizar a Constitution (com ADR)
-- Não prossiga silenciosamente contrariando a Constitution
+## 2. Goal
+What do we want to achieve? What's the expected outcome?
 
-**Se o Playbook estiver incompleto, ambíguo ou contraditório:**
-- Aponte ao usuário a parte específica que está confusa
-- Pergunte como proceder
-- Sugira atualizar o Playbook se for o caso
+## 3. User Stories
+Prioritized as user journeys. **Each story must be INDEPENDENTLY TESTABLE** — implementing only one delivers a viable MVP slice on its own. List in priority order: P1 (MVP), P2, P3...
 
-**Se o PRD não for encontrado:**
-- Avise o usuário
-- Pergunte se é para prosseguir mesmo assim ou se ele deve ser criado antes
+### Story 1 — [Title] (Priority: P1) 🎯 MVP
+**Why this priority:** [1 sentence — what value this delivers alone]
+**Independent test:** [How a user/QA validates this story works without P2/P3 implemented]
 
-## Princípio de não-duplicação
+**Acceptance scenarios** (Given/When/Then):
+- **Scenario 1:** Given [precondition], when [action], then [expected outcome].
+- **Scenario 2:** Given [...], when [...], then [...].
 
-Esta Skill é intencionalmente enxuta. **Toda regra de processo, template e critério vive no Playbook do Notion.** Se você se pegar adicionando passos, templates ou critérios aqui que não estão no Playbook, pare e atualize o Playbook — não esta Skill.
+### Story 2 — [Title] (Priority: P2)
+**Why this priority:** ...
+**Independent test:** ...
+**Acceptance scenarios:**
+- Given [...], when [...], then [...].
+
+### Edge Cases
+- [Edge case 1 — what happens when X is empty / Y times out / Z conflicts]
+- [Edge case 2 — ...]
+
+## 4. Functional Requirements
+Numbered, testable, format `System MUST [capability]`. Mark uncertainty with `[NEEDS CLARIFICATION: question]` (max 3).
+- **FR-001:** System MUST [capability]
+- **FR-002:** System MUST [capability]
+
+## 5. Non-Functional Requirements
+Performance, security, accessibility, observability, etc. Numbered if useful.
+- **NFR-001:** [requirement]
+
+## 6. Out of Scope
+What this feature **does not** do. As important as what it does.
+- ...
+- ...
+
+## 7. Success Criteria
+**Measurable, technology-agnostic outcomes.** Don't write "API responds in 200ms" — write "user sees results in under 1 second". Don't write "DB handles 1000 TPS" — write "system supports N concurrent campaigns without lag".
+- **SC-001:** [Outcome with a number]
+- **SC-002:** [Outcome with a number]
+
+## 8. Dependencies and Risks
+- **Depends on:** [other features, integrations, pending decisions]
+- **Risks:** [technical, product, schedule]
+
+## 9. Assumptions
+Decisions made by the spec author when the user description was silent. Each assumption should be reversible (the user can override during review).
+- ...
+- ...
+
+## 10. References
+Links to: PRD, related research, ADRs, mockups.
+````
+
+> The status header (`Not started | In progress | In review | Done`) reflects the actual values of the Notion DB — source: contract in `.ai/README.md`.
+
+## Diagrams
+
+A Spec usually does not need diagrams — textual scenarios (section 3) are enough. If the feature has non-obvious flows and the user asks, use the **tldraw MCP** and paste the link in section 3 or 10.
+
+## Best practices
+
+- **Focus on "what" and "why", never on "how".** Architecture, database, algorithm is Tech Design — move it there.
+- **User stories as MVP slices.** Each P1/P2/P3 story should deliver value alone. If story 2 can't ship without story 1, it's not really independent — rethink the slice.
+- **Success Criteria are user-facing metrics.** "Users complete setup in <2 min", "campaign opens with <500ms perceived latency". Tech metrics belong in the Tech Design.
+- **Acceptance Scenarios in Given/When/Then.** Forces concrete preconditions and outcomes; vague ones don't survive the format.
+- **Write "Out of Scope" early.** Prevents misunderstandings. "Does this fit?" → into that section.
+- **Limit clarifications.** Max 3 NEEDS CLARIFICATION markers in the Spec; max 3 questions per round to the user. Use defaults otherwise.
+- **Specs live.** If something changes during implementation, update the Spec **first**, then the code.
+- **One Spec, one cohesive feature.** Past 5 pages? Split.
+
+## Antipatterns
+
+- ❌ **Spec became a Tech Design** — full of implementation details. Move them to the Tech Design.
+- ❌ **Spec became meeting minutes** — records discussions instead of decisions. Reflect outcomes.
+- ❌ **User stories that aren't independent** — Story 2 needs Story 1 to be useful. Then they're one story.
+- ❌ **Acceptance "the system works"** — not verifiable. Use Given/When/Then.
+- ❌ **Success Criteria with tech metrics** — "200ms response" belongs to Tech Design. Use user-facing metrics.
+- ❌ **More than 3 NEEDS CLARIFICATION markers** — you're asking too much. Use defaults.
+- ❌ **Giant Spec** — past 5 pages? Split it.
+- ❌ **Spec written after the code** — defeats the purpose.
+
+## Final checklist before approving
+
+Walk through this before moving `Status` to `Done`:
+
+- [ ] Problem and goal are clear in 2-3 sentences each
+- [ ] At least one P1 user story with Independent Test and Acceptance scenarios in Given/When/Then
+- [ ] Each user story is independently testable as an MVP slice
+- [ ] Functional requirements are specific and testable (`System MUST...`)
+- [ ] "Out of Scope" is filled
+- [ ] Success Criteria are measurable and technology-agnostic
+- [ ] Dependencies and Risks mapped
+- [ ] Assumptions explicit (not silent guesses)
+- [ ] No more than 3 `[NEEDS CLARIFICATION]` markers remain (zero is the goal)
+- [ ] Reviewed by at least 1 person from each relevant area (PM, Eng, Design)
+- [ ] Does not contradict the Constitution (`.ai/constitution.md`)
+- [ ] Does not assume a stack or structure different from the canonical one (`.ai/engineering.md`)
+
+If any item fails, fix it before moving to `Done`.
+
+## Available resources
+
+- **Notion MCP** — search PRD and existing Specs; create the Spec in `Docs`; move status
+- **tldraw MCP** — occasional diagrams, when useful (rare in a Spec)
+- **context7 MCP** — not typical in a Spec (Spec is behavior, not API). Use only if the user asks for a specific library reference to validate feasibility.
+- **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`, ADRs in `docs/adr/`
+
+## On error
+
+**If the PRD is not found:**
+- Warn the user and ask whether to proceed anyway or create the PRD first
+
+**If a Spec with a similar name already exists:**
+- List it for the user and ask: update existing or create new?
+
+**If the Constitution and the proposed Spec conflict:**
+- Point out the specific conflict
+- Ask whether to adjust the Spec or propose an ADR to change the Constitution
+- Don't proceed silently against it
+
+**If the user can't answer a clarification question:**
+- Don't loop. Mark the Spec with `[NEEDS CLARIFICATION: short question]` (max 3 total) and continue.
+- Flag in the handoff so the Tech Design phase can resolve it.
+
+**If the contract in `.ai/README.md` diverges from Notion's actual state:**
+- Stop and warn the user
+- Ask to update the contract before proceeding
