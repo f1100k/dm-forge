@@ -1,0 +1,133 @@
+// Schema do Prisma — fonte da verdade do banco de dados de dm-forge.
+//
+// Convenções obrigatórias (ver `.ai/constitution.md` e `docs/coding-patterns.md`):
+//  * IDs gerados no cliente com cuid2 — nunca usar `@default(cuid())`.
+//  * Entidades de campanha carregam `state EntityState @default(ACTIVE)` para soft delete.
+//  * Tabelas de auth (User, Session, Account, Verification) seguem o contrato do Better Auth.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+generator zod {
+  provider                = "zod-prisma-types"
+  output                  = "../src/generated/zod"
+  createInputTypes        = false
+  createRelationValuesTypes = false
+  addIncludeType          = false
+  addSelectType           = false
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EntityState {
+  ACTIVE
+  DELETED
+}
+
+// ─── Better Auth (email + senha) ────────────────────────────────────────────
+// Os nomes de campos seguem o contrato esperado pelo Better Auth. Não renomear
+// sem revisar a configuração do Better Auth em apps/api.
+
+model User {
+  id            String   @id
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  aiConnections AiConnection[]
+  campaigns     Campaign[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+}
+
+// ─── Domínio dm-forge ──────────────────────────────────────────────────────
+
+model AiConnection {
+  id           String @id
+  userId       String
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Provedor LLM (por ora apenas "openrouter").
+  provider     String
+  label        String
+
+  // Chave BYOK criptografada com AES-256-GCM. Nunca decifrar fora do request
+  // que vai usá-la (ver docs/architecture-overview.md → BYOK).
+  encryptedKey Bytes
+  iv           Bytes
+  authTag      Bytes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("ai_connection")
+}
+
+model Campaign {
+  id          String      @id
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  state       EntityState @default(ACTIVE)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId, state])
+  @@map("campaign")
+}
