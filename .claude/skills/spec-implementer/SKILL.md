@@ -1,0 +1,6 @@
+---
+name: spec-implementer
+description: Use when the user asks to implement a specific Kanban task (one task per invocation). Triggers include "implement task X", "do card Y", "implement feature Z", "start implementation". Requires a Kanban card with links to Spec and Tech Design (both with Status Done). Reads Constitution + engineering + relevant docs, implements the card scope, updates the Kanban, and opens a PR. If the user asks for multiple tasks, executes only the first.
+---
+
+Strictly follow the instructions in @.ai/skills/spec-implementer.md.
