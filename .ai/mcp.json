@@ -1,23 +1,22 @@
 {
   "mcpServers": {
     "notion": {
-      "command": "npx",
+      "command": "sh",
       "args": [
-        "-y",
-        "@notionhq/notion-mcp-server"
-      ],
-      "env": {
-        "NOTION_API_KEY": "${NOTION_API_KEY}"
-      }
+        "-c",
+        "set -a; . /home/fpestelato/projects/dm-forge/.env; set +a; exec npx -y @notionhq/notion-mcp-server"
+      ]
     },
     "tldraw": {
+      "type": "http",
       "url": "https://tldraw-mcp-app.tldraw.workers.dev/mcp"
     },
     "context7": {
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
-      }
+      "command": "sh",
+      "args": [
+        "-c",
+        "set -a; . /home/fpestelato/projects/dm-forge/.env; set +a; exec npx -y @upstash/context7-mcp"
+      ]
     }
   }
 }
