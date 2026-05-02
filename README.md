@@ -8,10 +8,9 @@ SaaS for tabletop RPG dungeon masters with AI assistance via BYOK.
 # 1. Install deps (also runs `prisma generate`).
 pnpm install
 
-# 2. Copy env and fill required values.
+# 2. Copy env and generate the two required local secrets.
 cp .env.example .env
-#   - Generate BETTER_AUTH_SECRET: `openssl rand -base64 48`
-#   - Generate ENCRYPTION_KEY:     `openssl rand -base64 32`
+pnpm gen:secrets   # writes BETTER_AUTH_SECRET and ENCRYPTION_KEY into .env
 
 # 3. Start Postgres and apply migrations.
 docker compose up -d postgres
@@ -23,6 +22,33 @@ pnpm dev
 
 `apps/web` → http://localhost:5173
 `apps/api` → http://localhost:3000 (`/health`, `/trpc/*`, `/api/auth/*`)
+
+## Generating local secrets
+
+`apps/api` refuses to boot without `BETTER_AUTH_SECRET` and `ENCRYPTION_KEY`. Both are local-only — never share, never commit.
+
+| Variable | Purpose | Size |
+|---|---|---|
+| `BETTER_AUTH_SECRET` | HMAC key Better Auth uses to sign session cookies. Rotating it logs everyone out. | ≥ 32 chars (we use 48 bytes / 64 chars in base64) |
+| `ENCRYPTION_KEY` | AES-256-GCM master key that encrypts BYOK provider keys at rest. Losing it means every `AiConnection` row becomes unrecoverable. | exactly 32 bytes (44 chars in base64) |
+
+The repo ships a helper that generates both and writes them in-place:
+
+```bash
+pnpm gen:secrets
+```
+
+If you prefer to run it by hand:
+
+```bash
+# BETTER_AUTH_SECRET — 48 random bytes, base64 (64 chars)
+openssl rand -base64 48
+
+# ENCRYPTION_KEY — 32 random bytes, base64 (44 chars, ends with '=')
+openssl rand -base64 32
+```
+
+Paste the output into the matching `=` lines in `.env`.
 
 ## Layout
 

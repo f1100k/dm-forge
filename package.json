@@ -16,6 +16,7 @@
     "format:check": "biome format .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "gen:secrets": "node scripts/gen-secrets.mjs",
     "db:migrate": "node scripts/with-env.mjs prisma migrate",
     "db:studio": "node scripts/with-env.mjs prisma studio",
     "db:seed": "node scripts/with-env.mjs tsx packages/db/src/seed.ts",
