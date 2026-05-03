@@ -6,25 +6,25 @@ import { dirname, resolve } from 'node:path'
 let loaded = false
 
 export type LoadEnvOptions = {
-  // Caminho explícito para o `.env`. Se omitido, faz walk-up a partir do cwd
-  // até achar o primeiro `.env` na árvore.
+  // Explicit path to the `.env`. If omitted, walks up from cwd until it
+  // finds the first `.env` in the tree.
   path?: string
-  // Permite re-carregar (útil em testes). Padrão: idempotente.
+  // Allow re-loading (useful in tests). Default: idempotent.
   force?: boolean
-  // Quando true, valores do `.env` sobrescrevem variáveis já presentes em
-  // process.env. Padrão false (12-factor: env do sistema vence o arquivo).
+  // When true, values from `.env` overwrite variables already present in
+  // process.env. Default false (12-factor: system env wins over the file).
   override?: boolean
 }
 
-// Lê o .env do projeto e aplica expansão de variáveis (${OUTRA_VAR}) antes de
-// popular process.env. Deve ser chamado UMA vez no boot do processo, antes de
-// qualquer leitura de process.env (ver apps/api/src/load-env.ts).
+// Reads the project's `.env` and applies variable expansion (${OTHER_VAR})
+// before populating process.env. Must be called ONCE on process boot, before
+// any read of process.env (see apps/api/src/load-env.ts).
 export function loadEnv(options: LoadEnvOptions = {}): void {
   if (loaded && !options.force) return
   const envPath = options.path ?? findEnvFile(process.cwd())
   if (envPath) {
     const result = config({ path: envPath, quiet: true, override: options.override })
-    expand({ ...result, override: options.override })
+    expand(result)
   }
   loaded = true
 }

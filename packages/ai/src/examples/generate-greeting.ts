@@ -2,10 +2,10 @@ import { generateText } from 'ai'
 import { z } from 'zod'
 import { createOpenRouterClient } from '../provider.js'
 
-// Função-exemplo. Demonstra o contrato de funções tipadas do packages/ai:
-// recebe a chave BYOK decifrada + um input validado, devolve um valor tipado.
-// Substituir por funções reais (generateScene, summarizeNpc, ...) conforme
-// as features cheguem.
+// Example function. Demonstrates the typed-function contract of packages/ai:
+// receives the decrypted BYOK key + a validated input, returns a typed value.
+// Replace with real functions (generateScene, summarizeNpc, ...) as features
+// land.
 
 export const GenerateGreetingInputSchema = z.object({
   apiKey: z.string().min(1),
@@ -20,7 +20,7 @@ export async function generateGreeting(input: GenerateGreetingInput): Promise<st
   const openrouter = createOpenRouterClient(apiKey)
   const { text } = await generateText({
     model: openrouter(model),
-    prompt: `Cumprimente "${audienceName}" em uma frase curta no tom de um mestre de RPG.`,
+    prompt: `Greet "${audienceName}" in a single short sentence in the tone of an RPG game master.`,
   })
   return text
 }

@@ -1,5 +1,5 @@
-import { loadEnv } from '@dm-forge/shared'
+import { loadEnv } from '@dm-forge/shared/node'
 
-// Side-effect import: carrega o .env (com expansão de ${...}) ANTES de
-// qualquer leitura de process.env. Deve ser o primeiro import do entrypoint.
+// Side-effect import: loads `.env` (with ${...} expansion) BEFORE any read of
+// process.env. Must be the first import of the entrypoint.
 loadEnv()

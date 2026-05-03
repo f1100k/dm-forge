@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Wrapper que carrega o `.env` da raiz do monorepo com expansão (dotenv +
-// dotenv-expand) e então delega para o comando passado como argumento. Usado
-// pelos scripts `db:*` e qualquer outra ferramenta CLI que não suporte
-// expansão nativamente (Prisma, tsx, etc.). Apps em runtime carregam via
-// @dm-forge/shared#loadEnv direto no boot.
+// Wrapper that loads the monorepo-root `.env` with expansion (dotenv +
+// dotenv-expand) and then delegates to the command passed as arguments.
+// Used by the `db:*` scripts and any other CLI tool that does not support
+// expansion natively (Prisma, tsx, etc.). Runtime apps load via
+// @dm-forge/shared/node#loadEnv directly at boot.
 
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -22,13 +22,13 @@ if (existsSync(envPath)) {
 
 const [, , cmd, ...args] = process.argv
 if (!cmd) {
-  console.error('uso: node scripts/with-env.mjs <comando> [args...]')
+  console.error('usage: node scripts/with-env.mjs <command> [args...]')
   process.exit(64)
 }
 
 const child = spawn(cmd, args, { stdio: 'inherit', env: process.env, shell: false })
 child.on('error', (err) => {
-  console.error(`falha ao executar "${cmd}":`, err.message)
+  console.error(`failed to execute "${cmd}":`, err.message)
   process.exit(127)
 })
 child.on('exit', (code, signal) => {

@@ -1,9 +1,9 @@
-// Schema do Prisma — fonte da verdade do banco de dados de dm-forge.
+// Prisma schema — source of truth for the dm-forge database.
 //
-// Convenções obrigatórias (ver `.ai/constitution.md` e `docs/coding-patterns.md`):
-//  * IDs gerados no cliente com cuid2 — nunca usar `@default(cuid())`.
-//  * Entidades de campanha carregam `state EntityState @default(ACTIVE)` para soft delete.
-//  * Tabelas de auth (User, Session, Account, Verification) seguem o contrato do Better Auth.
+// Required conventions (see `.ai/constitution.md` and `docs/coding-patterns.md`):
+//  * IDs are generated client-side with cuid2 — never use `@default(cuid())`.
+//  * Campaign entities carry `state EntityState @default(ACTIVE)` for soft delete.
+//  * Auth tables (User, Session, Account, Verification) follow the Better Auth contract.
 
 generator client {
   provider = "prisma-client-js"
@@ -29,9 +29,9 @@ enum EntityState {
   DELETED
 }
 
-// ─── Better Auth (email + senha) ────────────────────────────────────────────
-// Os nomes de campos seguem o contrato esperado pelo Better Auth. Não renomear
-// sem revisar a configuração do Better Auth em apps/api.
+// ─── Better Auth (email + password) ─────────────────────────────────────────
+// Field names follow the contract expected by Better Auth. Do not rename
+// without revisiting the Better Auth configuration in apps/api.
 
 model User {
   id            String   @id
@@ -94,19 +94,19 @@ model Verification {
   @@map("verification")
 }
 
-// ─── Domínio dm-forge ──────────────────────────────────────────────────────
+// ─── dm-forge domain ───────────────────────────────────────────────────────
 
 model AiConnection {
   id           String @id
   userId       String
   user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Provedor LLM (por ora apenas "openrouter").
+  // LLM provider (for now only "openrouter").
   provider     String
   label        String
 
-  // Chave BYOK criptografada com AES-256-GCM. Nunca decifrar fora do request
-  // que vai usá-la (ver docs/architecture-overview.md → BYOK).
+  // BYOK key encrypted with AES-256-GCM. Never decrypt outside the request
+  // that will use it (see docs/architecture-overview.md → BYOK).
   encryptedKey Bytes
   iv           Bytes
   authTag      Bytes

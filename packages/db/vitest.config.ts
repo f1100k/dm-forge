@@ -2,7 +2,7 @@ import { defineProject } from 'vitest/config'
 
 export default defineProject({
   test: {
-    name: 'db',
+    name: 'unit:db',
     environment: 'node',
     include: ['src/**/*.test.ts'],
   },

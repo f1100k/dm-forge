@@ -4,7 +4,7 @@ import { defineProject } from 'vitest/config'
 export default defineProject({
   plugins: [react()],
   test: {
-    name: 'web',
+    name: 'unit:web',
     environment: 'happy-dom',
     include: ['src/**/*.test.{ts,tsx}'],
     globals: true,

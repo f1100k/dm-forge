@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-// Espelha o enum `EntityState` do Prisma. Mantemos aqui para que o frontend
-// e os contratos tRPC referenciem o tipo sem importar de @dm-forge/db.
+// Mirrors Prisma's `EntityState` enum. Kept here so the frontend and the
+// tRPC contracts can reference the type without importing from @dm-forge/db.
 export const EntityStateSchema = z.enum(['ACTIVE', 'DELETED'])
 export type EntityState = z.infer<typeof EntityStateSchema>

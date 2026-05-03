@@ -3,9 +3,9 @@ services:
     image: postgres:16-alpine
     container_name: dm-forge-postgres
     restart: unless-stopped
-    # Compose carrega o .env da raiz automaticamente. Estas variáveis vivem
-    # uma única vez lá — trocar a senha em um lugar reflete no banco e na
-    # DATABASE_URL (esta última é montada via dotenv-expand).
+    # Compose loads the root `.env` automatically. These variables live in
+    # a single place — changing the password there is reflected in both the
+    # database and DATABASE_URL (the latter is assembled via dotenv-expand).
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

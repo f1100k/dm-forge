@@ -1,7 +1,7 @@
 import { parseEnv } from '@dm-forge/shared'
 import { z } from 'zod'
 
-// Variáveis VITE_ ficam expostas no bundle do cliente — nunca colocar segredo aqui.
+// VITE_ variables are exposed in the client bundle — never put secrets here.
 const WebEnvSchema = z.object({
   VITE_API_URL: z.string().url().default('http://localhost:3000'),
 })

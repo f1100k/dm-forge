@@ -15,7 +15,7 @@ describe('loadEnv', () => {
     process.env = originalEnv
   })
 
-  it('expande variáveis referenciadas com ${...}', () => {
+  it('expands variables referenced with ${...}', () => {
     const dir = mkdtempSync(join(tmpdir(), 'dmforge-env-'))
     const envPath = join(dir, '.env')
     writeFileSync(
@@ -34,16 +34,16 @@ describe('loadEnv', () => {
     expect(process.env.DATABASE_URL).toBe('postgresql://dmforge:secret@localhost:5432/dmforge')
   })
 
-  it('é idempotente sem force', () => {
+  it('is idempotent without force', () => {
     const dir = mkdtempSync(join(tmpdir(), 'dmforge-env-'))
     const envPath = join(dir, '.env')
-    writeFileSync(envPath, 'FOO=primeiro\n')
+    writeFileSync(envPath, 'FOO=first\n')
 
     loadEnv({ path: envPath, force: true, override: true })
-    expect(process.env.FOO).toBe('primeiro')
+    expect(process.env.FOO).toBe('first')
 
-    writeFileSync(envPath, 'FOO=segundo\n')
+    writeFileSync(envPath, 'FOO=second\n')
     loadEnv({ path: envPath, override: true })
-    expect(process.env.FOO).toBe('primeiro')
+    expect(process.env.FOO).toBe('first')
   })
 })

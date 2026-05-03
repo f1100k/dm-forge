@@ -12,7 +12,7 @@ const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       url: `${env.VITE_API_URL}/trpc`,
-      // Mantém o cookie da sessão (Better Auth) na chamada cross-origin.
+      // Keep the session cookie (Better Auth) on cross-origin calls.
       fetch(url, options) {
         return fetch(url, { ...options, credentials: 'include' })
       },
@@ -21,7 +21,7 @@ const trpcClient = trpc.createClient({
 })
 
 const container = document.getElementById('root')
-if (!container) throw new Error('Container #root não encontrado.')
+if (!container) throw new Error('Container #root not found.')
 
 createRoot(container).render(
   <StrictMode>

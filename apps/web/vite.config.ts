@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [react()],
-  // O .env fica no root do monorepo — Vite por padrão olha apenas no cwd.
+  // The `.env` lives at the monorepo root — Vite by default only looks at cwd.
   envDir: '../..',
   server: {
     port: 5173,

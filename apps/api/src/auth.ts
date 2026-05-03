@@ -5,7 +5,7 @@ import { getEnv } from './env.js'
 
 const env = getEnv()
 
-// Better Auth com email + senha. OAuth fica para depois (ver ADR 0003).
+// Better Auth with email + password. OAuth comes later (see ADR 0003).
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   baseURL: env.BETTER_AUTH_URL,

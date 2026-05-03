@@ -1,8 +1,8 @@
 import { parseEnv } from '@dm-forge/shared'
 import { z } from 'zod'
 
-// Variáveis de ambiente exigidas pelo apps/api. Validadas no boot do servidor.
-// Ver docs/resilience-observability.md sobre logging e segredos.
+// Environment variables required by apps/api. Validated at server boot.
+// See docs/resilience-observability.md for logging and secrets guidance.
 const ApiEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_PORT: z.coerce.number().int().positive().default(3000),

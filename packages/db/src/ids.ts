@@ -1,8 +1,8 @@
 import { createId as cuid2, isCuid as isCuid2 } from '@paralleldrive/cuid2'
 
-// Gerador único de IDs do projeto. Use sempre este helper em vez de chamar
-// cuid2 diretamente — assim qualquer mudança futura (length, prefixo) acontece
-// em um único lugar (Constitution principle 4 + docs/coding-patterns.md).
+// Project-wide ID generator. Always use this helper instead of calling cuid2
+// directly — that way any future change (length, prefix) happens in a single
+// place (Constitution principle 4 + docs/coding-patterns.md).
 export function createId(): string {
   return cuid2()
 }
