@@ -15,7 +15,9 @@ out/
 *.log
 
 # Editores e IDEs
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
@@ -31,3 +33,16 @@ temp/
 
 # Cobertura de testes
 coverage/
+
+# Turborepo
+.turbo/
+
+# Vite
+.vite/
+
+# Geração automática (Prisma client, route tree)
+**/generated/
+**/.routeTree.gen.ts
+
+# pnpm
+.pnpm-store/

@@ -99,4 +99,8 @@ If an ADR conflicts with the current Constitution and doesn't propose a Constitu
 
 (Add ADRs here as they get accepted — newest first.)
 
-- _No ADRs yet._
+- [0005 — Environment configuration and runtime validation](0005-env-and-config.md)
+- [0004 — BYOK encryption with AES-256-GCM](0004-byok-encryption.md)
+- [0003 — Better Auth with email/password as the auth strategy](0003-auth-strategy.md)
+- [0002 — PostgreSQL + Prisma with versioned migrations](0002-database-and-migrations.md)
+- [0001 — Monorepo with pnpm workspaces and Turborepo](0001-monorepo-structure.md)
