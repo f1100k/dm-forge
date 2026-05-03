@@ -59,8 +59,8 @@ packages/db, packages/srd  (leaves)
 - **File names**: `kebab-case.ts`. React components and their files: `PascalCase.tsx`.
 - **Type names**: `PascalCase`, no `I` prefix. Hooks prefixed `use`. Zod schemas suffixed `Schema`.
 - **No default exports** in internal code.
-- **Language**: identifiers in English. Comments, internal logs, and user-facing error messages (returned via tRPC/REST) in PT-BR.
-- **Tests**: Vitest. `describe`/`it` descriptions in PT-BR. **Tests for new behavior ship in the same PR — not optional.** Each PR adds at least unit/integration coverage for the new behavior. No E2E in MVP.
+- **Language**: everything in the codebase in English — identifiers, comments, internal logs, and user-facing strings (error messages returned via tRPC/REST, UI copy).
+- **Tests**: Vitest. `describe`/`it` descriptions in English. **Tests for new behavior ship in the same PR — not optional.** Each PR adds at least unit/integration coverage for the new behavior. No E2E in MVP.
 - **Lint/format**: Biome. CI gates on `pnpm lint` and `pnpm typecheck`.
 - **Commits**: [Conventional Commits](https://www.conventionalcommits.org/). Format: `type(scope): description`.
   - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
@@ -73,8 +73,8 @@ packages/db, packages/srd  (leaves)
 ## Documentation language
 
 - **All repo files in English** — constitution, engineering, README, `docs/*.md`, `.ai/skills/*.md`, ADRs, adapters in `.claude/` and `.cursor/`. One language for everything written for devs and agents.
-- **Code identifiers in English. User-facing runtime strings (error messages returned via tRPC/REST, UI copy) and code comments in PT-BR** — the product targets Portuguese-speaking GMs; identifiers stay English to match libraries.
-- **Notion artifacts** (Specs, Tech Designs, Kanban cards) follow the team's preference. Default today is PT-BR; the agent should ask if unsure.
+- **All codebase content in English** — identifiers, code comments, test descriptions, internal logs, and user-facing runtime strings (error messages returned via tRPC/REST, UI copy). The product targets Portuguese-speaking GMs, but UI copy translation is handled separately (i18n layer when introduced); source strings stay English.
+- **Notion artifacts** (Specs, Tech Designs, Kanban cards) stay in PT-BR — default and confirmed team preference. Codebase language and Notion language are independent.
 
 When in doubt, copy the language of the closest sibling file.
 

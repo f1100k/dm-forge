@@ -1,10 +1,10 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto'
 
-// AES-256-GCM para chaves BYOK. Regras (ver docs/architecture-overview.md):
-//  * Chave-mestra de 32 bytes (256 bits), fornecida em base64 via ENCRYPTION_KEY.
-//  * IV (nonce) de 12 bytes, gerado aleatoriamente a cada operação.
-//  * authTag de 16 bytes (default do GCM) para detectar adulteração.
-//  * Decriptar SOMENTE em memória, dentro do request que vai usar a chave.
+// AES-256-GCM for BYOK keys. Rules (see docs/architecture-overview.md):
+//  * 32-byte (256-bit) master key, supplied in base64 via ENCRYPTION_KEY.
+//  * 12-byte IV (nonce), generated randomly on every operation.
+//  * 16-byte authTag (GCM default) to detect tampering.
+//  * Decrypt ONLY in memory, inside the request that will use the key.
 
 const ALGORITHM = 'aes-256-gcm'
 const IV_BYTES = 12
@@ -20,7 +20,7 @@ function loadMasterKey(masterKeyBase64: string): Buffer {
   const key = Buffer.from(masterKeyBase64, 'base64')
   if (key.length !== KEY_BYTES) {
     throw new Error(
-      `ENCRYPTION_KEY inválida: esperado ${KEY_BYTES} bytes em base64, recebido ${key.length}.`,
+      `invalid ENCRYPTION_KEY: expected ${KEY_BYTES} bytes in base64, got ${key.length}.`,
     )
   }
   return key

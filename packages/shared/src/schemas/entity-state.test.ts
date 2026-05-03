@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { EntityStateSchema } from './entity-state.js'
 
 describe('EntityStateSchema', () => {
-  it('aceita os valores ACTIVE e DELETED', () => {
+  it('accepts ACTIVE and DELETED values', () => {
     expect(EntityStateSchema.parse('ACTIVE')).toBe('ACTIVE')
     expect(EntityStateSchema.parse('DELETED')).toBe('DELETED')
   })
 
-  it('rejeita valores fora do enum', () => {
+  it('rejects values outside the enum', () => {
     expect(() => EntityStateSchema.parse('ARCHIVED')).toThrow()
   })
 })

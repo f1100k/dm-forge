@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 
-// Garante variáveis mínimas antes de o módulo ser importado (env.ts é eager).
+// Ensure minimal env vars before the module is imported (env.ts is eager).
 beforeAll(() => {
   process.env.NODE_ENV = 'test'
   process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
@@ -11,7 +11,7 @@ beforeAll(() => {
 })
 
 describe('apps/api server', () => {
-  it('responde 200 em GET /health', async () => {
+  it('responds 200 to GET /health', async () => {
     const { createApp } = await import('./server.js')
     const app = createApp()
     const res = await app.fetch(new Request('http://localhost/health'))
@@ -21,10 +21,11 @@ describe('apps/api server', () => {
     expect(body.service).toBe('dm-forge-api')
   })
 
-  it('expõe o handler do Better Auth em /api/auth/*', async () => {
+  it('exposes the Better Auth handler at /api/auth/*', async () => {
     const { createApp } = await import('./server.js')
     const app = createApp()
-    // Sem DB real, qualquer rota Better Auth deve responder algo (não 404 do Hono).
+    // Without a real DB, any Better Auth route should respond with something
+    // (not Hono's 404).
     const res = await app.fetch(new Request('http://localhost/api/auth/get-session'))
     expect(res.status).not.toBe(404)
   })

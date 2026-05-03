@@ -1,13 +1,13 @@
-import { loadEnv } from '@dm-forge/shared'
+import { loadEnv } from '@dm-forge/shared/node'
 
 loadEnv()
 
 const { prisma } = await import('./client.js')
 
-// Seed inicial — vazio até a primeira feature. O comando existe para que
-// `pnpm db:seed` faça parte do contrato desde o dia 1.
+// Initial seed — empty until the first feature. The command exists so that
+// `pnpm db:seed` is part of the contract from day 1.
 async function main() {
-  console.info(JSON.stringify({ level: 'info', msg: 'seed: nada a popular ainda' }))
+  console.info(JSON.stringify({ level: 'info', msg: 'seed: nothing to populate yet' }))
 }
 
 main()

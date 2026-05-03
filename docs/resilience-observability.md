@@ -31,7 +31,7 @@ type AppError =
   | { code: 'INTERNAL'; ref: string }   // ref points to a log line
 ```
 
-Provider errors (OpenRouter, etc.) get wrapped — never bubble raw. The PT-BR user-facing message is built on the client from the code.
+Provider errors (OpenRouter, etc.) get wrapped — never bubble raw. The user-facing message is built on the client from the code.
 
 ## SSE streams
 

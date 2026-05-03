@@ -98,7 +98,7 @@ Before any change:
 
 If a non-trivial decision shows up that isn't covered by the card / Tech Design / Spec, **don't decide silently**. Apply this rule:
 
-**Don't ask if there's a reasonable default.** Use the existing patterns in the codebase as the default. Document the choice in a code comment (in PT-BR) referencing the section of `docs/*.md` or `engineering.md` that justified it.
+**Don't ask if there's a reasonable default.** Use the existing patterns in the codebase as the default. Document the choice in a code comment (in English) referencing the section of `docs/*.md` or `engineering.md` that justified it.
 
 **Ask only when** the choice meaningfully impacts:
 - **Behavior** visible to the user (escalate to the Spec)
@@ -146,7 +146,7 @@ Operating principles:
 - **Patterns before new code** — before creating something new (component, hook, utility), look for an equivalent in the codebase. Reuse.
 - **Tests are mandatory, not optional** — every new behavior on this card ships with test coverage in the same PR. Vitest unit and/or integration. The card's `## Tests` section lists what's required; complete it. Acceptance scenarios from the Spec map to test cases. No E2E (MVP rule).
 - **No filler comments** — only comments where the "why" isn't obvious from the code.
-- **Language**: identifiers in English; comments and code-internal strings in PT-BR; user-facing error messages (returned via tRPC/REST) in PT-BR.
+- **Language**: everything in the codebase in English — identifiers, comments, code-internal strings, and user-facing strings (error messages returned via tRPC/REST, UI copy). Notion artifacts (Specs, Tech Designs, Kanban) stay in PT-BR.
 
 ### 9. Run the pre-PR checklist
 

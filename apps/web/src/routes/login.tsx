@@ -10,8 +10,8 @@ export const Route = createRoute({
 function LoginPage() {
   return (
     <section>
-      <h1>Entrar</h1>
-      <p>Placeholder — formulário de login chega na primeira feature de auth.</p>
+      <h1>Sign in</h1>
+      <p>Placeholder — the login form arrives with the first auth feature.</p>
     </section>
   )
 }

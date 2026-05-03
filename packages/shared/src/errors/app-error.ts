@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-// Códigos de erro estáveis devolvidos por tRPC/REST. Mensagens em PT-BR são
-// montadas no cliente a partir do código (ver docs/resilience-observability.md).
+// Stable error codes returned by tRPC/REST. Human-readable messages are
+// assembled on the client from the code (see docs/resilience-observability.md).
 export const AppErrorCodeSchema = z.enum([
   'BYOK_KEY_INVALID',
   'CAMPAIGN_NOT_FOUND',

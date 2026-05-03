@@ -1,9 +1,9 @@
 import { protectedProcedure, publicProcedure, router } from '../trpc.js'
 
 export const authRouter = router({
-  // Devolve o usuário da sessão atual ou null. Usado pelo apps/web no boot.
+  // Returns the current session user or null. Used by apps/web at boot.
   me: publicProcedure.query(({ ctx }) => ctx.session?.user ?? null),
 
-  // Exemplo de procedure protegida — futuras procedures de campanha vão por aqui.
+  // Example protected procedure — future campaign procedures live here.
   whoami: protectedProcedure.query(({ ctx }) => ctx.user),
 })

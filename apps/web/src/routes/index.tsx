@@ -11,7 +11,7 @@ function HomePage() {
   return (
     <section>
       <h1>dm-forge</h1>
-      <p>Plataforma para mestres de RPG. Bootstrap em andamento.</p>
+      <p>Platform for RPG game masters. Bootstrap in progress.</p>
     </section>
   )
 }

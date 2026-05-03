@@ -1,6 +1,7 @@
+// Browser-safe barrel: nothing here may import Node APIs. Node-only APIs
+// (loadEnv, etc.) live in `@dm-forge/shared/node` (`./node.ts`).
 export { EntityStateSchema, type EntityState } from './schemas/entity-state.js'
 export { parseEnv } from './env/parse-env.js'
-export { loadEnv, type LoadEnvOptions } from './env/load-env.js'
 export {
   AppErrorCodeSchema,
   type AppErrorCode,

@@ -6,7 +6,7 @@ import { Route as LoginRoute } from './routes/login.js'
 import { Route as RootRoute } from './routes/__root.js'
 
 describe('router', () => {
-  it('renderiza a tela inicial', async () => {
+  it('renders the home screen', async () => {
     const routeTree = RootRoute.addChildren([IndexRoute, LoginRoute])
     const router = createRouter({
       routeTree,
@@ -16,13 +16,13 @@ describe('router', () => {
     expect(await screen.findByText('dm-forge')).toBeTruthy()
   })
 
-  it('renderiza o placeholder de login', async () => {
+  it('renders the login placeholder', async () => {
     const routeTree = RootRoute.addChildren([IndexRoute, LoginRoute])
     const router = createRouter({
       routeTree,
       history: createMemoryHistory({ initialEntries: ['/login'] }),
     })
     render(<RouterProvider router={router} />)
-    expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeTruthy()
   })
 })

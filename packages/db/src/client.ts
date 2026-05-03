@@ -1,6 +1,6 @@
 import { PrismaClient } from './generated/client/index.js'
 
-// Singleton para evitar múltiplas conexões em hot-reload (Vite/Turbopack).
+// Singleton to avoid multiple connections under hot reload (Vite/Turbopack).
 declare global {
   // eslint-disable-next-line no-var
   var __dmForgePrisma: PrismaClient | undefined

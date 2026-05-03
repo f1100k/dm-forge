@@ -22,7 +22,7 @@ export function createApp() {
     c.json({ ok: true, service: 'dm-forge-api', timestamp: new Date().toISOString() }),
   )
 
-  // Better Auth — monta GET/POST em /api/auth/*.
+  // Better Auth — mounts GET/POST at /api/auth/*.
   app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw))
 
   // tRPC.
