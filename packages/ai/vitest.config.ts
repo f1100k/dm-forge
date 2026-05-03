@@ -2,7 +2,7 @@ import { defineProject } from 'vitest/config'
 
 export default defineProject({
   test: {
-    name: 'ai',
+    name: 'unit:ai',
     environment: 'node',
     include: ['src/**/*.test.ts'],
   },

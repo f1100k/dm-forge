@@ -71,7 +71,10 @@ pnpm typecheck
 pnpm lint
 pnpm format         # writes
 pnpm format:check
-pnpm test
+pnpm test                  # unit tests (fast, no Docker)
+pnpm test:integration      # integration tests (requires Docker)
+pnpm test:all              # everything
+pnpm test:coverage         # unit with v8 coverage
 pnpm db:migrate dev --name <name>
 pnpm db:studio
 pnpm db:seed
