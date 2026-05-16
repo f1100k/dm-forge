@@ -1,5 +1,7 @@
 import { PrismaClient } from './generated/client/index.js'
 
+export { PrismaClient }
+
 // Singleton to avoid multiple connections under hot reload (Vite/Turbopack).
 declare global {
   // eslint-disable-next-line no-var
