@@ -1,12 +1,14 @@
-import { createId, prisma } from '@dm-forge/db'
+import type { AuthSession } from '@dm-forge/api/auth'
+import { prisma } from '@dm-forge/db'
+import { createId } from '@dm-forge/shared'
 import { describe, expect, it } from 'vitest'
-import type { AuthSession } from '../../src/auth.js'
-import { createTestCaller } from './setup/trpc-caller.js'
+import { createTestCaller } from '../../../../helpers/harness/trpc.js'
 
-// Reference integration test: exercises tRPC procedures end-to-end against
-// a real Prisma + Postgres, with a synthetic session bypassing Better Auth.
-// Mirror this shape when adding new router tests.
-describe('auth router (integration)', () => {
+// Mirrors apps/api/src/trpc/routers/auth.ts. Exercises tRPC procedures
+// end-to-end against real Prisma + Postgres, with a synthetic session
+// bypassing Better Auth's HTTP layer. To test the cookie/middleware path,
+// hit createApp() via helpers/harness/auth.ts instead.
+describe('auth router', () => {
   it('returns null from auth.me when there is no session', async () => {
     const caller = createTestCaller()
     expect(await caller.auth.me()).toBeNull()

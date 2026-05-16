@@ -1,10 +1,12 @@
-import { createId, prisma } from '@dm-forge/db'
+import { prisma } from '@dm-forge/db'
+import { createId } from '@dm-forge/shared'
 import { describe, expect, it } from 'vitest'
 
-// Smoke test: verifies the Testcontainers harness booted Postgres, applied
-// migrations, and that PrismaClient can round-trip a User row. New domain
-// integration tests should follow this same shape.
-describe('prisma schema (integration)', () => {
+// Smoke test for the @dm-forge/db schema. Verifies the Testcontainers
+// harness booted Postgres, applied migrations, and that PrismaClient can
+// round-trip a User + cascade related rows. New domain tests follow the
+// same shape.
+describe('prisma schema', () => {
   it('inserts and reads a User', async () => {
     const id = createId()
     await prisma.user.create({

@@ -1,18 +1,18 @@
+import { Route as IndexRoute } from '@dm-forge/web/routes/index'
+import { Route as LoginRoute } from '@dm-forge/web/routes/login'
+import { Route as RootRoute } from '@dm-forge/web/routes/__root'
+import { trpc } from '@dm-forge/web/trpc'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createMemoryHistory, createRouter } from '@tanstack/react-router'
 import { httpBatchLink } from '@trpc/client'
 import { render, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
-import { Route as IndexRoute } from '../../src/routes/index.js'
-import { Route as LoginRoute } from '../../src/routes/login.js'
-import { Route as RootRoute } from '../../src/routes/__root.js'
-import { trpc } from '../../src/trpc.js'
-import { server } from './setup/msw-server.js'
+import { server } from '../../helpers/harness/msw-server.js'
 
-// Reference integration test for apps/web: real React tree, real TanStack
-// Router, real TanStack Query, real tRPC client. The server is replaced
-// with MSW handlers so we never reach a real apps/api.
+// Mirrors apps/web bootstrap. Real React + TanStack Router + Query + tRPC
+// client; the network boundary is replaced with MSW so we never reach a
+// real apps/api. Tests can `server.use(...)` to override handlers per case.
 function renderApp(initialPath = '/') {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const trpcClient = trpc.createClient({
@@ -32,7 +32,7 @@ function renderApp(initialPath = '/') {
   )
 }
 
-describe('app bootstrap (integration)', () => {
+describe('app bootstrap', () => {
   it('renders the home screen against MSW-mocked tRPC', async () => {
     renderApp('/')
     expect(await screen.findByText('dm-forge')).toBeTruthy()

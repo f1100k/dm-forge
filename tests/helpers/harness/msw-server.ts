@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 
-// Default handlers — tRPC endpoints the bootstrap path always hits. Tests
-// can layer overrides via server.use(http.post('/trpc/...', ...)).
+// Default MSW handlers — endpoints the apps/web bootstrap path always hits.
+// Individual tests layer overrides with server.use(http.post('/trpc/...')).
 const defaultHandlers = [
   http.get('http://localhost:3000/trpc/auth.me', () =>
     HttpResponse.json({ result: { data: null } }),

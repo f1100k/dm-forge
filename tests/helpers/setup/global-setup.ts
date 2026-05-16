@@ -1,8 +1,9 @@
-import { startPostgresForTests } from '@dm-forge/db/testing'
+import { startPostgresForTests } from '../harness/postgres.js'
 
-// Boots Postgres once for the whole apps/api integration project.
-// Sets DATABASE_URL plus the minimum env apps/api expects so its eager
-// env.ts loader does not throw when modules are imported lazily by tests.
+// Vitest `globalSetup` for the integration:backend project. Runs once per
+// test run, BEFORE any worker forks. Exports DATABASE_URL plus the minimum
+// env apps/api needs so its env.ts schema validates when modules are
+// imported lazily by tests.
 export async function setup() {
   const ctx = await startPostgresForTests()
 

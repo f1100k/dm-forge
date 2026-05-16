@@ -4,5 +4,14 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["vitest.workspace.ts", "*.config.ts"]
+  "include": ["vitest.config.ts", "*.config.ts", "scripts/**/*"],
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/db" },
+    { "path": "./packages/ai" },
+    { "path": "./packages/srd" },
+    { "path": "./apps/api" },
+    { "path": "./apps/web" },
+    { "path": "./tests" }
+  ]
 }
