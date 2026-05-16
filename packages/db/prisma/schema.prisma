@@ -39,6 +39,12 @@ model User {
   email         String   @unique
   emailVerified Boolean  @default(false)
   image         String?
+  locale        String   @default("pt-BR")
+  accountStatus String   @default("active")
+  pendingDeletionAt DateTime?
+  acceptedTermsVersion String?
+  acceptedPrivacyVersion String?
+  telemetryConsent Boolean @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -46,6 +52,8 @@ model User {
   accounts      Account[]
   aiConnections AiConnection[]
   campaigns     Campaign[]
+  consentRecords ConsentRecord[]
+  dataExportRequests DataExportRequest[]
 
   @@map("user")
 }
@@ -130,4 +138,53 @@ model Campaign {
 
   @@index([userId, state])
   @@map("campaign")
+}
+
+model ConsentRecord {
+  id         String   @id
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String
+  action     String
+  version    String
+  occurredAt DateTime @default(now())
+  ipPrefix   String?
+  userAgent  String?
+
+  @@index([userId, type, occurredAt(sort: Desc)])
+  @@map("consent_record")
+}
+
+model DataExportRequest {
+  id                String   @id
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status            String
+  requestedAt       DateTime @default(now())
+  readyAt           DateTime?
+  expiresAt         DateTime?
+  payload           Json?
+  downloadTokenHash String?
+
+  @@index([userId, requestedAt(sort: Desc)])
+  @@map("data_export_request")
+}
+
+model LoginAttempt {
+  id             String   @id
+  ipEmailKey     String   @unique
+  firstAttemptAt DateTime
+  attemptCount   Int
+  blockedUntil   DateTime?
+
+  @@map("login_attempt")
+}
+
+model AccountDeletionAudit {
+  id         String   @id
+  userIdHash String
+  deletedAt  DateTime @default(now())
+
+  @@index([deletedAt(sort: Desc)])
+  @@map("account_deletion_audit")
 }

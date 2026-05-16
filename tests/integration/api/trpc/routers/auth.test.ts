@@ -2,6 +2,7 @@ import type { AuthSession } from '@dm-forge/api/auth'
 import { prisma } from '@dm-forge/db'
 import { createId } from '@dm-forge/shared'
 import { describe, expect, it } from 'vitest'
+import { createUserViaSignup } from '../../../../helpers/factories/user.js'
 import { createTestCaller } from '../../../../helpers/harness/trpc.js'
 
 // Mirrors apps/api/src/trpc/routers/auth.ts. Exercises tRPC procedures
@@ -49,5 +50,52 @@ describe('auth router', () => {
     const caller = createTestCaller({ session })
     const me = await caller.auth.me()
     expect(me?.id).toBe(userId)
+  })
+
+  it('keeps auth bootstrap compatible with the extended auth schema', async () => {
+    const signedUpUser = await createUserViaSignup()
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: signedUpUser.id },
+    })
+
+    expect(user.locale).toBe('pt-BR')
+    expect(user.accountStatus).toBe('active')
+    expect(user.telemetryConsent).toBe(false)
+    expect(user.pendingDeletionAt).toBeNull()
+
+    await prisma.consentRecord.create({
+      data: {
+        id: createId(),
+        userId: signedUpUser.id,
+        type: 'TERMS',
+        action: 'ACCEPT',
+        version: 'v1',
+      },
+    })
+
+    await prisma.dataExportRequest.create({
+      data: {
+        id: createId(),
+        userId: signedUpUser.id,
+        status: 'PENDING',
+        payload: { source: 'integration-test' },
+      },
+    })
+
+    await prisma.loginAttempt.create({
+      data: {
+        id: createId(),
+        ipEmailKey: createId(),
+        firstAttemptAt: new Date(),
+        attemptCount: 1,
+      },
+    })
+
+    await prisma.accountDeletionAudit.create({
+      data: {
+        id: createId(),
+        userIdHash: createId(),
+      },
+    })
   })
 })
