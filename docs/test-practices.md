@@ -44,8 +44,8 @@ Layout is fully specified in `docs/testing.md`. Quick reference:
 
 | Layer | Location | Project | Example file |
 |---|---|---|---|
-| Unit | `<pkg>/src/**/*.test.ts(x)` (colocated) | `unit:<pkg>` | `packages/ai/src/encryption.test.ts` |
-| Integration | `<pkg>/tests/integration/**/*.test.ts(x)` | `integration:<pkg>` | `apps/api/tests/integration/auth-router.test.ts` |
+| Unit | `<pkg>/src/**/*.test.ts(x)` (colocated) | `unit:<pkg>` | `packages/ai/src/crypto/encryption.test.ts` |
+| Integration | `tests/integration/<area>/**/*.test.ts(x)` (single `@dm-forge/tests` package) | `integration:backend` or `integration:web` | `tests/integration/api/routers/auth.test.ts` |
 | E2E | (deferred — do not add) | — | — |
 
 Decision tree — *which layer does this test belong in?*
@@ -55,7 +55,8 @@ Decision tree — *which layer does this test belong in?*
    → **Unit**, colocated with the source.
 2. Does it wire several internal modules and need a **real** Prisma
    client, Hono app, tRPC router, or React tree?
-   → **Integration**, under `tests/integration/`.
+   → **Integration**, under `tests/integration/<area>/` in the
+   `@dm-forge/tests` package, mirroring the source location.
 3. Does it cross a real network boundary you don't own (LLM, OAuth
    provider, OpenRouter)?
    → Still **integration**, but with that boundary mocked
@@ -150,7 +151,7 @@ Default to:
 - **Real Zod schemas, real domain objects, real reducers, real React
   components.**
 - **Real Prisma client** in integration tests (the Testcontainers
-  harness in `@dm-forge/db/testing` exists for this — never mock
+  harness in `tests/helpers/harness/postgres.ts` exists for this — never mock
   Prisma).
 - **Hand-written fakes** for narrow interfaces (e.g., a 10-line
   `FakeClock` that returns a fixed `now()`) over `vi.fn()` chains.
@@ -161,8 +162,8 @@ The only legitimate mock targets in this repo:
 
 | Boundary | How to mock |
 |---|---|
-| LLM provider (`@dm-forge/ai` → OpenRouter) | `vi.mock('@dm-forge/ai', …)` — already wired as a guard in `apps/api/tests/integration/setup/each-test.ts` |
-| HTTP from the browser (`apps/web` → `apps/api`) | MSW (`apps/web/tests/integration/setup/msw-server.ts`) |
+| LLM provider (`@dm-forge/ai` → OpenRouter) | `vi.mock('@dm-forge/ai', …)` — already wired as a guard in `tests/helpers/setup/setup-backend.ts` |
+| HTTP from the browser (`apps/web` → `apps/api`) | MSW (`tests/helpers/harness/msw-server.ts`) |
 | Better Auth OAuth callbacks | MSW for the provider's HTTP endpoints |
 | The system clock (`Date.now()`, `setTimeout`) | `vi.useFakeTimers()` — only when time is part of the behavior under test |
 | File system (rare) | A temp-dir fake or `vi.mock('node:fs', …)` |
@@ -240,11 +241,12 @@ of the following:
   schema dump). Snapshots of React trees rot fast and hide intent.
 - Leaves `it.only`, `describe.only`, `it.skip`, or `console.log` in
   the source.
-- Depends on test order — every integration test must call
-  `truncateAll(prisma)` (handled by the per-test setup) and every MSW
-  test must `server.resetHandlers()` (handled by the per-test setup).
+- Depends on test order — every backend integration test is isolated
+  by the `beforeEach: truncateAll` in `tests/helpers/setup/setup-backend.ts`,
+  and every web integration test by the `afterEach: server.resetHandlers()`
+  in `tests/helpers/setup/setup-web.ts`. Don't reach around either.
 - Mocks `@dm-forge/db`'s `prisma` client. Use the Testcontainers
-  harness instead.
+  harness in `tests/helpers/harness/postgres.ts` instead.
 - Mocks an internal module the test author owns (a router, a service,
   a Zod schema, a reducer).
 - Tests that `vi.fn()` was called with specific arguments **without**

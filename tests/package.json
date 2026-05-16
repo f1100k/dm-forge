@@ -1,0 +1,42 @@
+{
+  "name": "@dm-forge/tests",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Home of every integration test in the monorepo. See docs/testing.md.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm -w exec vitest run --config tests/vitest.config.ts",
+    "test:backend": "pnpm -w exec vitest run --config tests/vitest.config.ts --project='integration:backend'",
+    "test:web": "pnpm -w exec vitest run --config tests/vitest.config.ts --project='integration:web'",
+    "clean": "rm -rf .turbo coverage"
+  },
+  "dependencies": {
+    "@dm-forge/ai": "workspace:*",
+    "@dm-forge/api": "workspace:*",
+    "@dm-forge/db": "workspace:*",
+    "@dm-forge/shared": "workspace:*",
+    "@dm-forge/web": "workspace:*"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "catalog:",
+    "@prisma/client": "catalog:",
+    "@tanstack/react-query": "^5.62.11",
+    "@tanstack/react-router": "^1.95.1",
+    "@testcontainers/postgresql": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@trpc/client": "catalog:",
+    "@trpc/server": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "catalog:",
+    "happy-dom": "catalog:",
+    "msw": "catalog:",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "testcontainers": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

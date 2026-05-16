@@ -17,8 +17,9 @@ export type LoadEnvOptions = {
 }
 
 // Reads the project's `.env` and applies variable expansion (${OTHER_VAR})
-// before populating process.env. Must be called ONCE on process boot, before
-// any read of process.env (see apps/api/src/load-env.ts).
+// before populating process.env. Idempotent — apps call it from the top of
+// their env module (see apps/api/src/env.ts) so any `getEnv()` callsite
+// triggers it on first import.
 export function loadEnv(options: LoadEnvOptions = {}): void {
   if (loaded && !options.force) return
   const envPath = options.path ?? findEnvFile(process.cwd())

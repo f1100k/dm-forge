@@ -4,12 +4,17 @@
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server/app.ts",
+    "./routers": "./src/trpc/routers/index.ts",
+    "./auth": "./src/auth/better-auth.ts"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:integration": "vitest run -c vitest.integration.config.ts",
+    "test": "pnpm -w exec vitest run --project='unit:api'",
     "clean": "rm -rf .turbo coverage dist"
   },
   "dependencies": {
@@ -17,15 +22,15 @@
     "@dm-forge/db": "workspace:*",
     "@dm-forge/shared": "workspace:*",
     "@hono/node-server": "^1.13.7",
-    "@trpc/server": "^11.0.0-rc.660",
-    "better-auth": "^1.1.6",
+    "@trpc/server": "catalog:",
+    "better-auth": "catalog:",
     "hono": "^4.6.14",
-    "zod": "^3.24.1"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3",
-    "vitest": "^3.2.4"
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

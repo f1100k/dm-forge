@@ -57,8 +57,9 @@ apps/web        # Vite + React + TanStack Router + tRPC client
 apps/api        # Hono + tRPC + Better Auth
 packages/db     # Prisma schema, client, seed
 packages/ai     # Vercel AI SDK + OpenRouter, BYOK encryption
-packages/shared # Zod contracts shared by web and api
+packages/shared # Zod contracts + typed env loader
 packages/srd    # Versioned SRDs (placeholder)
+tests           # @dm-forge/tests — the entire integration suite (see docs/testing.md)
 ```
 
 Detailed dependency graph and rationale: `.ai/engineering.md` and `docs/modular-principles.md`.

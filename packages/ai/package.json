@@ -10,18 +10,18 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "pnpm -w exec vitest run --project='unit:ai'",
     "clean": "rm -rf .turbo coverage"
   },
   "dependencies": {
     "@dm-forge/shared": "workspace:*",
     "@openrouter/ai-sdk-provider": "^0.7.2",
     "ai": "^4.0.30",
-    "zod": "^3.24.1"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
-    "typescript": "^5.7.3",
-    "vitest": "^3.2.4"
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

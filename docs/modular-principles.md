@@ -9,16 +9,26 @@ apps/web    → packages/shared
 apps/api    → packages/db, packages/shared, packages/ai
 packages/ai → packages/shared, packages/db
 packages/db, packages/srd  (leaves)
+tests/      → every package + app it tests   (test-only exception)
 ```
 
 Forbidden:
 
 - `apps/web` importing `packages/db` — DB types reach the frontend only through tRPC inference.
 - `apps/web` importing `packages/ai` — the frontend never speaks to an LLM directly. Even with BYOK keys, calls route through `apps/api`.
-- Any package importing from `apps/*`.
+- **Production code** (anything outside `tests/`) importing from `apps/*`. The `@dm-forge/tests` package is the one legitimate consumer of `apps/*` — it exists to wire the real implementations together for integration testing. No other package may depend on `apps/*`.
 - Circular dependencies anywhere. Treat the Turborepo warning as an error.
 
 Changes to the dependency graph require an ADR.
+
+## Cross-app subpath exports for the tests package
+
+`apps/api` and `apps/web` expose narrow subpath exports so `@dm-forge/tests` can pull the real modules without falling back to deep `./src/...` paths:
+
+- `apps/api`: `.` (main entry — boots the server, **do not import in tests**), `./server` (`createApp` factory, side-effect-free), `./routers` (`appRouter`), `./auth` (`auth`, `AuthSession`).
+- `apps/web`: specific entries for the routes and modules the web integration test needs (`./trpc`, `./routes/__root`, `./routes/index`, `./routes/login`).
+
+When a test needs a new entry point, add it to the corresponding `package.json` `exports` map — do **not** broaden to a wildcard `"./*"` (that opens every internal file as a public import surface).
 
 ## When code moves to `packages/shared`
 

@@ -7,31 +7,26 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./client": "./src/client.ts",
-    "./testing": "./src/testing/index.ts"
+    "./client": "./src/client.ts"
   },
   "scripts": {
     "postinstall": "prisma generate",
     "build": "prisma generate",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:integration": "vitest run -c vitest.integration.config.ts",
+    "test": "pnpm -w exec vitest run --project='unit:db'",
     "seed": "tsx src/seed.ts",
     "clean": "rm -rf .turbo coverage src/generated"
   },
   "dependencies": {
     "@dm-forge/shared": "workspace:*",
-    "@paralleldrive/cuid2": "^2.2.2",
-    "@prisma/client": "^6.1.0",
-    "zod": "^3.24.1"
+    "@prisma/client": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@testcontainers/postgresql": "^10.13.2",
-    "prisma": "^6.1.0",
-    "testcontainers": "^10.13.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3",
-    "vitest": "^3.2.4",
-    "zod-prisma-types": "^3.2.4"
+    "prisma": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "zod-prisma-types": "catalog:"
   }
 }

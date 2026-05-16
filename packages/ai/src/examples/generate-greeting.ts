@@ -1,6 +1,6 @@
 import { generateText } from 'ai'
 import { z } from 'zod'
-import { createOpenRouterClient } from '../provider.js'
+import { createOpenRouterClient } from '../provider/openrouter.js'
 
 // Example function. Demonstrates the typed-function contract of packages/ai:
 // receives the decrypted BYOK key + a validated input, returns a typed value.

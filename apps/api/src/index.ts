@@ -1,7 +1,6 @@
-import './load-env.js'
 import { serve } from '@hono/node-server'
 import { getEnv } from './env.js'
-import { createApp } from './server.js'
+import { createApp } from './server/app.js'
 
 const env = getEnv()
 const app = createApp()
@@ -23,4 +22,4 @@ serve(
   },
 )
 
-export type { AppRouter } from './routers/index.js'
+export type { AppRouter } from './trpc/routers/index.js'

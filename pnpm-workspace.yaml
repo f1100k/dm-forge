@@ -1,3 +1,46 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "tests"
+
+# Single source of truth for versions of dependencies used in >1 workspace.
+# Reference them with "catalog:" in each package.json — pnpm resolves to the
+# version pinned here. Adding a new shared dep? Pin it here first, then point
+# every package.json at "catalog:". Single-use deps stay local to their package.
+catalog:
+  # Toolchain (devDeps)
+  typescript: ^5.7.3
+  vitest: ^3.2.4
+  tsx: ^4.19.2
+  "@types/node": ^22.10.5
+  # Plugin used by both apps/web and the root vitest workspace (unit:web /
+  # integration:web projects). Catalog the version so they cannot drift.
+  "@vitejs/plugin-react": ^4.3.4
+
+  # Validation + types
+  zod: ^3.24.1
+  zod-prisma-types: ^3.2.4
+
+  # Database
+  prisma: ^6.1.0
+  "@prisma/client": ^6.1.0
+
+  # Auth
+  better-auth: ^1.1.6
+
+  # tRPC (the 11.0.0-rc.660 line co-versions server + client + react-query)
+  "@trpc/server": ^11.0.0-rc.660
+  "@trpc/client": ^11.0.0-rc.660
+  "@trpc/react-query": ^11.0.0-rc.660
+
+  # Env loading (used by packages/shared and previously root)
+  dotenv: ^16.4.7
+  dotenv-expand: ^12.0.1
+
+  # Test helpers (owned by the new @dm-forge/tests package)
+  "@testcontainers/postgresql": ^10.13.2
+  testcontainers: ^10.13.2
+  "@faker-js/faker": ^9.3.0
+  msw: ^2.7.0
+  happy-dom: ^15.11.7
+  "@testing-library/react": ^16.1.0

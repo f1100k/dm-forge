@@ -24,7 +24,7 @@ describe('parseEnv', () => {
     expect(result).toEqual({ FOO: 'bar', PORT: 3000 })
   })
 
-  it("falls back to process.env when no source is given", () => {
+  it('falls back to process.env when no source is given', () => {
     // Arrange
     process.env.PARSE_ENV_FIXTURE = 'from-process-env'
     const schema = z.object({ PARSE_ENV_FIXTURE: z.string() })

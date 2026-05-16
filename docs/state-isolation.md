@@ -33,7 +33,7 @@ A snapshot is **immutable**. Restoring a snapshot creates a new entity-state on 
 
 ## Hydration order on bootstrap
 
-Bootstrap response order is fixed (canonical order in `apps/api/src/routers/bootstrap.ts`):
+Bootstrap response order is fixed (canonical order in `apps/api/src/trpc/routers/bootstrap.ts`):
 
 1. User + preferences
 2. Campaign metadata
