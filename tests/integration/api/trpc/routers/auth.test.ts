@@ -1,8 +1,11 @@
-import type { AuthSession } from '@dm-forge/api/auth'
 import { prisma } from '@dm-forge/db'
 import { createId } from '@dm-forge/shared'
 import { describe, expect, it } from 'vitest'
-import { createUserViaSignup } from '../../../../helpers/factories/user.js'
+import {
+  createSyntheticAuthSession,
+  createUserViaSignup,
+} from '../../../../helpers/factories/user.js'
+import { createApp } from '../../../../helpers/harness/app.js'
 import { createTestCaller } from '../../../../helpers/harness/trpc.js'
 
 // Mirrors apps/api/src/trpc/routers/auth.ts. Exercises tRPC procedures
@@ -25,34 +28,18 @@ describe('auth router', () => {
       },
     })
 
-    const session = {
-      session: {
-        id: createId(),
-        token: createId(),
-        userId,
-        expiresAt: new Date(Date.now() + 60_000),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        ipAddress: null,
-        userAgent: null,
-      },
-      user: {
-        id: userId,
-        name: 'Marie Curie',
-        email: `${userId}@example.test`,
-        emailVerified: false,
-        image: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    } as unknown as NonNullable<AuthSession>
+    const session = createSyntheticAuthSession({
+      id: userId,
+      name: 'Marie Curie',
+      email: `${userId}@example.test`,
+    })
 
     const caller = createTestCaller({ session })
     const me = await caller.auth.me()
     expect(me?.id).toBe(userId)
   })
 
-  it('keeps auth bootstrap compatible with the extended auth schema', async () => {
+  it('creates a usable session through sign-up', async () => {
     const signedUpUser = await createUserViaSignup()
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: signedUpUser.id },
@@ -63,39 +50,17 @@ describe('auth router', () => {
     expect(user.telemetryConsent).toBe(false)
     expect(user.pendingDeletionAt).toBeNull()
 
-    await prisma.consentRecord.create({
-      data: {
-        id: createId(),
-        userId: signedUpUser.id,
-        type: 'TERMS',
-        action: 'ACCEPT',
-        version: 'v1',
-      },
-    })
+    const app = createApp()
 
-    await prisma.dataExportRequest.create({
-      data: {
-        id: createId(),
-        userId: signedUpUser.id,
-        status: 'PENDING',
-        payload: { source: 'integration-test' },
-      },
+    const sessionAfterSignupRes = await app.request('/api/auth/get-session', {
+      headers: { cookie: signedUpUser.cookie },
     })
-
-    await prisma.loginAttempt.create({
-      data: {
-        id: createId(),
-        ipEmailKey: createId(),
-        firstAttemptAt: new Date(),
-        attemptCount: 1,
-      },
-    })
-
-    await prisma.accountDeletionAudit.create({
-      data: {
-        id: createId(),
-        userIdHash: createId(),
-      },
-    })
+    expect(sessionAfterSignupRes.status).toBe(200)
+    const sessionAfterSignup = (await sessionAfterSignupRes.json()) as
+      | { user?: { id?: string; email?: string } }
+      | null
+    expect(sessionAfterSignup).not.toBeNull()
+    expect(sessionAfterSignup?.user?.id).toBe(signedUpUser.id)
+    expect(sessionAfterSignup?.user?.email).toBe(signedUpUser.email)
   })
 })

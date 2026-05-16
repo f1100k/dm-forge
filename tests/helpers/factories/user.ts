@@ -1,3 +1,4 @@
+import type { AuthSession } from '@dm-forge/api/auth'
 import { prisma } from '@dm-forge/db'
 import { createId } from '@dm-forge/shared'
 import { faker } from '@faker-js/faker'
@@ -52,4 +53,39 @@ export async function createUserRaw(overrides: RawUserOverrides = {}) {
       name: overrides.name ?? faker.person.fullName(),
     },
   })
+}
+
+export type SyntheticAuthSessionUser = {
+  id: string
+  name: string
+  email: string
+}
+
+// Builds the minimum Better Auth session object needed by createTestCaller().
+// Use this when tests need an authenticated tRPC context without HTTP cookies.
+export function createSyntheticAuthSession(
+  user: SyntheticAuthSessionUser,
+): NonNullable<AuthSession> {
+  const now = new Date()
+  return {
+    session: {
+      id: createId(),
+      token: createId(),
+      userId: user.id,
+      expiresAt: new Date(now.getTime() + 60_000),
+      createdAt: now,
+      updatedAt: now,
+      ipAddress: null,
+      userAgent: null,
+    },
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      emailVerified: false,
+      image: null,
+      createdAt: now,
+      updatedAt: now,
+    },
+  } as unknown as NonNullable<AuthSession>
 }
