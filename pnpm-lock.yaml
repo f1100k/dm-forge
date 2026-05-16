@@ -4,6 +4,72 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@faker-js/faker':
+      specifier: ^9.3.0
+      version: 9.9.0
+    '@prisma/client':
+      specifier: ^6.1.0
+      version: 6.19.3
+    '@testcontainers/postgresql':
+      specifier: ^10.13.2
+      version: 10.28.0
+    '@testing-library/react':
+      specifier: ^16.1.0
+      version: 16.3.2
+    '@trpc/client':
+      specifier: ^11.0.0-rc.660
+      version: 11.17.0
+    '@trpc/react-query':
+      specifier: ^11.0.0-rc.660
+      version: 11.17.0
+    '@trpc/server':
+      specifier: ^11.0.0-rc.660
+      version: 11.17.0
+    '@types/node':
+      specifier: ^22.10.5
+      version: 22.19.17
+    '@vitejs/plugin-react':
+      specifier: ^4.3.4
+      version: 4.7.0
+    better-auth:
+      specifier: ^1.1.6
+      version: 1.6.9
+    dotenv:
+      specifier: ^16.4.7
+      version: 16.6.1
+    dotenv-expand:
+      specifier: ^12.0.1
+      version: 12.0.3
+    happy-dom:
+      specifier: ^15.11.7
+      version: 15.11.7
+    msw:
+      specifier: ^2.7.0
+      version: 2.14.2
+    prisma:
+      specifier: ^6.1.0
+      version: 6.19.3
+    testcontainers:
+      specifier: ^10.13.2
+      version: 10.28.0
+    tsx:
+      specifier: ^4.19.2
+      version: 4.21.0
+    typescript:
+      specifier: ^5.7.3
+      version: 5.9.3
+    vitest:
+      specifier: ^3.2.4
+      version: 3.2.4
+    zod:
+      specifier: ^3.24.1
+      version: 3.25.76
+    zod-prisma-types:
+      specifier: ^3.2.4
+      version: 3.3.11
+
 importers:
 
   .:
@@ -12,34 +78,31 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
       '@types/node':
-        specifier: ^22.10.5
+        specifier: 'catalog:'
         version: 22.19.17
+      '@vitejs/plugin-react':
+        specifier: 'catalog:'
+        version: 4.7.0(vite@6.4.2(@types/node@22.19.17)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4))
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4))
-      dotenv:
-        specifier: ^16.4.7
-        version: 16.6.1
-      dotenv-expand:
-        specifier: ^12.0.1
-        version: 12.0.3
       prisma:
-        specifier: ^6.1.0
+        specifier: 'catalog:'
         version: 6.19.3(magicast@0.3.5)(typescript@5.9.3)
       tsx:
-        specifier: ^4.19.2
+        specifier: 'catalog:'
         version: 4.21.0
       turbo:
         specifier: ^2.3.4
         version: 2.9.7
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
       zod-prisma-types:
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.3.11(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@4.4.2)
 
   apps/api:
@@ -57,29 +120,29 @@ importers:
         specifier: ^1.13.7
         version: 1.19.14(hono@4.12.16)
       '@trpc/server':
-        specifier: ^11.0.0-rc.660
+        specifier: 'catalog:'
         version: 11.17.0(typescript@5.9.3)
       better-auth:
-        specifier: ^1.1.6
+        specifier: 'catalog:'
         version: 1.6.9(@opentelemetry/api@1.9.0)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4))
       hono:
         specifier: ^4.6.14
         version: 4.12.16
       zod:
-        specifier: ^3.24.1
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^22.10.5
+        specifier: 'catalog:'
         version: 22.19.17
       tsx:
-        specifier: ^4.19.2
+        specifier: 'catalog:'
         version: 4.21.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
 
   apps/web:
@@ -94,16 +157,16 @@ importers:
         specifier: ^1.95.1
         version: 1.169.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@trpc/client':
-        specifier: ^11.0.0-rc.660
+        specifier: 'catalog:'
         version: 11.17.0(@trpc/server@11.17.0(typescript@5.9.3))(typescript@5.9.3)
       '@trpc/react-query':
-        specifier: ^11.0.0-rc.660
+        specifier: 'catalog:'
         version: 11.17.0(@tanstack/react-query@5.100.8(react@18.3.1))(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.17.0(typescript@5.9.3))(react@18.3.1)(typescript@5.9.3)
       '@trpc/server':
-        specifier: ^11.0.0-rc.660
+        specifier: 'catalog:'
         version: 11.17.0(typescript@5.9.3)
       better-auth:
-        specifier: ^1.1.6
+        specifier: 'catalog:'
         version: 1.6.9(@opentelemetry/api@1.9.0)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4))
       react:
         specifier: ^18.3.1
@@ -112,7 +175,7 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       zod:
-        specifier: ^3.24.1
+        specifier: 'catalog:'
         version: 3.25.76
       zustand:
         specifier: ^5.0.2
@@ -122,7 +185,7 @@ importers:
         specifier: workspace:*
         version: link:../api
       '@testing-library/react':
-        specifier: ^16.1.0
+        specifier: 'catalog:'
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/react':
         specifier: ^18.3.18
@@ -131,22 +194,19 @@ importers:
         specifier: ^18.3.5
         version: 18.3.7(@types/react@18.3.28)
       '@vitejs/plugin-react':
-        specifier: ^4.3.4
+        specifier: 'catalog:'
         version: 4.7.0(vite@6.4.2(@types/node@22.19.17)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4))
       happy-dom:
-        specifier: ^15.11.7
+        specifier: 'catalog:'
         version: 15.11.7
-      msw:
-        specifier: ^2.7.0
-        version: 2.14.2(@types/node@22.19.17)(typescript@5.9.3)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
         specifier: ^6.0.7
         version: 6.4.2(@types/node@22.19.17)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4)
       vitest:
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
 
   packages/ai:
@@ -161,17 +221,17 @@ importers:
         specifier: ^4.0.30
         version: 4.3.19(react@18.3.1)(zod@3.25.76)
       zod:
-        specifier: ^3.24.1
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^22.10.5
+        specifier: 'catalog:'
         version: 22.19.17
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
 
   packages/db:
@@ -179,62 +239,132 @@ importers:
       '@dm-forge/shared':
         specifier: workspace:*
         version: link:../shared
-      '@paralleldrive/cuid2':
-        specifier: ^2.2.2
-        version: 2.3.1
       '@prisma/client':
-        specifier: ^6.1.0
+        specifier: 'catalog:'
         version: 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
       zod:
-        specifier: ^3.24.1
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
-      '@testcontainers/postgresql':
-        specifier: ^10.13.2
-        version: 10.28.0
       prisma:
-        specifier: ^6.1.0
+        specifier: 'catalog:'
         version: 6.19.3(magicast@0.3.5)(typescript@5.9.3)
-      testcontainers:
-        specifier: ^10.13.2
-        version: 10.28.0
       tsx:
-        specifier: ^4.19.2
+        specifier: 'catalog:'
         version: 4.21.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
       zod-prisma-types:
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.3.11(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@3.25.76)
 
   packages/shared:
     dependencies:
+      '@paralleldrive/cuid2':
+        specifier: ^2.2.2
+        version: 2.3.1
       dotenv:
-        specifier: ^16.4.7
+        specifier: 'catalog:'
         version: 16.6.1
       dotenv-expand:
-        specifier: ^12.0.1
+        specifier: 'catalog:'
         version: 12.0.3
       zod:
-        specifier: ^3.24.1
+        specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
 
   packages/srd:
     devDependencies:
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.9.3
+
+  tests:
+    dependencies:
+      '@dm-forge/ai':
+        specifier: workspace:*
+        version: link:../packages/ai
+      '@dm-forge/api':
+        specifier: workspace:*
+        version: link:../apps/api
+      '@dm-forge/db':
+        specifier: workspace:*
+        version: link:../packages/db
+      '@dm-forge/shared':
+        specifier: workspace:*
+        version: link:../packages/shared
+      '@dm-forge/web':
+        specifier: workspace:*
+        version: link:../apps/web
+    devDependencies:
+      '@faker-js/faker':
+        specifier: 'catalog:'
+        version: 9.9.0
+      '@prisma/client':
+        specifier: 'catalog:'
+        version: 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+      '@tanstack/react-query':
+        specifier: ^5.62.11
+        version: 5.100.8(react@18.3.1)
+      '@tanstack/react-router':
+        specifier: ^1.95.1
+        version: 1.169.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@testcontainers/postgresql':
+        specifier: 'catalog:'
+        version: 10.28.0
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@trpc/client':
+        specifier: 'catalog:'
+        version: 11.17.0(@trpc/server@11.17.0(typescript@5.9.3))(typescript@5.9.3)
+      '@trpc/server':
+        specifier: 'catalog:'
+        version: 11.17.0(typescript@5.9.3)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.19.17
+      '@types/react':
+        specifier: ^18.3.18
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: ^18.3.5
+        version: 18.3.7(@types/react@18.3.28)
+      '@vitejs/plugin-react':
+        specifier: 'catalog:'
+        version: 4.7.0(vite@6.4.2(@types/node@22.19.17)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4))
+      happy-dom:
+        specifier: 'catalog:'
+        version: 15.11.7
+      msw:
+        specifier: 'catalog:'
+        version: 2.14.2(@types/node@22.19.17)(typescript@5.9.3)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      testcontainers:
+        specifier: 'catalog:'
+        version: 10.28.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@22.19.17)(happy-dom@15.11.7)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
 
 packages:
 
@@ -809,6 +939,10 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@faker-js/faker@9.9.0':
+    resolution: {integrity: sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==}
+    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
   '@fastify/busboy@2.1.1':
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
@@ -3062,6 +3196,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.7':
     optional: true
+
+  '@faker-js/faker@9.9.0': {}
 
   '@fastify/busboy@2.1.1': {}
 
