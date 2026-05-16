@@ -1,4 +1,4 @@
-import { router } from '../trpc.js'
+import { router } from '../init.js'
 import { authRouter } from './auth.js'
 import { bootstrapRouter } from './bootstrap.js'
 

@@ -1,10 +1,10 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { auth } from './auth.js'
-import { createContext } from './context.js'
-import { getEnv } from './env.js'
-import { appRouter } from './routers/index.js'
+import { auth } from '../auth/better-auth.js'
+import { getEnv } from '../env.js'
+import { createContext } from '../trpc/context.js'
+import { appRouter } from '../trpc/routers/index.js'
 
 export function createApp() {
   const env = getEnv()

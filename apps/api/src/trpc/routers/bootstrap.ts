@@ -1,4 +1,4 @@
-import { publicProcedure, router } from '../trpc.js'
+import { publicProcedure, router } from '../init.js'
 
 export const bootstrapRouter = router({
   // Simple healthcheck — reserved for the real monolithic bootstrap

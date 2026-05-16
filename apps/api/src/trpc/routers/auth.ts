@@ -1,4 +1,4 @@
-import { protectedProcedure, publicProcedure, router } from '../trpc.js'
+import { protectedProcedure, publicProcedure, router } from '../init.js'
 
 export const authRouter = router({
   // Returns the current session user or null. Used by apps/web at boot.

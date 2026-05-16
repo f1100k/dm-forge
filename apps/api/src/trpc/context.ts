@@ -1,4 +1,4 @@
-import { auth } from './auth.js'
+import { auth } from '../auth/better-auth.js'
 
 export type Context = {
   session: Awaited<ReturnType<typeof auth.api.getSession>>

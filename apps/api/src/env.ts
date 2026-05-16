@@ -1,5 +1,11 @@
 import { parseEnv } from '@dm-forge/shared'
+import { loadEnv } from '@dm-forge/shared/node'
 import { z } from 'zod'
+
+// Side-effect: read `.env` (with ${...} expansion) into process.env BEFORE the
+// schema parses anything. `loadEnv` is idempotent and never overwrites values
+// already present in process.env (12-factor — system env wins).
+loadEnv()
 
 // Environment variables required by apps/api. Validated at server boot.
 // See docs/resilience-observability.md for logging and secrets guidance.

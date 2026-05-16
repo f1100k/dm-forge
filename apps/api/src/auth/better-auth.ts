@@ -1,7 +1,8 @@
-import { createId, prisma } from '@dm-forge/db'
+import { prisma } from '@dm-forge/db'
+import { createId } from '@dm-forge/shared'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
-import { getEnv } from './env.js'
+import { getEnv } from '../env.js'
 
 const env = getEnv()
 
