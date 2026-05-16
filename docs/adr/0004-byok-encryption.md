@@ -11,7 +11,7 @@ Users supply their own LLM provider keys (`docs/architecture-overview.md` → BY
 
 ## Decision
 
-- **AES-256-GCM** is the only allowed cipher for BYOK keys. Implementation lives in `packages/ai/src/encryption.ts`. No alternative cipher; no roll-your-own.
+- **AES-256-GCM** is the only allowed cipher for BYOK keys. Implementation lives in `packages/ai/src/crypto/encryption.ts`. No alternative cipher; no roll-your-own.
 - **Master key** is a 32-byte (256-bit) value loaded from `ENCRYPTION_KEY` (base64-encoded). Generated via `openssl rand -base64 32`.
 - **IV (nonce)** is 12 bytes, randomly generated per encryption. Stored alongside the ciphertext in the `AiConnection.iv` column.
 - **Authentication tag** (16 bytes, GCM default) is stored in `AiConnection.authTag`. Tampering fails decryption.

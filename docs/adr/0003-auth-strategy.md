@@ -11,7 +11,7 @@ dm-forge needs authenticated sessions for `/trpc/*` and to gate row-level access
 
 ## Decision
 
-- **Better Auth** is the auth library. Configured in `apps/api/src/auth.ts`.
+- **Better Auth** is the auth library. Configured in `apps/api/src/auth/better-auth.ts`.
 - **Email + password** is the only sign-in method on day one. `autoSignIn: true` after registration. `minPasswordLength: 8`.
 - **Session cookies**, not JWTs. Cookies travel cross-origin between `apps/web` and `apps/api` via `credentials: 'include'`.
 - **Better Auth uses our cuid2 generator** (`advanced.database.generateId`) so user IDs satisfy the client-ID rule from the inside.
@@ -20,7 +20,7 @@ dm-forge needs authenticated sessions for `/trpc/*` and to gate row-level access
 
 ## Consequences
 
-- **Positive:** sessions just work for tRPC + Better Auth; one Prisma migrator covers auth and domain tables; switching ID strategy or adding OAuth is contained to `auth.ts`.
+- **Positive:** sessions just work for tRPC + Better Auth; one Prisma migrator covers auth and domain tables; switching ID strategy or adding OAuth is contained to `apps/api/src/auth/`.
 - **Negative:** Better Auth's contract (table names, columns) leaks into our Prisma schema — schema renames require checking the Better Auth config.
 - **Neutral:** authorization is row-level and lives in tRPC procedures, not in Better Auth. Better Auth resolves *who*; the procedures resolve *what they can touch*.
 

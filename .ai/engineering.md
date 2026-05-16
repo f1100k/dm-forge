@@ -34,9 +34,10 @@ dm-forge/
 │   └── api/         # Hono + tRPC backend
 ├── packages/
 │   ├── db/          # Prisma schema, client, migrations, seed
-│   ├── shared/      # Zod schemas, types, constants
+│   ├── shared/      # Zod schemas, types, constants, env loader
 │   ├── ai/          # AI SDK setup, prompt builders, BYOK
 │   └── srd/         # Versioned SRDs (dnd5e, pf2e, ...)
+├── tests/           # @dm-forge/tests — the entire integration suite
 ├── docs/            # Detailed rules, ADRs
 └── .ai/             # Constitution, engineering, skills, MCP config
 ```
@@ -48,9 +49,14 @@ apps/web    → packages/shared
 apps/api    → packages/db, packages/shared, packages/ai
 packages/ai → packages/shared, packages/db
 packages/db, packages/srd  (leaves)
+tests/      → every package + app it tests (test-only consumer)
 ```
 
-`apps/web` MUST NOT import from `packages/db` or `packages/ai`. Cross-package types reach the frontend through tRPC, never by direct import. Detailed rationale and exceptions: `docs/modular-principles.md`.
+`apps/web` MUST NOT import from `packages/db` or `packages/ai`. Cross-package types reach the frontend through tRPC, never by direct import. The `tests/` package is the one exception that depends on apps — it is test-only and exists to wire the real implementations together. Detailed rationale and exceptions: `docs/modular-principles.md`.
+
+## Dependency version control — pnpm catalog
+
+Any dependency used in **more than one workspace** is pinned in the `catalog:` block of `pnpm-workspace.yaml` and referenced from each `package.json` as `"catalog:"`. Single-use deps stay local with their explicit version. Adding a new shared dep: pin it in the catalog first, then point every consumer at `"catalog:"`. Bumping a version: edit one line in the catalog and the whole monorepo moves together.
 
 ## Standards
 
@@ -60,7 +66,7 @@ packages/db, packages/srd  (leaves)
 - **Type names**: `PascalCase`, no `I` prefix. Hooks prefixed `use`. Zod schemas suffixed `Schema`.
 - **No default exports** in internal code.
 - **Language**: everything in the codebase in English — identifiers, comments, internal logs, and user-facing strings (error messages returned via tRPC/REST, UI copy).
-- **Tests**: Vitest, organized as a pyramid (unit colocated under `src/`, integration under `tests/integration/` per app/package). `describe`/`it` descriptions in English. **Tests for new behavior ship in the same PR — not optional.** Each PR adds at least unit/integration coverage for the new behavior. No E2E in MVP. Full strategy and harnesses in `docs/testing.md`.
+- **Tests**: Vitest, organized as a pyramid. Unit tests are colocated under `src/`. Integration tests live in the single `@dm-forge/tests` workspace package (`tests/integration/<area>/`, mirroring `apps/<area>/src/`), with helpers in `tests/helpers/`. `describe`/`it` descriptions in English. **Tests for new behavior ship in the same PR — not optional.** Each PR adds at least unit/integration coverage for the new behavior. No E2E in MVP. Full strategy and harnesses in `docs/testing.md`.
 - **Lint/format**: Biome. CI gates on `pnpm lint` and `pnpm typecheck`.
 - **Commits**: [Conventional Commits](https://www.conventionalcommits.org/). Format: `type(scope): description`.
   - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
@@ -87,8 +93,9 @@ pnpm dev --filter=web|api
 pnpm typecheck
 pnpm lint
 pnpm format                    # Biome --write
-pnpm test
-pnpm test --filter=api
+pnpm test                      # unit tests (fast, no Docker)
+pnpm test:integration          # @dm-forge/tests (needs Docker)
+pnpm --filter @dm-forge/api test
 pnpm db:migrate dev --name <name>
 pnpm db:studio
 pnpm db:seed

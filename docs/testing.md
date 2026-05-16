@@ -14,7 +14,7 @@ Read together with `engineering.md` (Standards → Tests).
         ┌──────────────────┐
         │  E2E (deferred)  │   ← post-MVP only; see engineering.md
         ├──────────────────┤
-        │  Integration     │   ← per app/package, real DB, mocked externals
+        │  Integration     │   ← one suite, real DB, mocked externals
         ├──────────────────┤
         │  Unit (broad)    │   ← colocated, pure, fast — the wide base
         └──────────────────┘
@@ -25,104 +25,144 @@ Read together with `engineering.md` (Standards → Tests).
   network. No Docker. Aim for fast feedback (< 5 s for the whole `unit:*`
   project). Unit tests must outnumber integration tests by ~3–5× per
   feature — see `docs/test-practices.md` for the rationale.
-- **Integration** verifies that the modules in one app or package work
-  together against real internal infrastructure (Postgres via
-  Testcontainers, real Prisma, real Hono, real tRPC, real React tree),
-  with **only the external boundaries mocked**: LLM provider
-  (`@dm-forge/ai`), OAuth providers, and any third-party HTTP.
+- **Integration** verifies that modules work together against real
+  internal infrastructure (Postgres via Testcontainers, real Prisma,
+  real Hono, real tRPC, real React tree), with **only the external
+  boundaries mocked**: LLM provider (`@dm-forge/ai`), OAuth providers,
+  and any third-party HTTP. Every integration test lives in the
+  **single `@dm-forge/tests` package** — never colocated with the app
+  it tests (see "Why one package" below).
 - **E2E** is intentionally not set up — `engineering.md` defers it until
   after MVP. When it is added, it will live in a separate package
   (`apps/e2e/`) and be wired through a deployed sandbox.
 
-## File and project layout
+## Layout
+
+```
+tests/                            ← @dm-forge/tests workspace package
+├── package.json                  ← owns vitest + every test-only dep
+├── vitest.config.ts              ← single config; two projects
+├── tsconfig.json
+├── helpers/                      ← small primitives, not abstractions
+│   ├── setup/                    ← vitest globalSetup + setupFiles
+│   │   ├── global-setup.ts       ← boots Postgres, exports DATABASE_URL
+│   │   ├── setup-backend.ts      ← truncate beforeEach + vi.mock LLM
+│   │   └── setup-web.ts          ← MSW lifecycle
+│   ├── harness/                  ← test infrastructure primitives
+│   │   ├── postgres.ts           ← Testcontainers boot + migrate deploy
+│   │   ├── truncate.ts           ← auto-discover tables via information_schema
+│   │   ├── app.ts                ← re-exports createApp from @dm-forge/api
+│   │   ├── trpc.ts               ← createTestCaller({ session? })
+│   │   ├── auth.ts               ← loginAndGetCookie(), signIn()
+│   │   ├── msw-server.ts         ← default MSW handlers
+│   │   └── types.ts              ← shared ApiError / ZodErrorResponse
+│   └── factories/
+│       └── user.ts               ← createUserViaSignup(), createUserRaw()
+└── integration/
+    ├── api/                      ← mirrors apps/api/src/
+    │   ├── server/
+    │   │   └── app.test.ts
+    │   └── trpc/
+    │       └── routers/
+    │           └── auth.test.ts
+    ├── db/                       ← mirrors packages/db/
+    │   └── prisma-schema.test.ts
+    └── web/                      ← mirrors apps/web/
+        └── bootstrap.test.tsx
+```
+
+**Mirror rule.** `integration/api/<feature>/<file>.test.ts` tests
+`apps/api/src/<feature>/<file>.ts`. Same shape under `db/` and `web/`.
+Easy to find the test for any source file.
 
 | Layer | Location | Vitest project |
 |---|---|---|
 | Unit | `<pkg>/src/**/*.test.ts(x)` (colocated) | `unit:<pkg>` |
-| Integration | `<pkg>/tests/integration/**/*.test.ts(x)` | `integration:<pkg>` |
+| Integration (backend) | `tests/integration/{api,db}/**/*.test.ts` | `integration:backend` |
+| Integration (web) | `tests/integration/web/**/*.test.{ts,tsx}` | `integration:web` |
 
-Per-package configs:
+Unit projects are declared in the root `vitest.config.ts`. Integration
+projects live in `tests/vitest.config.ts`. Adding a new package: drop a
+unit project in the root file; integration tests follow the mirror rule
+under `tests/integration/<area>/`.
 
-- `vitest.config.ts` — unit project (the default).
-- `vitest.integration.config.ts` — integration project, only present where
-  it makes sense (`packages/db`, `apps/api`, `apps/web`).
+## Why one package
 
-The root `vitest.config.ts` registers every project so a single command
-runs everything.
+The clone-tabnews pattern, applied here:
+
+- **No scattering.** All integration tests + helpers live next to each
+  other. No hunting through `apps/*/tests/`, `packages/*/tests/`.
+- **One config.** A single `vitest.config.ts` owns the suite. Two
+  projects inside it (`integration:backend` and `integration:web`) so
+  the runner can apply different settings — `pool: 'forks'` +
+  `fileParallelism: false` for the DB-bound files, parallel-safe
+  defaults for the DOM-bound ones.
+- **The package depends on every internal package it tests** via
+  `workspace:*`. Importing `@dm-forge/api/server`, `@dm-forge/api/auth`,
+  `@dm-forge/api/routers`, `@dm-forge/web/routes/...` mirrors how a
+  consumer would.
+- **Helpers are primitives, not abstractions.** Each helper is a one- to
+  three-line wrapper that composes real services. No fixtures, no
+  beforeAll pools, no test base classes. Each test calls the primitives
+  it needs and writes its own state.
 
 ## Commands
 
 ```bash
 pnpm test                  # alias for test:unit (fast, no Docker)
 pnpm test:unit             # all unit:* projects
-pnpm test:integration      # all integration:* projects (needs Docker)
-pnpm test:all              # unit + integration
+pnpm test:integration      # delegates to @dm-forge/tests (needs Docker)
+pnpm test:all              # unit then integration
 pnpm test:coverage         # unit with v8 coverage report
 pnpm test:watch            # unit projects in watch mode
 
-# Filter to one project:
-pnpm vitest run --project=unit:api
-pnpm vitest run --project=integration:web
-
-# From inside a single package:
-pnpm --filter @dm-forge/api test                # that package's unit
-pnpm --filter @dm-forge/api test:integration    # that package's integration
+# Filter the integration suite:
+pnpm --filter @dm-forge/tests test:backend
+pnpm --filter @dm-forge/tests test:web
 ```
 
-## Integration testing — Postgres harness
+## Integration testing — backend pattern
 
-Integration tests in `packages/db` and `apps/api` boot an ephemeral
-Postgres via [Testcontainers](https://node.testcontainers.org/) and apply
-the dm-forge schema with `prisma migrate deploy`. Docker must be running
-on the host.
-
-The harness lives in `@dm-forge/db/testing`:
-
-```ts
-import { startPostgresForTests, truncateAll } from '@dm-forge/db/testing'
-```
-
-It is invoked from each integration project's `globalSetup`
-(`tests/integration/setup/global.ts`) and the URL is exported as
-`DATABASE_URL` so the singleton `prisma` client picks it up. Per-test
-isolation uses `truncateAll(prisma)` in a `beforeEach`.
-
-Cold startup is ~5–10 s (Postgres image pull + container boot + migrate
-deploy). Subsequent runs reuse the cached image.
-
-## Integration testing — apps/api
-
-Pattern: in-process tRPC caller against the real router with a synthetic
-session, real Prisma, mocked LLM.
+One Postgres container per test run, shared by every backend file.
+Files run sequentially (`fileParallelism: false`) inside forked
+processes (`pool: 'forks'`). Each test gets a fresh DB state via
+`beforeEach: truncate every public table` (auto-discovered through
+`information_schema` — new tables added by future migrations are picked
+up with zero maintenance).
 
 ```ts
-import { createTestCaller } from './setup/trpc-caller.js'
+import { createApp } from '../../helpers/harness/app.js'
+import { createTestCaller } from '../../helpers/harness/trpc.js'
+import { createUserViaSignup } from '../../helpers/factories/user.js'
 
+// in-process HTTP — no port binding, no network
+const app = createApp()
+const res = await app.request('/health')
+
+// or call procedures directly with a synthetic session
 const caller = createTestCaller({ session: fakeSession })
-const result = await caller.auth.me()
+
+// or sign up a real user through Better Auth and reuse the cookie
+const user = await createUserViaSignup()
+const res2 = await app.request('/api/auth/get-session', {
+  headers: { cookie: user.cookie },
+})
 ```
 
-The default `vi.mock('@dm-forge/ai', …)` in
-`tests/integration/setup/each-test.ts` throws if any test reaches the
-LLM provider without an explicit override. Override per case with
-`vi.mocked(createOpenRouterClient).mockReturnValue(stub)`.
+The default `vi.mock('@dm-forge/ai', ...)` in `helpers/setup/setup-backend.ts`
+throws if any test reaches the real LLM provider without an explicit
+override.
 
-For tests that need to exercise the Hono HTTP layer (cookies, CORS,
-Better Auth), call `app.fetch(new Request(...))` instead — see
-`src/server.test.ts` for a unit-level example of the same primitive.
+## Integration testing — web pattern
 
-## Integration testing — apps/web
-
-Pattern: real React tree + real TanStack Router + real TanStack Query +
-real tRPC client; the network boundary is mocked with
-[MSW](https://mswjs.io/).
-
-Default handlers live in `tests/integration/setup/msw-server.ts`. Tests
-override per case:
+Real React tree + real TanStack Router + real TanStack Query + real
+tRPC client. The network boundary is mocked with
+[MSW](https://mswjs.io/). Default handlers live in
+`helpers/harness/msw-server.ts`; tests override per case:
 
 ```ts
 import { http, HttpResponse } from 'msw'
-import { server } from './setup/msw-server.js'
+import { server } from '../../helpers/harness/msw-server.js'
 
 server.use(
   http.get('http://localhost:3000/trpc/auth.me', () =>
@@ -139,16 +179,16 @@ test. This forces tests to be explicit about every boundary they touch.
 | Layer | Database | tRPC/Hono | React/Router/Query | LLM (`@dm-forge/ai`) | OAuth (Better Auth providers) | OpenRouter HTTP |
 |---|---|---|---|---|---|---|
 | Unit | (n/a) | (n/a) | (small components) | mock | mock | mock |
-| Integration `db` | **real** | (n/a) | (n/a) | (n/a) | (n/a) | (n/a) |
-| Integration `api` | **real** | **real** | (n/a) | mock | mock | mock |
-| Integration `web` | (n/a) | mock (MSW) | **real** | (n/a) | mock (MSW) | (n/a) |
+| `integration:backend` | **real** | **real** | (n/a) | mock | mock | mock |
+| `integration:web` | (n/a) | mock (MSW) | **real** | (n/a) | mock (MSW) | (n/a) |
 
 ## Conventions
 
 - Test descriptions in English (`describe`/`it`), per `engineering.md`.
 - One assertion theme per `it`. Multiple `expect`s are fine.
-- Integration tests must isolate state (`truncateAll` for DB,
-  `server.resetHandlers` for MSW). Order independence is non-negotiable.
+- Backend integration tests rely on `beforeEach: truncateAll` and must
+  not depend on order. Web tests rely on `server.resetHandlers()` in
+  `afterEach`.
 - Never call out to OpenRouter from any test, paid or otherwise.
 - Coverage thresholds are not enforced yet — read the report for
   signal, not as a gate.
