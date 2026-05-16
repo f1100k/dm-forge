@@ -143,7 +143,7 @@ This guarantees bidirectional traceability: Tech Design → cards and card → T
 
 Before closing:
 - [ ] Each item in section 9 of the Tech Design has exactly 1 card in the Kanban
-- [ ] Each card carries Phase, User Story (or N/A), Parallel info, Depends-on, Acceptance, Tests, References
+- [ ] Each card carries Phase, User Story (mandatory), Parallel info, Depends-on, Acceptance, Tests, References
 - [ ] Each User Story phase has test coverage represented (separate card or inline)
 - [ ] Each card points to the Tech Design and the Spec
 - [ ] The Tech Design was updated with card links grouped by phase
@@ -157,23 +157,27 @@ Report to the user in up to 8 lines:
 - Which cards are parallelizable now (no blocking dependencies) — useful when more than one dev can pick work
 - Next steps: implementation via `spec-implementer`, **one task per invocation**. Suggest starting with the Foundational phase; once Done, P1 user-story cards unlock.
 
-## Card body template (Markdown)
+## Card body template (Notion-native blocks)
 
-````markdown
-## Phase
-Foundational | User Story 1 (P1) | User Story 2 (P2) | User Story 3 (P3) | Polish
+Create the body with native Notion block types (`paragraph`, `bulleted_list_item`) using plain text.
+Do **not** write markdown markers like `##`, `-`, fenced code, or checklist syntax.
 
-## User Story
-[US1: short title from the Spec — link to the Spec section]
-(or `N/A` for Foundational/Polish)
+Structure each card body in this order (as plain text section labels + bullets):
 
-## Parallel
-- Yes — can run alongside: [card name(s)]
-- No — exclusive
+1. `Phase`
+2. `User Story`
+3. `Parallel`
+4. `Depends on`
+5. `Context`
+6. `Scope`
+7. `Acceptance criteria`
+8. `Success criteria touchpoint`
+9. `Tests`
+10. `Constitution complexity (if any)`
+11. `References`
 
 ## Depends on
 - [card name or task ID that must be `Done` first]
-(or `None`)
 
 ## Context
 [1-2 lines: what this task delivers in the context of the feature]
@@ -183,10 +187,14 @@ Foundational | User Story 1 (P1) | User Story 2 (P2) | User Story 3 (P3) | Polis
 - ...
 - ...
 
+## User Story
+Every card must have at least one linked User Story from the Spec in the `User Story` section.
+
 ## Acceptance criteria
 Clip the Given/When/Then scenarios from the Spec User Story that this card directly enables. Add any task-specific criteria.
 - [ ] Given [...], when [...], then [...].
 - [ ] ...
+
 
 ## Success criteria touchpoint
 List the SC IDs from the Spec this card contributes to (no need to fully satisfy — just contribute).
@@ -217,11 +225,15 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 - **Bidirectional traceability.** Card points to Tech Design and Spec. Tech Design points back to the cards (grouped by phase).
 - **Confirmation before bulk creation.** Always show the grouped list and ask for OK.
 - **Verbatim Execution Plan item.** Paste the original item text in the card. Helps detect drift if the Tech Design is edited later.
+- **Notion-native body only.** Use Notion blocks (paragraph/list), never markdown formatting in card content.
+- **User Story is always mandatory.** If mapping is unclear, stop and alert instead of filling placeholder text.
 
 ## Antipatterns
 
 - ❌ **Card without acceptance criteria.** Implementer won't know when to stop.
 - ❌ **Card without tests.** Tests are not optional in this project.
+- ❌ **Card body written in markdown.** Notion content must be native blocks, not markdown syntax.
+- ❌ **Card with `User Story: N/A`.** Every card must map to at least one Spec User Story.
 - ❌ **Card called "polish" or "final adjustments".** Too vague. Split it or attach to a specific phase.
 - ❌ **Card mixing areas (back + front + DB).** Almost always too big.
 - ❌ **Generic cards** ("do backend", "do frontend"). No scope = TODO list, not Kanban.
@@ -235,7 +247,8 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 - [ ] Tech Design and Spec both `Done`
 - [ ] Execution Plan has phase grouping (Foundational / US1..N / Polish) and healthy granularity
 - [ ] List of cards confirmed with the user before creation
-- [ ] Each card carries Phase, US label (or N/A), Parallel info, Depends-on, Acceptance, Success Criteria touchpoint, Tests, Constitution complexity (if any), References
+- [ ] Each card carries Phase, US label (mandatory), Parallel info, Depends-on, Acceptance, Success Criteria touchpoint, Tests, Constitution complexity (if any), References
+- [ ] No card body uses markdown syntax; content is in Notion-native blocks
 - [ ] Each User Story phase has test coverage represented
 - [ ] Tech Design updated with card links grouped by phase
 - [ ] No duplicate cards from previous runs

@@ -1,29 +1,20 @@
 {
   "mcpServers": {
     "notion": {
-      "command": "sh",
-      "args": [
-        "-c",
-        "set -a; . /home/fpestelato/projects/dm-forge/.env; set +a; exec npx -y @notionhq/notion-mcp-server"
-      ]
+      "command": "./scripts/mcp-launch.sh",
+      "args": ["@notionhq/notion-mcp-server"]
     },
     "tldraw": {
       "type": "http",
       "url": "https://tldraw-mcp-app.tldraw.workers.dev/mcp"
     },
     "context7": {
-      "command": "sh",
-      "args": [
-        "-c",
-        "set -a; . /home/fpestelato/projects/dm-forge/.env; set +a; exec npx -y @upstash/context7-mcp"
-      ]
+      "command": "./scripts/mcp-launch.sh",
+      "args": ["@upstash/context7-mcp"]
     },
     "github": {
-      "command": "sh",
-      "args": [
-        "-c",
-        "set -a; . /home/fpestelato/projects/dm-forge/.env; set +a; exec npx -y @modelcontextprotocol/server-github"
-      ]
+      "command": "./scripts/mcp-launch.sh",
+      "args": ["@modelcontextprotocol/server-github"]
     }
   }
 }
