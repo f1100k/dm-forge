@@ -244,6 +244,21 @@ If any item fails, fix it before moving to `Done`.
 - **context7 MCP** — not typical in a Spec (Spec is behavior, not API). Use only if the user asks for a specific library reference to validate feasibility.
 - **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`, ADRs in `docs/adr/`
 
+## MCP Notion quirks (operational note)
+
+The Notion MCP exposed in this project advertises (via its tool schema) only `paragraph` and `bulleted_list_item` block types and `rich_text` without annotations. **The server accepts more than the schema declares** — `heading_2`, `heading_3`, and `rich_text` with `annotations` (`bold`, `italic`, etc.) all pass through and render correctly. Use them.
+
+When building the Spec page via `patch-block-children`, structure blocks like this:
+
+- `heading_2` for top-level section titles (`1. Contexto e Problema`, `2. Goal`, ...).
+- `heading_3` for sub-sections (`Story 1 — ...`, `Edge Cases`, FR sub-groups like `Revisão por IA`).
+- `paragraph` with bold `rich_text` annotations for labels (`Status:`, `Why this priority:`, `Acceptance scenarios:`, `FR-001:`, `SC-002:` ...).
+- `bulleted_list_item` for lists, including acceptance scenarios (`Scenario 1: Given... when... then...`).
+
+Do **not** fall back to ASCII section markers (e.g., `═══ N. SECTION ═══`) — they render as flat paragraphs and break the template's visual hierarchy. If unsure whether a given block type passes the harness validation, append one test block first via `patch-block-children` and inspect the response before sending the full batch.
+
+The same applies to `tech-design-writer` and any other skill that writes Notion content.
+
 ## On error
 
 **If the PRD is not found:**
