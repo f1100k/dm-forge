@@ -39,8 +39,13 @@ A Tech Design answers:
 Before starting:
 
 1. **Spec approved** — search Notion `Docs` for `Doc name` starting with `Spec - [Feature name]`, `Category` containing `Spec`, `Status = Done`. **If not `Done`, stop immediately** and instruct the user to finalize the Spec first.
-2. **Tech Design not duplicated** — search for `Doc name` starting with `Tech Design - [Feature name]`, `Category` containing `Tech Design`. If it exists, ask whether to update the existing one.
-3. **Existing ADRs consulted** — list files under `docs/adr/`. Past decisions constrain what can be proposed.
+2. **Design gates closed** — open the Spec body and check, in order:
+   - The `**UI:**` header is set (not blank). If blank, **stop** and send the user back to `spec-writer` step 2.5 to run the UI detection.
+   - If `UI: yes`, section 3.5 must carry a real `design_url` — neither empty nor still equal to the `[NEEDS DESIGN: link pending]` placeholder. If still pending, **stop** with: `Spec has UI: yes but design_url is empty. Run /design-handoff to attach the canonical link (claude.ai/design) or edit section 3.5 before retrying.`
+   - The Spec must have **zero** open `[NEEDS DESIGN: …]` markers (in section 3.5 or elsewhere). If any remain, **stop** and quote each marker verbatim, then tell the user to close them via `/design-handoff` or by editing the Spec before retrying.
+   - If `UI: no`, skip this check entirely and proceed.
+3. **Tech Design not duplicated** — search for `Doc name` starting with `Tech Design - [Feature name]`, `Category` containing `Tech Design`. If it exists, ask whether to update the existing one.
+4. **Existing ADRs consulted** — list files under `docs/adr/`. Past decisions constrain what can be proposed.
 
 ## Notion contract
 
@@ -66,6 +71,7 @@ Via Notion MCP, read the approved Spec in full. In particular:
 - **Functional + Non-Functional Requirements**
 - **Out of scope** — bounds the Tech Design
 - Any remaining `[NEEDS CLARIFICATION]` markers — must be resolved before proceeding (escalate to user)
+- Any remaining `[NEEDS DESIGN]` markers — the Prerequisites design gate should already have stopped you here; if you reach this point with markers still open, the gate failed — abort and re-check Prerequisites step 2
 
 ### 3. Gather additional technical context
 
@@ -329,6 +335,19 @@ If any item fails, fix it before moving to `Done`.
 **If the Spec has unresolved `[NEEDS CLARIFICATION]`:**
 - Stop and either resolve them via the clarification protocol (with the user) or send the user back to update the Spec
 - Don't paper over with assumptions in the Tech Design
+
+**If the Spec has `UI: yes` and `design_url` is empty or still `[NEEDS DESIGN: link pending]`:**
+- Stop and tell the user to run `/design-handoff` to attach the canonical link (`claude.ai/design`), or to edit section 3.5 of the Spec directly
+- Don't invent a design or proceed without the link
+
+**If the Spec carries open `[NEEDS DESIGN: …]` markers:**
+- Stop and quote every marker verbatim so the user can see exactly what's open
+- Tell the user to close them via `/design-handoff` or by editing the Spec before retrying
+- Don't paper over with assumptions in the Tech Design
+
+**If the Spec's `UI:` header is blank (step 2.5 of `spec-writer` was skipped):**
+- Stop and send the user back to `spec-writer` to set `UI: yes` or `UI: no`
+- Don't guess the verdict — downstream gating depends on this single source of truth
 
 **If the Constitution and the proposed approach conflict:**
 - Apply the pre-design gate (step 5): adjust, justify in section 12, or propose ADR
