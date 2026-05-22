@@ -1,0 +1,29 @@
+name: security
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: semgrep
+    runs-on: ubuntu-latest
+    # Rollout phase: ship with continue-on-error: true so the 3-day false-positive
+    # cleanup window does not block merges. Flip to false after the cleanup
+    # (see docs/devex/branch-protection.md "Rollout phases").
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep CE
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/typescript
+            p/javascript
+            p/owasp-top-ten
+            p/security-audit
