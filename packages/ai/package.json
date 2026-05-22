@@ -16,7 +16,7 @@
   "dependencies": {
     "@dm-forge/shared": "workspace:*",
     "@openrouter/ai-sdk-provider": "^0.7.2",
-    "ai": "^4.0.30",
+    "ai": "^5.0.52",
     "zod": "catalog:"
   },
   "devDependencies": {
