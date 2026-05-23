@@ -50,3 +50,42 @@ jobs:
 
       - name: Run Gitleaks
         run: gitleaks detect --source . --redact --verbose
+
+  deps-audit:
+    name: deps-audit
+    runs-on: ubuntu-latest
+    # Rollout phase: same rationale as semgrep/gitleaks — allow initial
+    # tuning window before enforcing. Flip to false after Day +3
+    # (see docs/devex/branch-protection.md "Rollout phases").
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Check security-exception label
+        id: exception
+        run: |
+          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'security-exception') }}" == "true" ]]; then
+            echo "granted=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::deps-audit bypassed — PR carries the 'security-exception' label. Exception must be justified in the PR description."
+          else
+            echo "granted=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Audit dependencies
+        if: steps.exception.outputs.granted == 'false'
+        run: |
+          if pnpm audit --prod --audit-level high; then
+            exit 0
+          fi
+          echo ""
+          echo "::error::High/Critical vulnerabilities found. Fix: upgrade the affected dependency, or add the 'security-exception' label to this PR (admin only). Exceptions are reviewed in the next monthly security sweep."
+          exit 1
