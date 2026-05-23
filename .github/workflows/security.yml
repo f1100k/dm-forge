@@ -27,3 +27,21 @@ jobs:
             p/javascript
             p/owasp-top-ten
             p/security-audit
+
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    # Rollout phase: same rationale as semgrep — allow 3-day allowlist
+    # tuning window before enforcing. Flip to false after cleanup
+    # (see docs/devex/branch-protection.md "Rollout phases").
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
