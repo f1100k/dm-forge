@@ -28,6 +28,11 @@
     "db:generate": "pnpm --filter @dm-forge/db exec prisma generate",
     "clean": "turbo run clean && rm -rf node_modules"
   },
+  "pnpm": {
+    "overrides": {
+      "kysely": "0.28.17"
+    }
+  },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/node": "catalog:",
