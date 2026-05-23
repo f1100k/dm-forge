@@ -1,5 +1,5 @@
-This file intentionally contains a fake AWS key to test Gitleaks detection.
+This file intentionally contains fake credentials to test Gitleaks detection.
 DO NOT MERGE — delete this branch after verifying the check fails.
 
-AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+GITHUB_TOKEN=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef12
+OPENAI_API_KEY=sk-proj-abc123def456ghi789jkl012mno345pqr678stu901vwx234
