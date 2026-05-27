@@ -55,14 +55,14 @@ These are the only sanctioned ways to merge despite a failing or skipped check.
 - `skip-claude-review` (label on PR): the `claude-review` job exits early with the reason logged. Use when the diff is mechanical (renames, large generated files) and an AI pass would only add noise.
 - `security-exception` (label on PR, admin only): converts the `deps-audit` fail into a warning when the dependency cannot be patched yet. The exception must be justified in the PR description and is reviewed in the next monthly security sweep. See `.github/workflows/security.yml`.
 
-## Rollout phases
+## Rollout status
 
-Branch protection is enabled in two phases, matching the Tech Design's deploy plan:
+Both rollout phases from the Tech Design's deploy plan are complete:
 
-1. **Day 0 — claude-review only.** After F1/F2/F3 + S1.1–S1.3 ship, the `claude-review` check is published but not required. Validate with one example PR to confirm authentication works before requiring anything.
-2. **Day +3 — security suite required.** After S2.1–S2.4 ship and `.github/workflows/security.yml` runs with `continue-on-error: true` for three days (to settle the Gitleaks allowlist), flip `continue-on-error` off and add `semgrep`, `gitleaks`, `deps-audit` to the required-checks list. Branch protection now blocks merge on any of the three.
+1. **Day 0 — claude-review only.** ✅ Shipped with F1/F2/F3 + S1.1–S1.3. The `claude-review` check is published but not required (advisory per Constitution principle 6).
+2. **Day +3 — security suite required.** ✅ Shipped with S2.1–S2.4. `continue-on-error` removed from all three jobs; `semgrep`, `gitleaks`, `deps-audit` are now hard blockers via branch protection.
 
-Rollback during either phase: toggle the rule off in the same UI.
+Rollback: toggle the branch protection rule off in the GitHub UI.
 
 ## Verification
 
