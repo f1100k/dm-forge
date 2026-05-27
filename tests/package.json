@@ -21,8 +21,8 @@
   "devDependencies": {
     "@faker-js/faker": "catalog:",
     "@prisma/client": "catalog:",
-    "@tanstack/react-query": "^5.62.11",
-    "@tanstack/react-router": "^1.95.1",
+    "@tanstack/react-query": "^5.100.14",
+    "@tanstack/react-router": "^1.170.8",
     "@testcontainers/postgresql": "catalog:",
     "@testing-library/react": "catalog:",
     "@trpc/client": "catalog:",
