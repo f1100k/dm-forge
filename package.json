@@ -39,5 +39,8 @@
     "typescript": "catalog:",
     "vitest": "catalog:",
     "zod-prisma-types": "catalog:"
+  },
+  "dependencies": {
+    "node-forge": "0.10.0"
   }
 }
