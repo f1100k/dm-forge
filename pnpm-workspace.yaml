@@ -39,7 +39,7 @@ catalog:
 
   # Test helpers (owned by the new @dm-forge/tests package)
   "@testcontainers/postgresql": ^10.13.2
-  testcontainers: ^10.13.2
+  testcontainers: ^12.0.1
   "@faker-js/faker": ^9.3.0
   msw: ^2.7.0
   happy-dom: ^20.8.9
