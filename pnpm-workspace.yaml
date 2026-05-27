@@ -23,7 +23,7 @@ catalog:
 
   # Database
   prisma: ^6.1.0
-  "@prisma/client": ^6.1.0
+  "@prisma/client": ^7.8.0
 
   # Auth
   better-auth: ^1.1.6
