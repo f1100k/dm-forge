@@ -10,8 +10,8 @@ catalogs:
       specifier: ^9.3.0
       version: 9.9.0
     '@prisma/client':
-      specifier: ^6.1.0
-      version: 6.19.3
+      specifier: ^7.8.0
+      version: 7.8.0
     '@testcontainers/postgresql':
       specifier: ^10.13.2
       version: 10.28.0
@@ -106,7 +106,7 @@ importers:
         version: 3.2.4(@types/node@22.19.17)(happy-dom@20.9.0)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
       zod-prisma-types:
         specifier: 'catalog:'
-        version: 3.3.11(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@4.4.2)
+        version: 3.3.11(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@4.4.2)
 
   apps/api:
     dependencies:
@@ -127,7 +127,7 @@ importers:
         version: 11.17.0(typescript@5.9.3)
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.9(@opentelemetry/api@1.9.0)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@3.2.4(@types/node@22.19.17)(happy-dom@20.9.0)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4))
+        version: 1.6.9(@opentelemetry/api@1.9.0)(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@3.2.4(@types/node@22.19.17)(happy-dom@20.9.0)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4))
       hono:
         specifier: ^4.12.18
         version: 4.12.18
@@ -170,7 +170,7 @@ importers:
         version: 11.17.0(typescript@5.9.3)
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.9(@opentelemetry/api@1.9.0)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@3.2.4(@types/node@22.19.17)(happy-dom@20.9.0)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4))
+        version: 1.6.9(@opentelemetry/api@1.9.0)(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@3.2.4(@types/node@22.19.17)(happy-dom@20.9.0)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4))
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -244,7 +244,7 @@ importers:
         version: link:../shared
       '@prisma/client':
         specifier: 'catalog:'
-        version: 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+        version: 7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -263,7 +263,7 @@ importers:
         version: 3.2.4(@types/node@22.19.17)(happy-dom@20.9.0)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
       zod-prisma-types:
         specifier: 'catalog:'
-        version: 3.3.11(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@3.25.76)
+        version: 3.3.11(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@3.25.76)
 
   packages/shared:
     dependencies:
@@ -316,7 +316,7 @@ importers:
         version: 9.9.0
       '@prisma/client':
         specifier: 'catalog:'
-        version: 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+        version: 7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
       '@tanstack/react-query':
         specifier: ^5.62.11
         version: 5.100.8(react@18.3.1)
@@ -1086,12 +1086,12 @@ packages:
   '@prisma/client-runtime-utils@7.8.0':
     resolution: {integrity: sha512-5NQZztQ0oY/ADFkmd9gPuweH5A1/CCY8YQPorLLO0Mu6a87mY5gsnDkzmFmIHs9NFaLnZojzgddFVN4RpKYrdw==}
 
-  '@prisma/client@6.19.3':
-    resolution: {integrity: sha512-mKq3jQFhjvko5LTJFHGilsuQs+W+T3Gm451NzuTDGQxwCzwXHYnIu2zGkRoW+Exq3Rob7yp2MfzSrdIiZVhrBg==}
-    engines: {node: '>=18.18'}
+  '@prisma/client@7.8.0':
+    resolution: {integrity: sha512-HFp3Dawv/3sU3JtlPha90IB+48lS7zHiH4LKZPjmcE8YH5P9DOXGPvo8dqOtO7MqLDd1p2hOWMcFlRT1DMblHw==}
+    engines: {node: ^20.19 || ^22.12 || >=24.0}
     peerDependencies:
       prisma: '*'
-      typescript: '>=5.1.0'
+      typescript: '>=5.4.0'
     peerDependenciesMeta:
       prisma:
         optional: true
@@ -2974,12 +2974,12 @@ snapshots:
       '@better-auth/core': 1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.0
 
-  '@better-auth/prisma-adapter@1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))':
+  '@better-auth/prisma-adapter@1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))':
     dependencies:
       '@better-auth/core': 1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.0
     optionalDependencies:
-      '@prisma/client': 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client': 7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
       prisma: 6.19.3(magicast@0.3.5)(typescript@5.9.3)
 
   '@better-auth/telemetry@1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)':
@@ -3317,7 +3317,9 @@ snapshots:
 
   '@prisma/client-runtime-utils@7.8.0': {}
 
-  '@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)':
+  '@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)':
+    dependencies:
+      '@prisma/client-runtime-utils': 7.8.0
     optionalDependencies:
       prisma: 6.19.3(magicast@0.3.5)(typescript@5.9.3)
       typescript: 5.9.3
@@ -3839,14 +3841,14 @@ snapshots:
     dependencies:
       tweetnacl: 0.14.5
 
-  better-auth@1.6.9(@opentelemetry/api@1.9.0)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@3.2.4(@types/node@22.19.17)(happy-dom@20.9.0)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)):
+  better-auth@1.6.9(@opentelemetry/api@1.9.0)(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@3.2.4(@types/node@22.19.17)(happy-dom@20.9.0)(jiti@2.6.1)(msw@2.14.2(@types/node@22.19.17)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)):
     dependencies:
       '@better-auth/core': 1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0)
       '@better-auth/drizzle-adapter': 1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)
       '@better-auth/kysely-adapter': 1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(kysely@0.28.17)
       '@better-auth/memory-adapter': 1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)
       '@better-auth/mongo-adapter': 1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)
-      '@better-auth/prisma-adapter': 1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))
+      '@better-auth/prisma-adapter': 1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))
       '@better-auth/telemetry': 1.6.9(@better-auth/core@1.6.9(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
@@ -3859,7 +3861,7 @@ snapshots:
       nanostores: 1.3.0
       zod: 4.4.2
     optionalDependencies:
-      '@prisma/client': 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client': 7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
       prisma: 6.19.3(magicast@0.3.5)(typescript@5.9.3)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -4992,9 +4994,9 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.7.0
 
-  zod-prisma-types@3.3.11(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@3.25.76):
+  zod-prisma-types@3.3.11(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@3.25.76):
     dependencies:
-      '@prisma/client': 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client': 7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
       '@prisma/client-runtime-utils': 7.8.0
       '@prisma/dmmf': 7.8.0
       '@prisma/generator-helper': 7.8.0
@@ -5003,9 +5005,9 @@ snapshots:
       prisma: 6.19.3(magicast@0.3.5)(typescript@5.9.3)
       zod: 3.25.76
 
-  zod-prisma-types@3.3.11(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@4.4.2):
+  zod-prisma-types@3.3.11(@prisma/client@7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(zod@4.4.2):
     dependencies:
-      '@prisma/client': 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client': 7.8.0(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
       '@prisma/client-runtime-utils': 7.8.0
       '@prisma/dmmf': 7.8.0
       '@prisma/generator-helper': 7.8.0
