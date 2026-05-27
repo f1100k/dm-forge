@@ -11,10 +11,6 @@ jobs:
   semgrep:
     name: semgrep
     runs-on: ubuntu-latest
-    # Rollout phase: ship with continue-on-error: true so the 3-day false-positive
-    # cleanup window does not block merges. Flip to false after the cleanup
-    # (see docs/devex/branch-protection.md "Rollout phases").
-    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,10 +27,6 @@ jobs:
   gitleaks:
     name: gitleaks
     runs-on: ubuntu-latest
-    # Rollout phase: same rationale as semgrep — allow 3-day allowlist
-    # tuning window before enforcing. Flip to false after cleanup
-    # (see docs/devex/branch-protection.md "Rollout phases").
-    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,10 +46,6 @@ jobs:
   deps-audit:
     name: deps-audit
     runs-on: ubuntu-latest
-    # Rollout phase: same rationale as semgrep/gitleaks — allow initial
-    # tuning window before enforcing. Flip to false after Day +3
-    # (see docs/devex/branch-protection.md "Rollout phases").
-    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
