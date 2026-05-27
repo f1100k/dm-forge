@@ -23,7 +23,7 @@ catalog:
 
   # Database
   prisma: ^6.1.0
-  "@prisma/client": ^6.1.0
+  "@prisma/client": ^7.8.0
 
   # Auth
   better-auth: ^1.1.6
@@ -39,8 +39,8 @@ catalog:
 
   # Test helpers (owned by the new @dm-forge/tests package)
   "@testcontainers/postgresql": ^10.13.2
-  testcontainers: ^12.0.1
-  "@faker-js/faker": ^9.3.0
+  testcontainers: ^10.13.2
+  "@faker-js/faker": ^10.4.0
   msw: ^2.7.0
   happy-dom: ^20.8.9
   "@testing-library/react": ^16.1.0
