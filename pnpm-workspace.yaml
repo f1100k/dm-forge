@@ -15,7 +15,7 @@ catalog:
   "@types/node": ^22.10.5
   # Plugin used by both apps/web and the root vitest workspace (unit:web /
   # integration:web projects). Catalog the version so they cannot drift.
-  "@vitejs/plugin-react": ^4.3.4
+  "@vitejs/plugin-react": ^5.2.0
 
   # Validation + types
   zod: ^3.24.1
