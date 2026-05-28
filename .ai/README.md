@@ -12,6 +12,7 @@ This folder is the **source of truth** for the technical configuration used by t
 ├── mcp.json                      ← MCP server config (shared via symlink)
 └── skills/
     ├── spec-writer.md            ← full content
+    ├── design-handoff.md         ← full content
     ├── tech-design-writer.md     ← full content
     ├── tasks-writer.md           ← full content
     └── spec-implementer.md       ← full content
@@ -170,6 +171,7 @@ Skills consume the **artifacts** stored in Notion (PRD, Specs, Tech Designs, Kan
 | Skill | When to use |
 |---|---|
 | `spec-writer` | Create a feature Spec (no prerequisite) |
+| `design-handoff` | Run the structured handoff to `claude.ai/design` for a `UI: yes` Spec, after it's `Done` (fills `design_url` in section 3.5) |
 | `tech-design-writer` | Create a Tech Design (requires Spec `Done`) |
 | `tasks-writer` | Break a Tech Design's Execution Plan into Kanban cards (requires Tech Design `Done`) |
 | `spec-implementer` | Implement a single Kanban card end-to-end (one task per invocation) |
