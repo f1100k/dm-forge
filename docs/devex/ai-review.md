@@ -65,6 +65,20 @@ Do **not** tune the prompt for a single bad suggestion. One outlier is noise; re
 
 Avoid prompt changes that encode reviewer style preferences not grounded in the Constitution or `engineering.md` — the prompt's authority comes from anchoring on those documents.
 
+## Latency metric (SC-001 verification)
+
+`scripts/collect-review-latency.mjs` collects review latency for a given month from the GitHub Actions API, outputs CSV to stdout, and prints P50/P95 plus any runs exceeding the 5-minute SLA to stderr.
+
+```bash
+node scripts/collect-review-latency.mjs                  # previous month
+node scripts/collect-review-latency.mjs --month 2026-05  # specific month
+node scripts/collect-review-latency.mjs > may-2026.csv   # redirect to file for spreadsheet import
+```
+
+Runs shorter than 30 seconds are excluded (they indicate a skipped review via `skip-claude-review` label). Latency is measured as `run.created_at` to `run.updated_at`, which approximates `ready_for_review` event to review comment posted (including queue and setup time).
+
+Import the CSV into Google Sheets monthly to build the SC-001 compliance record.
+
 ## References
 
 - Workflow: `.github/workflows/claude-review.yml`.
