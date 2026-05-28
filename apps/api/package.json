@@ -24,7 +24,7 @@
     "@hono/node-server": "^1.13.7",
     "@trpc/server": "catalog:",
     "better-auth": "catalog:",
-    "hono": "^4.12.18",
+    "hono": "^4.12.23",
     "zod": "catalog:"
   },
   "devDependencies": {
