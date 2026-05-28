@@ -1,0 +1,6 @@
+---
+name: design-handoff
+description: Use after a Spec with UI is Done to run the structured handoff to claude.ai/design. Triggers include "run /design-handoff", "do the design step", "attach a design to spec X", "get mockups for the spec". Builds a copy-paste handoff prompt from the Spec's UI user stories, pauses for execution in claude.ai/design, then validates the returned URL and absorbs it into design_url in section 3.5 (or registers [NEEDS DESIGN] markers). Canonical channel only — no fallback.
+---
+
+Strictly follow the instructions in @.ai/skills/design-handoff.md.
