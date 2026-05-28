@@ -70,7 +70,7 @@ Avoid prompt changes that encode reviewer style preferences not grounded in the 
 `scripts/collect-review-latency.mjs` collects review latency for a given month from the GitHub Actions API, outputs CSV to stdout, and prints P50/P95 plus any runs exceeding the 5-minute SLA to stderr.
 
 ```bash
-node scripts/collect-review-latency.mjs                  # previous month
+node scripts/collect-review-latency.mjs                  # current month
 node scripts/collect-review-latency.mjs --month 2026-05  # specific month
 node scripts/collect-review-latency.mjs > may-2026.csv   # redirect to file for spreadsheet import
 ```
