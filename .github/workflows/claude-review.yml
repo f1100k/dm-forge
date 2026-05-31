@@ -18,6 +18,12 @@ permissions:
   pull-requests: write
   id-token: write
 
+env:
+  # Monthly hard-cap for AI review cost (NFR-002, fail-closed). Conservative
+  # guardrail — normal usage (a few cents per PR) stays far below this. Adjust
+  # here; rationale and the override path are documented in docs/devex/ai-review.md.
+  CLAUDE_MONTHLY_BUDGET_USD: '20'
+
 jobs:
   claude-review:
     name: claude-review
@@ -39,8 +45,53 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Claude review
+      - name: Resolve budget month
         if: steps.skip.outputs.skip == 'false'
+        id: month
+        run: echo "month=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+
+      # Ledger persists the running monthly spend across PR runs via the Actions
+      # cache (no protected-branch push — see docs/devex/ai-review.md). The key is
+      # rolling: restore the latest entry for the month by prefix, save a unique
+      # entry per run. Cache entries are immutable, so a fixed monthly key could
+      # never accumulate.
+      - name: Restore cost ledger
+        if: steps.skip.outputs.skip == 'false'
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/claude-cost-ledger.json
+          key: claude-cost-ledger-${{ steps.month.outputs.month }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            claude-cost-ledger-${{ steps.month.outputs.month }}-
+
+      - name: Budget gate
+        if: steps.skip.outputs.skip == 'false'
+        id: budget
+        run: |
+          node scripts/check-review-budget.mjs gate \
+            --budget "$CLAUDE_MONTHLY_BUDGET_USD" \
+            --ledger "$RUNNER_TEMP/claude-cost-ledger.json" \
+            --has-override "${{ contains(github.event.pull_request.labels.*.name, 'claude-cost-high') }}" \
+            --month "${{ steps.month.outputs.month }}"
+
+      - name: Notify budget exceeded
+        if: steps.skip.outputs.skip == 'false' && steps.budget.outputs.should_cancel == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          MONTH_TOTAL: ${{ steps.budget.outputs.month_total }}
+          BUDGET: ${{ steps.budget.outputs.budget }}
+        run: |
+          BODY=$(printf '%s\n\n%s\n\n%s\n' \
+            "⚠️ **Claude review skipped — monthly AI-review budget reached.**" \
+            "This month's estimated AI-review spend (\$$MONTH_TOTAL) has reached the configured budget (\$$BUDGET), so the advisory review was not run (NFR-002, fail-closed)." \
+            "To run it anyway on this PR, add the \`claude-cost-high\` label and re-trigger — comment \`@claude review\` or re-run the workflow. See \`docs/devex/ai-review.md\`.")
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "$BODY"
+          echo "::notice::Claude review cancelled — monthly budget reached (\$$MONTH_TOTAL of \$$BUDGET). Add 'claude-cost-high' to override."
+
+      - name: Claude review
+        if: steps.skip.outputs.skip == 'false' && steps.budget.outputs.should_cancel == 'false'
+        id: review
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -106,3 +157,21 @@ jobs:
 
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+
+      # Add this run's cost to the month's ledger even if the review step failed
+      # (the cost is incurred regardless). Missing execution_file -> records 0.
+      - name: Record review cost
+        if: ${{ !cancelled() && steps.skip.outputs.skip == 'false' && steps.budget.outputs.should_cancel == 'false' }}
+        run: |
+          node scripts/check-review-budget.mjs record \
+            --budget "$CLAUDE_MONTHLY_BUDGET_USD" \
+            --ledger "$RUNNER_TEMP/claude-cost-ledger.json" \
+            --execution-file "${{ steps.review.outputs.execution_file }}" \
+            --month "${{ steps.month.outputs.month }}"
+
+      - name: Save cost ledger
+        if: ${{ !cancelled() && steps.skip.outputs.skip == 'false' && steps.budget.outputs.should_cancel == 'false' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/claude-cost-ledger.json
+          key: claude-cost-ledger-${{ steps.month.outputs.month }}-${{ github.run_id }}-${{ github.run_attempt }}
