@@ -21,5 +21,5 @@ export function createNoopEmailSender(observe: NoopEmailObserver = logKindOnly):
 }
 
 function logKindOnly(message: EmailMessage): void {
-  console.info(`[email:noop] queued ${message.kind}`)
+  console.info(JSON.stringify({ action: 'email:noop:queued', kind: message.kind }))
 }

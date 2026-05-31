@@ -128,4 +128,19 @@ describe('EmailMessageSchema', () => {
     // Assert
     expect(result.success).toBe(false)
   })
+  it('rejects a non-absolute reset URL', () => {
+    // Arrange
+    const message = {
+      kind: 'password_reset',
+      to: 'gm@example.com',
+      locale: 'en',
+      resetUrl: '/reset-password/abc123',
+    }
+
+    // Act
+    const result = EmailMessageSchema.safeParse(message)
+
+    // Assert
+    expect(result.success).toBe(false)
+  })
 })
