@@ -14,9 +14,36 @@ The custom prompt anchors judgments on the Source of truth hierarchy (Constituti
 
 Order of magnitude per PR (small/medium diffs touching application code): a handful of cents in OAuth-token-equivalent usage against the owner's Claude Pro/Max plan. Cost scales with the size of the diff and the number of `docs/*.md` files the agent decides to load — large refactors that span several detail docs sit at the upper end.
 
-Operational cap per PR: **1 automated review + 1 manual re-request**. Beyond that, the human reviewer drives the conversation. This cap is a convention, not yet enforced by the workflow; a hard cancel-on-budget guard is tracked as Polish item P2 (NFR-002, see `branch-protection.md` references).
+Operational cap per PR: **1 automated review + 1 manual re-request**. Beyond that, the human reviewer drives the conversation. This per-PR cap is a convention; the per-month hard cap below (NFR-002) is enforced by the workflow.
 
-A latency goal of 5 minutes (NFR-001) is in place; the action's run time is visible in the GitHub Actions UI and will feed Polish item P1 (latency metric).
+A latency goal of 5 minutes (NFR-001) is in place; the action's run time is visible in the GitHub Actions UI and is measured by Polish item P1 (latency metric, see below).
+
+## Monthly budget cap (NFR-002)
+
+The workflow enforces a **monthly hard cap** on AI-review spend. It fails closed: once the month's estimated spend reaches the budget, new reviews are cancelled before the action runs (zero cost) until the next month — or until a maintainer overrides a specific PR.
+
+- **Budget.** `CLAUDE_MONTHLY_BUDGET_USD`, an `env` value at the top of `.github/workflows/claude-review.yml` (default **`20`**). It is a conservative guardrail — at a few cents per PR, normal months stay far below it; the cap exists to stop runaway loops (large PRs re-requested repeatedly). Raise or lower it by editing that one line.
+- **How spend is measured.** Each review's cost is the `total_cost_usd` reported in the action's `execution_file` (the claude-code execution log). The *Record review cost* step adds it to a running monthly total.
+- **Gate.** Before invoking the action, the *Budget gate* step compares the month's accumulated spend against the budget. If it has reached the budget and the PR lacks the override label, the workflow posts a guidance comment and stops — no checkout cost beyond the gate, no action invocation.
+- **Override.** Add the **`claude-cost-high`** label to a PR to bypass the cap for that PR, then re-trigger (comment `@claude review` or re-run the workflow). Use it for a PR that genuinely needs the review despite the month being over budget.
+
+### Where the running total lives
+
+The monthly total is a small JSON ledger (`"YYYY-MM"` → cumulative USD) persisted via the **GitHub Actions cache**, not committed to the repo. Pushing a ledger to `master` is not an option — branch protection forbids direct pushes (`docs/devex/branch-protection.md`) — and the cache keeps this guard within the *lazy infrastructure* principle (no new branch, secret, or service).
+
+Two trade-offs come with the cache, both acceptable for an advisory guardrail:
+
+- **Eviction.** GitHub evicts caches after 7 days of inactivity or under the 10 GB repo LRU limit. If the month's ledger is evicted, the total resets to zero and the cap is briefly more permissive than intended. On an active repo the monthly key is touched often enough to survive.
+- **Concurrent runs.** Cache entries are immutable, so the workflow uses a rolling key (restore the latest entry for the month by prefix, save a unique entry per run). Two reviews finishing at once can each restore the same base and overwrite, slightly under-counting. The cap is a guardrail, not billing — small under-counts are tolerated.
+
+### The budget script
+
+`scripts/check-review-budget.mjs` holds the testable logic (gate decision, ledger sum, cost extraction), covered by `scripts/check-review-budget.test.mjs`; the workflow YAML only orchestrates it. Run modes:
+
+```bash
+node scripts/check-review-budget.mjs gate   --budget 20 --ledger <path> --has-override <bool> --month YYYY-MM
+node scripts/check-review-budget.mjs record --budget 20 --ledger <path> --execution-file <path> --month YYYY-MM
+```
 
 ## Skip mechanism
 
@@ -82,10 +109,12 @@ Import the CSV into Google Sheets monthly to build the SC-001 compliance record.
 ## References
 
 - Workflow: `.github/workflows/claude-review.yml`.
+- Budget cap script: `scripts/check-review-budget.mjs` (+ `*.test.mjs`).
 - Branch protection (where `claude-review` sits): `docs/devex/branch-protection.md`.
 - Constitution principle 6 (determinism over sophistication) — justifies the advisory-only stance.
+- Constitution principle 7 (lazy infrastructure) — justifies the cache-backed ledger over new infra.
 - Source of truth hierarchy — `.ai/constitution.md`.
-- Spec NFR-001 (5-min review SLA), NFR-002 (cost fail-closed — soft in MVP, hard-cap in Polish P2).
+- Spec NFR-001 (5-min review SLA), NFR-002 (cost fail-closed — hard-cap shipped in Polish P2).
 - Spec SC-001 (review delivered on covered PRs).
 - Tech Design: *Tech Design - Reforço do fluxo de engenharia (DevEx)* (Notion).
 - Spec: *Spec - Reforço do fluxo de engenharia (DevEx)* (Notion).
