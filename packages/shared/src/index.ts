@@ -16,3 +16,9 @@ export {
   type ConsentType,
   type Locale,
 } from './auth/schemas.js'
+export {
+  TERMS_VERSION,
+  PRIVACY_VERSION,
+  requiresTermsReAcceptance,
+  type AcceptedVersions,
+} from './auth/constants.js'
