@@ -208,7 +208,7 @@ Report to the user in up to 5 lines:
 - **Notion MCP** — read card/Spec/Tech Design, move the card in the Kanban, paste links
 - **GitHub MCP** — create the PR (`create_pull_request`); read files via API if needed; comment on PRs/issues
 - **context7 MCP** — current library/SDK/CLI docs (use when touching external APIs instead of guessing from memory)
-- **tldraw MCP** — only if you need to **read** a diagram referenced in the Tech Design; doesn't create diagrams here
+- **Diagrams** — Tech Design diagrams are Mermaid `mermaid` code blocks; read them inline in Notion. This skill doesn't create diagrams.
 - **Filesystem** — Constitution, engineering, relevant `docs/*.md`, ADRs, code
 - **Bash** — project commands (pnpm, git). Code push goes via `git` + SSH (existing setup).
 

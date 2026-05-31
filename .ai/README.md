@@ -12,6 +12,7 @@ This folder is the **source of truth** for the technical configuration used by t
 ├── mcp.json                      ← MCP server config (shared via symlink)
 └── skills/
     ├── spec-writer.md            ← full content
+    ├── design-handoff.md         ← full content
     ├── tech-design-writer.md     ← full content
     ├── tasks-writer.md           ← full content
     └── spec-implementer.md       ← full content
@@ -170,6 +171,7 @@ Skills consume the **artifacts** stored in Notion (PRD, Specs, Tech Designs, Kan
 | Skill | When to use |
 |---|---|
 | `spec-writer` | Create a feature Spec (no prerequisite) |
+| `design-handoff` | Run the structured handoff to `claude.ai/design` for a `UI: yes` Spec, after it's `Done` (fills `design_url` in section 3.5) |
 | `tech-design-writer` | Create a Tech Design (requires Spec `Done`) |
 | `tasks-writer` | Break a Tech Design's Execution Plan into Kanban cards (requires Tech Design `Done`) |
 | `spec-implementer` | Implement a single Kanban card end-to-end (one task per invocation) |
@@ -195,7 +197,7 @@ Code + PR
 ## Resources available to agents
 
 - **Notion MCP** — read/create pages in `Docs`, move `Kanban` cards, retrieve database schemas
-- **tldraw MCP** — diagrams (flow, architecture, sequence, state)
+- **Mermaid (diagrams-as-code)** — diagrams (flow, architecture, sequence, state) authored as `mermaid` code blocks in the Notion artifact; Notion renders them natively, so no MCP/server is needed (see ADR 0006)
 - **context7 MCP** — current library/framework docs (preferred over web search for SDK/API references)
 - **GitHub MCP** — create/comment on PRs and issues, read files via API. Code push still via `git` + SSH (the MCP does not replace `git push`).
 - **Filesystem** — code, ADRs in `docs/adr/`, Constitution in `.ai/constitution.md`, Engineering rules in `.ai/engineering.md`, detail docs in `docs/*.md`

@@ -60,6 +60,38 @@ Before writing, confirm with the user:
 
 Use the **clarification protocol** below for anything ambiguous.
 
+### 2.5 UI detection
+
+Determine whether the feature has a user-visible surface. This flag (`spec.ui = yes | no`) drives section 3.5 (Design) inclusion and the post-Done design handoff. Run this **before** the clarification protocol — a design surface can itself raise new questions that the clarification loop will then absorb.
+
+**2.5.1 — Token scan.** Scan the feature title and **every** user story collected in step 2. Count hits against two disjoint vocabularies (English + PT-BR equivalents accepted):
+
+- **UI tokens:** `screen`/`tela`, `view`, `form`/`formulário`, `button`/`botão`, `modal`, `drawer`, `flow`/`fluxo`, `wizard`, `dashboard`, `landing`, `onboarding`, `page`/`página`, `listing`/`listagem`, `table`, `dropdown`, `tooltip`, `menu`, `navbar`, `sidebar`, `card`, `toast`.
+- **Backend tokens:** `api`, `endpoint`, `worker`, `cron`, `job`, `migration`, `schema`, `queue`, `webhook receiver`, `batch`, `etl`.
+
+Decision rule:
+
+| `ui_hits` | `backend_hits` | Verdict |
+|---|---|---|
+| 0 | ≥ 1 | `ui = no` |
+| ≥ 2 | any | `ui = yes` |
+| 1 | 0 | `ui = yes` |
+| any other | — | ambiguous → 2.5.2 |
+
+**2.5.2 — Disambiguate (only when ambiguous).** One question, default option B (no):
+
+> Q1: Does this feature expose a user-visible UI surface?
+>
+> | Option | Approach | Implication |
+> |---|---|---|
+> | A | Yes, there is UI | Section 3.5 (Design) is added; step 8.5 recommends `/design-handoff` at the end |
+> | B | No, backend/headless only | Section 3.5 is omitted; step 8.5 is skipped |
+> | Custom | (the user writes it) | (the user describes) |
+
+**2.5.3 — Persist the flag.** Record the verdict at the top of the Spec body as a labeled line (`**UI:** yes` or `**UI:** no`) right next to `Status:` and `Owner:`. This is the single source of truth that downstream skills (`tech-design-writer`, `tasks-writer`, `design-handoff`) read — do not duplicate it into a Notion property.
+
+If `ui = no`, omit section 3.5 from the rendered template and skip step 8.5. If `ui = yes`, continue to step 3 with the flag set.
+
 ### 3. Clarification protocol
 
 When the description has gaps, **don't ask blindly**. Apply this rule:
@@ -93,6 +125,8 @@ Number the questions (Q1, Q2, Q3) so the user can answer "Q1: A; Q2: Custom: ...
 
 After answers, update the Spec and continue. **If the user can't answer or the answer is ambiguous, mark the Spec with `[NEEDS CLARIFICATION: short question]` (max 3 markers total) and proceed — don't loop forever.**
 
+> **Design gaps use a separate marker — `[NEEDS DESIGN: short question, ≤80 chars]` — with its own independent budget of max 3. The two budgets do not share a cap; a Spec can carry up to 3 `[NEEDS CLARIFICATION]` plus 3 `[NEEDS DESIGN]`. `[NEEDS DESIGN]` markers live in section 3.5, not here. See step 2.5 and the template.**
+
 ### 4. Create the page in Notion
 
 Via the Notion MCP, create a page in the `Docs` database with:
@@ -118,8 +152,16 @@ After review and adjustments, set `Status` to `Done`. **Who moves it:** the owne
 Report to the user in up to 5 lines:
 - Link to the created Spec
 - Current status
-- Assumptions made (if any) and `[NEEDS CLARIFICATION]` markers (if any)
+- Assumptions made (if any), `[NEEDS CLARIFICATION]` markers (if any), and `[NEEDS DESIGN]` markers (if any)
 - Next steps: Tech Design via `tech-design-writer`, then Tasks via `tasks-writer`, then implementation via `spec-implementer`
+
+### 8.5 Recommend design handoff
+
+If `spec.ui = yes`, append a **Design handoff** line to the next-steps list **before** the `tech-design-writer` line:
+
+> **Design handoff:** run `/design-handoff` to attach a `design_url` (canonical channel: `claude.ai/design`) or register `[NEEDS DESIGN: …]` markers in section 3.5. `tech-design-writer` will abort if `UI: yes` and `design_url` is still empty.
+
+If `spec.ui = no`, skip this step entirely.
 
 ## Spec template (fill in on creation)
 
@@ -127,6 +169,7 @@ Report to the user in up to 5 lines:
 # Spec - [Feature name]
 
 **Status:** Not started | In progress | In review | Done
+**UI:** yes | no
 **Owner:** [your name]
 **Reviewers:** [names]
 **Last updated:** [YYYY-MM-DD]
@@ -157,6 +200,23 @@ Prioritized as user journeys. **Each story must be INDEPENDENTLY TESTABLE** — 
 ### Edge Cases
 - [Edge case 1 — what happens when X is empty / Y times out / Z conflicts]
 - [Edge case 2 — ...]
+
+## 3.5 Design
+> Render this section only when `UI: yes`. Omit it entirely when `UI: no`.
+
+**Canonical channel:** claude.ai/design (no fallback)
+**design_url:** [NEEDS DESIGN: link pending]
+
+### Scope
+- Platforms (web, mobile, ...)
+- Flows / screens
+- States (empty, loading, error, success)
+
+### Known gaps
+- Pending decisions or open questions about the design.
+
+### Active markers
+- `[NEEDS DESIGN: short question, ≤80 chars]` (max 3 — independent count from `[NEEDS CLARIFICATION]`)
 
 ## 4. Functional Requirements
 Numbered, testable, format `System MUST [capability]`. Mark uncertainty with `[NEEDS CLARIFICATION: question]` (max 3).
@@ -194,7 +254,7 @@ Links to: PRD, related research, ADRs, mockups.
 
 ## Diagrams
 
-A Spec usually does not need diagrams — textual scenarios (section 3) are enough. If the feature has non-obvious flows and the user asks, use the **tldraw MCP** and paste the link in section 3 or 10.
+A Spec usually does not need diagrams — textual scenarios (section 3) are enough. If the feature has non-obvious flows and the user asks, author a **Mermaid** (`mermaid`) code block inline in section 3 or 10 (rendered natively in Notion; see ADR 0006).
 
 ## Best practices
 
@@ -204,6 +264,8 @@ A Spec usually does not need diagrams — textual scenarios (section 3) are enou
 - **Acceptance Scenarios in Given/When/Then.** Forces concrete preconditions and outcomes; vague ones don't survive the format.
 - **Write "Out of Scope" early.** Prevents misunderstandings. "Does this fit?" → into that section.
 - **Limit clarifications.** Max 3 NEEDS CLARIFICATION markers in the Spec; max 3 questions per round to the user. Use defaults otherwise.
+- **UI detection is deterministic.** Run step 2.5 before clarifications. Only ask the user when the token scan is ambiguous; never skip the scan to save a round-trip.
+- **Design markers are separate from clarifications.** `[NEEDS DESIGN]` has its own budget of 3, independent of `[NEEDS CLARIFICATION]`. Don't merge or trade them.
 - **Specs live.** If something changes during implementation, update the Spec **first**, then the code.
 - **One Spec, one cohesive feature.** Past 5 pages? Split.
 
@@ -215,6 +277,9 @@ A Spec usually does not need diagrams — textual scenarios (section 3) are enou
 - ❌ **Acceptance "the system works"** — not verifiable. Use Given/When/Then.
 - ❌ **Success Criteria with tech metrics** — "200ms response" belongs to Tech Design. Use user-facing metrics.
 - ❌ **More than 3 NEEDS CLARIFICATION markers** — you're asking too much. Use defaults.
+- ❌ **More than 3 NEEDS DESIGN markers** — same rule, separate budget.
+- ❌ **Section 3.5 written but `UI: no`** — drop the section. It only exists for UI-bearing features.
+- ❌ **Skipping step 2.5** — leaving `UI` blank breaks downstream gating in `tech-design-writer` and `design-handoff`.
 - ❌ **Giant Spec** — past 5 pages? Split it.
 - ❌ **Spec written after the code** — defeats the purpose.
 
@@ -231,6 +296,9 @@ Walk through this before moving `Status` to `Done`:
 - [ ] Dependencies and Risks mapped
 - [ ] Assumptions explicit (not silent guesses)
 - [ ] No more than 3 `[NEEDS CLARIFICATION]` markers remain (zero is the goal)
+- [ ] `UI:` header is set to `yes` or `no` (step 2.5 ran; never left blank)
+- [ ] If `UI: yes`, section 3.5 (Design) is present — at minimum the `design_url` placeholder; if `UI: no`, section 3.5 is absent
+- [ ] No more than 3 `[NEEDS DESIGN]` markers remain (budget is independent of `[NEEDS CLARIFICATION]`)
 - [ ] Reviewed by at least 1 person from each relevant area (PM, Eng, Design)
 - [ ] Does not contradict the Constitution (`.ai/constitution.md`)
 - [ ] Does not assume a stack or structure different from the canonical one (`.ai/engineering.md`)
@@ -240,9 +308,24 @@ If any item fails, fix it before moving to `Done`.
 ## Available resources
 
 - **Notion MCP** — search PRD and existing Specs; create the Spec in `Docs`; move status
-- **tldraw MCP** — occasional diagrams, when useful (rare in a Spec)
+- **Mermaid (diagrams-as-code)** — occasional `mermaid` code-block diagrams, when useful (rare in a Spec)
 - **context7 MCP** — not typical in a Spec (Spec is behavior, not API). Use only if the user asks for a specific library reference to validate feasibility.
 - **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`, ADRs in `docs/adr/`
+
+## MCP Notion quirks (operational note)
+
+The Notion MCP exposed in this project advertises (via its tool schema) only `paragraph` and `bulleted_list_item` block types and `rich_text` without annotations. **The server accepts more than the schema declares** — `heading_2`, `heading_3`, and `rich_text` with `annotations` (`bold`, `italic`, etc.) all pass through and render correctly. Use them.
+
+When building the Spec page via `patch-block-children`, structure blocks like this:
+
+- `heading_2` for top-level section titles (`1. Contexto e Problema`, `2. Goal`, ...).
+- `heading_3` for sub-sections (`Story 1 — ...`, `Edge Cases`, FR sub-groups like `Revisão por IA`).
+- `paragraph` with bold `rich_text` annotations for labels (`Status:`, `Why this priority:`, `Acceptance scenarios:`, `FR-001:`, `SC-002:` ...).
+- `bulleted_list_item` for lists, including acceptance scenarios (`Scenario 1: Given... when... then...`).
+
+Do **not** fall back to ASCII section markers (e.g., `═══ N. SECTION ═══`) — they render as flat paragraphs and break the template's visual hierarchy. If unsure whether a given block type passes the harness validation, append one test block first via `patch-block-children` and inspect the response before sending the full batch.
+
+The same applies to `tech-design-writer` and any other skill that writes Notion content.
 
 ## On error
 
@@ -260,6 +343,13 @@ If any item fails, fix it before moving to `Done`.
 **If the user can't answer a clarification question:**
 - Don't loop. Mark the Spec with `[NEEDS CLARIFICATION: short question]` (max 3 total) and continue.
 - Flag in the handoff so the Tech Design phase can resolve it.
+
+**If `UI: yes` and the author has no design artifact yet:**
+- Don't block the Spec. Leave `design_url: [NEEDS DESIGN: link pending]` in section 3.5 and let the author add `[NEEDS DESIGN: short question]` markers (max 3, independent budget) under "Active markers".
+- Surface the open markers in step 8's handoff so `/design-handoff` (step 8.5) can close them before `tech-design-writer` runs.
+
+**If step 2.5 is ambiguous and the user can't decide UI: yes vs no:**
+- Default to `UI: no` (the safer choice — backend Specs flow through unchanged). Record the assumption in section 9 (Assumptions) and flag it in the handoff so a reviewer can override.
 
 **If the contract in `.ai/README.md` diverges from Notion's actual state:**
 - Stop and warn the user

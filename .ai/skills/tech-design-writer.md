@@ -39,8 +39,13 @@ A Tech Design answers:
 Before starting:
 
 1. **Spec approved** — search Notion `Docs` for `Doc name` starting with `Spec - [Feature name]`, `Category` containing `Spec`, `Status = Done`. **If not `Done`, stop immediately** and instruct the user to finalize the Spec first.
-2. **Tech Design not duplicated** — search for `Doc name` starting with `Tech Design - [Feature name]`, `Category` containing `Tech Design`. If it exists, ask whether to update the existing one.
-3. **Existing ADRs consulted** — list files under `docs/adr/`. Past decisions constrain what can be proposed.
+2. **Design gates closed** — open the Spec body and check, in order:
+   - The `**UI:**` header is set (not blank). If blank, **stop** and send the user back to `spec-writer` step 2.5 to run the UI detection.
+   - If `UI: yes`, section 3.5 must carry a real `design_url` — neither empty nor still equal to the `[NEEDS DESIGN: link pending]` placeholder. If still pending, **stop** with: `Spec has UI: yes but design_url is empty. Run /design-handoff to attach the canonical link (claude.ai/design) or edit section 3.5 before retrying.`
+   - The Spec must have **zero** open `[NEEDS DESIGN: …]` markers (in section 3.5 or elsewhere). If any remain, **stop** and quote each marker verbatim, then tell the user to close them via `/design-handoff` or by editing the Spec before retrying.
+   - If `UI: no`, skip this check entirely and proceed.
+3. **Tech Design not duplicated** — search for `Doc name` starting with `Tech Design - [Feature name]`, `Category` containing `Tech Design`. If it exists, ask whether to update the existing one.
+4. **Existing ADRs consulted** — list files under `docs/adr/`. Past decisions constrain what can be proposed.
 
 ## Notion contract
 
@@ -66,6 +71,7 @@ Via Notion MCP, read the approved Spec in full. In particular:
 - **Functional + Non-Functional Requirements**
 - **Out of scope** — bounds the Tech Design
 - Any remaining `[NEEDS CLARIFICATION]` markers — must be resolved before proceeding (escalate to user)
+- Any remaining `[NEEDS DESIGN]` markers — the Prerequisites design gate should already have stopped you here; if you reach this point with markers still open, the gate failed — abort and re-check Prerequisites step 2
 
 ### 3. Gather additional technical context
 
@@ -135,9 +141,9 @@ Use the full template below. Start with **Proposed Architecture** — it orients
 
 ### 8. Diagrams
 
-Use the **tldraw MCP** for diagrams in **Proposed Architecture** (section 3). Suggested types: flowchart, sequence, architecture. Criterion: only when they help.
+Author diagrams as **Mermaid** (`mermaid` code blocks) directly in **Proposed Architecture** (section 3) — Notion renders them natively, so no external tool or MCP is needed. Suggested types: flowchart, sequence, state, architecture (graph). Criterion: only when they help. See ADR 0006.
 
-Paste the links in section 3 of the Tech Design body.
+Embed the `mermaid` code block in section 3 of the Tech Design body (no link to paste).
 
 ### 9. Identify decisions for ADR
 
@@ -204,7 +210,7 @@ Relevant current state: what already exists, which systems will be touched, whic
 
 ## 3. Proposed architecture
 Solution overview. Components involved and how they communicate.
-(Include diagrams via tldraw if they help — flowchart, sequence, architecture.)
+(Include diagrams as Mermaid `mermaid` code blocks if they help — flowchart, sequence, state, architecture.)
 
 ## 4. Data model
 - New tables/collections
@@ -279,7 +285,7 @@ Links to: Spec, related ADRs, external docs, PoCs, loaded `docs/*.md` files.
 - **Trade-offs are mandatory.** Every technical decision has a cost. If you can't list trade-offs, you haven't thought enough.
 - **Mirror the Spec's user-story structure in section 9.** Foundational → P1 → P2 → P3 → Polish. Implementer can ship MVP after P1 alone.
 - **Mark parallelism in section 9.** `[P]` on tasks that touch different files and have no shared mutation. The `tasks-writer` consumes this.
-- **Diagrams are worth a thousand words.** But only when they help. Use **tldraw**.
+- **Diagrams are worth a thousand words.** But only when they help. Author them as **Mermaid** code blocks (rendered natively in Notion).
 - **Stay focused on "how", not "what".** Behavior is Spec — go back and adjust there.
 - **Big decisions become ADRs.** The Tech Design describes the full solution; the ADR records a specific decision that lasts.
 - **Declare Constitution violations openly in section 12.** Hidden violations rot the system. Visible ones with a justification are tracked debt.
@@ -317,7 +323,7 @@ If any item fails, fix it before moving to `Done`.
 ## Available resources
 
 - **Notion MCP** — search Spec, existing Tech Designs; create the Tech Design in `Docs`; move status
-- **tldraw MCP** — architecture, sequence, flowchart diagrams
+- **Mermaid (diagrams-as-code)** — architecture, sequence, flowchart, state diagrams as `mermaid` code blocks in Notion (no MCP needed)
 - **context7 MCP** — current library/SDK/CLI docs when designing approaches that use external APIs
 - **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`, relevant `docs/*.md`, ADRs in `docs/adr/`, code
 
@@ -329,6 +335,19 @@ If any item fails, fix it before moving to `Done`.
 **If the Spec has unresolved `[NEEDS CLARIFICATION]`:**
 - Stop and either resolve them via the clarification protocol (with the user) or send the user back to update the Spec
 - Don't paper over with assumptions in the Tech Design
+
+**If the Spec has `UI: yes` and `design_url` is empty or still `[NEEDS DESIGN: link pending]`:**
+- Stop and tell the user to run `/design-handoff` to attach the canonical link (`claude.ai/design`), or to edit section 3.5 of the Spec directly
+- Don't invent a design or proceed without the link
+
+**If the Spec carries open `[NEEDS DESIGN: …]` markers:**
+- Stop and quote every marker verbatim so the user can see exactly what's open
+- Tell the user to close them via `/design-handoff` or by editing the Spec before retrying
+- Don't paper over with assumptions in the Tech Design
+
+**If the Spec's `UI:` header is blank (step 2.5 of `spec-writer` was skipped):**
+- Stop and send the user back to `spec-writer` to set `UI: yes` or `UI: no`
+- Don't guess the verdict — downstream gating depends on this single source of truth
 
 **If the Constitution and the proposed approach conflict:**
 - Apply the pre-design gate (step 5): adjust, justify in section 12, or propose ADR

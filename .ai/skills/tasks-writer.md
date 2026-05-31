@@ -30,7 +30,12 @@ Before starting:
 
 1. **Tech Design `Done`** — search Notion `Docs` for `Doc name` starting with `Tech Design - [Feature name]`, `Category` containing `Tech Design`, `Status = Done`. **If not `Done`, stop** and instruct the user to finalize it first.
 2. **Spec `Done`** — the related Spec (same feature, prefix `Spec - `) must be `Done`. Card acceptance criteria are pulled from there.
-3. **Tasks not duplicated** — search the `Kanban` for cards already linked to this Tech Design (link in the body). If they exist, ask whether to complement (create only the missing ones) or replace (after archiving the old ones).
+3. **Design gates closed** — open the Spec body and check, in order (mirrors `tech-design-writer`):
+   - The `**UI:**` header is set (not blank). If blank, **stop** and send the user back to `spec-writer` step 2.5 to run the UI detection.
+   - If `UI: yes`, section 3.5 must carry a real `design_url` — neither empty nor still equal to the `[NEEDS DESIGN: link pending]` placeholder. If still pending, **stop** with: `Spec has UI: yes but design_url is empty. Run /design-handoff to attach the canonical link (claude.ai/design) or edit section 3.5 before retrying.`
+   - The Spec must have **zero** open `[NEEDS DESIGN: …]` markers. If any remain, **stop** and quote each marker verbatim, then tell the user to close them via `/design-handoff` or by editing the Spec before retrying.
+   - If `UI: no`, skip this check entirely and proceed.
+4. **Tasks not duplicated** — search the `Kanban` for cards already linked to this Tech Design (link in the body). If they exist, ask whether to complement (create only the missing ones) or replace (after archiving the old ones).
 
 ## Notion contract
 
@@ -257,7 +262,7 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 ## Available resources
 
 - **Notion MCP** — search Spec/Tech Design; verify `Kanban` shape; create cards; update the Tech Design
-- **tldraw MCP** — not used in this skill
+- **Mermaid (diagrams-as-code)** — not used in this skill
 - **context7 MCP** — not used in this skill (no new code here)
 - **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`
 
@@ -268,6 +273,19 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 
 **If the related Spec is not `Done`:**
 - Stop and warn — criteria come from the Spec; it must be stable
+
+**If the Spec has `UI: yes` and `design_url` is empty or still `[NEEDS DESIGN: link pending]`:**
+- Stop and tell the user to run `/design-handoff` to attach the canonical link (`claude.ai/design`), or to edit section 3.5 of the Spec directly
+- Don't create cards over a Spec whose design surface is still undefined
+
+**If the Spec carries open `[NEEDS DESIGN: …]` markers:**
+- Stop and quote every marker verbatim so the user can see exactly what's open
+- Tell the user to close them via `/design-handoff` or by editing the Spec before retrying
+- Don't translate open design gaps into Kanban cards
+
+**If the Spec's `UI:` header is blank (step 2.5 of `spec-writer` was skipped):**
+- Stop and send the user back to `spec-writer` to set `UI: yes` or `UI: no`
+- Don't guess the verdict — downstream gating depends on this single source of truth
 
 **If the Execution Plan is missing, vague, or has wrong granularity / no phases / no `[P]` info:**
 - Point out the specific problem

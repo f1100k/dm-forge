@@ -49,6 +49,15 @@ export default defineConfig({
           globals: true,
         },
       },
+      {
+        // Repo-level Node scripts (CI helpers) with extracted, testable logic.
+        test: {
+          name: 'unit:scripts',
+          root: './scripts',
+          environment: 'node',
+          include: ['**/*.test.mjs'],
+        },
+      },
     ],
     coverage: {
       provider: 'v8',
