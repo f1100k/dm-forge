@@ -22,7 +22,7 @@ A latency goal of 5 minutes (NFR-001) is in place; the action's run time is visi
 
 The workflow enforces a **monthly hard cap** on AI-review spend. It fails closed: once the month's estimated spend reaches the budget, new reviews are cancelled before the action runs (zero cost) until the next month — or until a maintainer overrides a specific PR.
 
-- **Budget.** `CLAUDE_MONTHLY_BUDGET_USD`, an `env` value at the top of `.github/workflows/claude-review.yml` (default **`20`**). It is a conservative guardrail — at a few cents per PR, normal months stay far below it; the cap exists to stop runaway loops (large PRs re-requested repeatedly). Raise or lower it by editing that one line.
+- **Budget.** `CLAUDE_MONTHLY_BUDGET_USD`, an `env` value at the top of `.github/workflows/claude-review.yml` (default **`80`**). It is a conservative guardrail — at a few cents per PR, normal months stay far below it; the cap exists to stop runaway loops (large PRs re-requested repeatedly). Raise or lower it by editing that one line.
 - **How spend is measured.** Each review's cost is the `total_cost_usd` reported in the action's `execution_file` (the claude-code execution log). The *Record review cost* step adds it to a running monthly total.
 - **Gate.** Before invoking the action, the *Budget gate* step compares the month's accumulated spend against the budget. If it has reached the budget and the PR lacks the override label, the workflow posts a guidance comment and stops — no checkout cost beyond the gate, no action invocation.
 - **Override.** Add the **`claude-cost-high`** label to a PR to bypass the cap for that PR, then re-trigger (comment `@claude review` or re-run the workflow). Use it for a PR that genuinely needs the review despite the month being over budget.
@@ -41,8 +41,8 @@ Two trade-offs come with the cache, both acceptable for an advisory guardrail:
 `scripts/check-review-budget.mjs` holds the testable logic (gate decision, ledger sum, cost extraction), covered by `scripts/check-review-budget.test.mjs`; the workflow YAML only orchestrates it. Run modes:
 
 ```bash
-node scripts/check-review-budget.mjs gate   --budget 20 --ledger <path> --has-override <bool> --month YYYY-MM
-node scripts/check-review-budget.mjs record --budget 20 --ledger <path> --execution-file <path> --month YYYY-MM
+node scripts/check-review-budget.mjs gate   --budget 80 --ledger <path> --has-override <bool> --month YYYY-MM
+node scripts/check-review-budget.mjs record --budget 80 --ledger <path> --execution-file <path> --month YYYY-MM
 ```
 
 ## Skip mechanism

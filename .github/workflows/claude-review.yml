@@ -22,7 +22,7 @@ env:
   # Monthly hard-cap for AI review cost (NFR-002, fail-closed). Conservative
   # guardrail — normal usage (a few cents per PR) stays far below this. Adjust
   # here; rationale and the override path are documented in docs/devex/ai-review.md.
-  CLAUDE_MONTHLY_BUDGET_USD: '20'
+  CLAUDE_MONTHLY_BUDGET_USD: '80'
 
 jobs:
   claude-review:
