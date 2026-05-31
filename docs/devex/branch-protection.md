@@ -1,16 +1,30 @@
 # Branch protection
 
-Load this when configuring or auditing the merge gate on `master`. Settings here live in the GitHub UI — not in `git` — so this file is the canonical reference.
+Load this when configuring or auditing the merge gate on `master`. The gate is a **GitHub Repository Ruleset** whose canonical source is versioned at `.github/rulesets/master.json` — edit that file, not the GitHub UI.
 
-## Why this is a document, not a file
+## Source of truth
 
-GitHub branch protection settings (Settings → Branches → Branch protection rules) are stored server-side. The Tech Design accepts this trade-off in section 8 and mitigates it with this doc; future migration to versioned Repository Rulesets (`.github/rulesets/`) is tracked as Polish item P5.
+The merge gate lives in `.github/rulesets/master.json` (Repository Ruleset, GA since 2024). GitHub does **not** auto-apply files under `.github/rulesets/` — the file is the versioned source of truth, and it is pushed to the repo with the `gh api` command below. This doc indexes the file and explains each rule; the JSON is authoritative for the exact values.
+
+> Migrated from UI branch protection to a versioned ruleset in P5 (see "Rollout status"). The legacy Settings → Branches rule is no longer the source of truth.
 
 ## Where to apply
 
-GitHub UI: **Settings → Branches → Branch protection rules → Add rule** (or edit the rule on `master`).
+The ruleset is applied via the REST API from the versioned file — there is no UI step. Requires repo admin.
 
-CLI alternative: `gh api -X PUT repos/f1100k/dm-forge/branches/master/protection` with the equivalent JSON payload — keep it as a fallback; the UI is the documented path until P5 lands.
+First-time create:
+
+```bash
+gh api -X POST repos/f1100k/dm-forge/rulesets --input .github/rulesets/master.json
+```
+
+Update after editing the file (find the id with `gh api repos/f1100k/dm-forge/rulesets`):
+
+```bash
+gh api -X PUT repos/f1100k/dm-forge/rulesets/<id> --input .github/rulesets/master.json
+```
+
+Workflow: change the file → open a PR → re-run the `gh api` command after merge. An automated sync workflow was considered for P5 and **deferred** — it needs an admin PAT stored as a secret, which is unjustified for the current team size; the one-line manual apply is the documented path.
 
 ## Branch name pattern
 
@@ -18,7 +32,7 @@ CLI alternative: `gh api -X PUT repos/f1100k/dm-forge/branches/master/protection
 
 ## Required status checks
 
-Enable **Require status checks to pass before merging** and **Require branches to be up to date before merging**. The check names below match the GitHub Actions job names that publish them.
+The ruleset's `required_status_checks` rule requires these checks to pass before merging, with `strict_required_status_checks_policy: true` (branches must be up to date). The check names below match the GitHub Actions job names that publish them.
 
 | Check | Source workflow | Role | Required? |
 |---|---|---|---|
@@ -32,22 +46,22 @@ Enable **Require status checks to pass before merging** and **Require branches t
 
 ## Pull request reviews
 
-Enable **Require a pull request before merging** with:
+The `pull_request` rule requires a PR before merging, with these parameters (see `master.json`):
 
-- **Required approvals:** 1 (raise to 2 once the team passes three contributors).
-- **Dismiss stale pull request approvals when new commits are pushed:** on.
-- **Require review from Code Owners:** off (no `CODEOWNERS` file yet; revisit when the team grows).
-- **Require approval of the most recent reviewable push:** on.
-- **Require conversation resolution before merging:** on.
+- **`required_approving_review_count`: 1** (raise to 2 once the team passes three contributors).
+- **`dismiss_stale_reviews_on_push`: true** — approvals are dismissed when new commits are pushed.
+- **`require_code_owner_review`: false** (no `CODEOWNERS` file yet; revisit when the team grows).
+- **`require_last_push_approval`: true** — the most recent reviewable push must be approved.
+- **`required_review_thread_resolution`: true** — conversations must be resolved before merging.
 
 ## Other rules
 
-- **Require linear history:** on — keep `master` rebase/merge-only, no merge commits without fast-forward.
-- **Require signed commits:** off for MVP (revisit if the team grows or compliance asks).
-- **Do not allow bypassing the above settings:** on for everyone (including admins). Exceptions go through the labels below, not by toggling protection.
-- **Restrict who can push to matching branches:** off — protection is what enforces merges through PR.
-- **Allow force pushes:** off.
-- **Allow deletions:** off.
+- **`required_linear_history` rule:** present — keep `master` rebase/merge-only, no non-fast-forward merge commits.
+- **`non_fast_forward` rule:** present — force pushes are blocked.
+- **`deletion` rule:** present — branch deletion is blocked.
+- **`bypass_actors`: `[]`** — nobody bypasses the ruleset, including admins. Exceptions go through the labels below, not by relaxing the ruleset.
+- **Signed commits:** not enforced for MVP (no `required_signatures` rule; revisit if the team grows or compliance asks).
+- **Restrict who can push:** not set — the gate enforces merges through PR, not push restrictions.
 
 ## Exceptions
 
@@ -58,12 +72,11 @@ These are the only sanctioned ways to merge despite a failing or skipped check.
 
 ## Rollout status
 
-Both rollout phases from the Tech Design's deploy plan are complete:
-
 1. **Day 0 — claude-review only.** ✅ Shipped with F1/F2/F3 + S1.1–S1.3. The `claude-review` check is published but not required (advisory per Constitution principle 6).
-2. **Day +3 — security suite required.** ✅ Shipped with S2.1–S2.4. `continue-on-error` removed from all three jobs; `semgrep`, `gitleaks`, `deps-audit` are now hard blockers via branch protection.
+2. **Day +3 — security suite required.** ✅ Shipped with S2.1–S2.4. `continue-on-error` removed from all jobs; `semgrep`, `gitleaks`, `deps-audit`, `actions-pinning` publish blocking checks.
+3. **P5 — versioned ruleset.** ✅ The merge gate is the Repository Ruleset in `.github/rulesets/master.json`, applied via `gh api`. This supersedes any legacy UI branch protection rule.
 
-Rollback: toggle the branch protection rule off in the GitHub UI.
+Rollback: set `"enforcement": "disabled"` in `master.json` and re-apply (`gh api -X PUT …`), or delete the ruleset (`gh api -X DELETE repos/f1100k/dm-forge/rulesets/<id>`).
 
 ## Verification
 
@@ -73,9 +86,9 @@ After applying:
 2. Add the `skip-claude-review` label on a no-op PR and confirm `claude-review` exits early without blocking.
 3. Push a commit on an already-approved PR and confirm the approval is dismissed (stale-review rule).
 
-## Future state — Repository Rulesets (P5)
+## Ruleset migration (P5 — done)
 
-Once `.github/rulesets/` reaches feature parity (GitHub Repository Rulesets, available since 2024), migrate this configuration into a versioned JSON ruleset under `.github/rulesets/master.json`. At that point this file becomes a thin index pointing at the ruleset. Tracked as Polish item P5 in the Tech Design.
+P5 migrated the merge gate from UI branch protection to the versioned ruleset at `.github/rulesets/master.json`; this doc is now the index that explains each rule. An automated sync workflow (apply-on-merge via the REST API) was evaluated and **deferred** — it requires an admin PAT stored as a secret, unjustified at the current team size. Until that changes, edit the file and re-run the `gh api` apply (see "Where to apply").
 
 ## References
 
