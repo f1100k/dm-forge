@@ -59,7 +59,7 @@ The `pull_request` rule requires a PR before merging, with these parameters (see
 - **`required_linear_history` rule:** present — keep `master` rebase/merge-only, no non-fast-forward merge commits.
 - **`non_fast_forward` rule:** present — force pushes are blocked.
 - **`deletion` rule:** present — branch deletion is blocked.
-- **`bypass_actors`: `[]`** — nobody bypasses the ruleset, including admins. Exceptions go through the labels below, not by relaxing the ruleset.
+- **`bypass_actors`: Repository Admin role (`bypass_mode: always`)** — admins (currently just the repo owner) can bypass the ruleset, including the PR-approval requirement, so a solo maintainer can merge their own PRs. Trade-off accepted at the current team size; tighten to `pull_request` mode or remove the bypass once a second reviewer is routinely available. Routine exceptions still go through the labels below.
 - **Signed commits:** not enforced for MVP (no `required_signatures` rule; revisit if the team grows or compliance asks).
 - **Restrict who can push:** not set — the gate enforces merges through PR, not push restrictions.
 
