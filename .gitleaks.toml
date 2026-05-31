@@ -1,5 +1,5 @@
 # Gitleaks configuration — allowlist for known false positives.
-# Review monthly (tracked as Polish P3 in the DevEx Kanban).
+# Reviewed monthly — see the accounting runbook in docs/devex/secret-scanning.md.
 
 [extend]
 useDefault = true
