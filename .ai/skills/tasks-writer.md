@@ -262,7 +262,7 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 ## Available resources
 
 - **Notion MCP** — search Spec/Tech Design; verify `Kanban` shape; create cards; update the Tech Design
-- **tldraw MCP** — not used in this skill
+- **Mermaid (diagrams-as-code)** — not used in this skill
 - **context7 MCP** — not used in this skill (no new code here)
 - **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`
 

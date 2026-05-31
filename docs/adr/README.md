@@ -99,6 +99,7 @@ If an ADR conflicts with the current Constitution and doesn't propose a Constitu
 
 (Add ADRs here as they get accepted — newest first.)
 
+- [0006 — Diagrams as code with Mermaid (replacing the tldraw MCP)](0006-diagrams-as-code-mermaid.md) — _proposed_
 - [0005 — Environment configuration and runtime validation](0005-env-and-config.md)
 - [0004 — BYOK encryption with AES-256-GCM](0004-byok-encryption.md)
 - [0003 — Better Auth with email/password as the auth strategy](0003-auth-strategy.md)

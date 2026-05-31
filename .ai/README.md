@@ -197,7 +197,7 @@ Code + PR
 ## Resources available to agents
 
 - **Notion MCP** — read/create pages in `Docs`, move `Kanban` cards, retrieve database schemas
-- **tldraw MCP** — diagrams (flow, architecture, sequence, state)
+- **Mermaid (diagrams-as-code)** — diagrams (flow, architecture, sequence, state) authored as `mermaid` code blocks in the Notion artifact; Notion renders them natively, so no MCP/server is needed (see ADR 0006)
 - **context7 MCP** — current library/framework docs (preferred over web search for SDK/API references)
 - **GitHub MCP** — create/comment on PRs and issues, read files via API. Code push still via `git` + SSH (the MCP does not replace `git push`).
 - **Filesystem** — code, ADRs in `docs/adr/`, Constitution in `.ai/constitution.md`, Engineering rules in `.ai/engineering.md`, detail docs in `docs/*.md`

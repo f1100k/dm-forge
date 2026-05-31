@@ -254,7 +254,7 @@ Links to: PRD, related research, ADRs, mockups.
 
 ## Diagrams
 
-A Spec usually does not need diagrams — textual scenarios (section 3) are enough. If the feature has non-obvious flows and the user asks, use the **tldraw MCP** and paste the link in section 3 or 10.
+A Spec usually does not need diagrams — textual scenarios (section 3) are enough. If the feature has non-obvious flows and the user asks, author a **Mermaid** (`mermaid`) code block inline in section 3 or 10 (rendered natively in Notion; see ADR 0006).
 
 ## Best practices
 
@@ -308,7 +308,7 @@ If any item fails, fix it before moving to `Done`.
 ## Available resources
 
 - **Notion MCP** — search PRD and existing Specs; create the Spec in `Docs`; move status
-- **tldraw MCP** — occasional diagrams, when useful (rare in a Spec)
+- **Mermaid (diagrams-as-code)** — occasional `mermaid` code-block diagrams, when useful (rare in a Spec)
 - **context7 MCP** — not typical in a Spec (Spec is behavior, not API). Use only if the user asks for a specific library reference to validate feasibility.
 - **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`, ADRs in `docs/adr/`
 
