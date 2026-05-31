@@ -141,9 +141,9 @@ Use the full template below. Start with **Proposed Architecture** — it orients
 
 ### 8. Diagrams
 
-Use the **tldraw MCP** for diagrams in **Proposed Architecture** (section 3). Suggested types: flowchart, sequence, architecture. Criterion: only when they help.
+Author diagrams as **Mermaid** (`mermaid` code blocks) directly in **Proposed Architecture** (section 3) — Notion renders them natively, so no external tool or MCP is needed. Suggested types: flowchart, sequence, state, architecture (graph). Criterion: only when they help. See ADR 0006.
 
-Paste the links in section 3 of the Tech Design body.
+Embed the `mermaid` code block in section 3 of the Tech Design body (no link to paste).
 
 ### 9. Identify decisions for ADR
 
@@ -210,7 +210,7 @@ Relevant current state: what already exists, which systems will be touched, whic
 
 ## 3. Proposed architecture
 Solution overview. Components involved and how they communicate.
-(Include diagrams via tldraw if they help — flowchart, sequence, architecture.)
+(Include diagrams as Mermaid `mermaid` code blocks if they help — flowchart, sequence, state, architecture.)
 
 ## 4. Data model
 - New tables/collections
@@ -285,7 +285,7 @@ Links to: Spec, related ADRs, external docs, PoCs, loaded `docs/*.md` files.
 - **Trade-offs are mandatory.** Every technical decision has a cost. If you can't list trade-offs, you haven't thought enough.
 - **Mirror the Spec's user-story structure in section 9.** Foundational → P1 → P2 → P3 → Polish. Implementer can ship MVP after P1 alone.
 - **Mark parallelism in section 9.** `[P]` on tasks that touch different files and have no shared mutation. The `tasks-writer` consumes this.
-- **Diagrams are worth a thousand words.** But only when they help. Use **tldraw**.
+- **Diagrams are worth a thousand words.** But only when they help. Author them as **Mermaid** code blocks (rendered natively in Notion).
 - **Stay focused on "how", not "what".** Behavior is Spec — go back and adjust there.
 - **Big decisions become ADRs.** The Tech Design describes the full solution; the ADR records a specific decision that lasts.
 - **Declare Constitution violations openly in section 12.** Hidden violations rot the system. Visible ones with a justification are tracked debt.
@@ -323,7 +323,7 @@ If any item fails, fix it before moving to `Done`.
 ## Available resources
 
 - **Notion MCP** — search Spec, existing Tech Designs; create the Tech Design in `Docs`; move status
-- **tldraw MCP** — architecture, sequence, flowchart diagrams
+- **Mermaid (diagrams-as-code)** — architecture, sequence, flowchart, state diagrams as `mermaid` code blocks in Notion (no MCP needed)
 - **context7 MCP** — current library/SDK/CLI docs when designing approaches that use external APIs
 - **Filesystem** — `.ai/constitution.md`, `.ai/engineering.md`, relevant `docs/*.md`, ADRs in `docs/adr/`, code
 

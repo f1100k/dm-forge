@@ -24,7 +24,7 @@ A finalized Spec with UI carries a `## 3.5 Design` section seeded by `spec-write
 2. **Pause** so the author runs the prompt in `claude.ai/design` and returns the shareable URL (Step 3).
 3. **Validate** the returned URL against the canonical pattern and **absorb** it into `design_url` in section 3.5 — or record `[NEEDS DESIGN: …]` markers when the author defers (Step 4).
 
-**Canonical channel: `claude.ai/design` only. No fallback** — no Figma, Excalidraw, or tldraw. If the author can't use it now, they register a `[NEEDS DESIGN: …]` marker and proceed; the downstream gate (`tech-design-writer` / `tasks-writer`) collects on it.
+**Canonical channel: `claude.ai/design` only. No fallback** — no Figma, Excalidraw, or similar. If the author can't use it now, they register a `[NEEDS DESIGN: …]` marker and proceed; the downstream gate (`tech-design-writer` / `tasks-writer`) collects on it.
 
 This skill **does not improvise**. It writes only into section 3.5 of the Spec. It does not edit the Spec's behavior, other sections, or any code.
 
@@ -110,7 +110,7 @@ Present the block from Step 2 and these instructions, then **stop and wait** for
 
 > Paste the block above into `https://claude.ai/design` (a new project, or the product's existing design project). When the design is ready, return **only** the shareable URL — it must match `^https://claude\.ai/design/.+`.
 >
-> ⚠ This skill accepts `claude.ai/design` URLs only. No fallback (no Figma, Excalidraw, or tldraw). If you can't use `claude.ai/design` right now, reply with a short reason and I'll register a `[NEEDS DESIGN: <reason>]` marker and proceed — the downstream gate will collect on it.
+> ⚠ This skill accepts `claude.ai/design` URLs only. No fallback (no Figma, Excalidraw, or similar). If you can't use `claude.ai/design` right now, reply with a short reason and I'll register a `[NEEDS DESIGN: <reason>]` marker and proceed — the downstream gate will collect on it.
 
 ### 4. Pass 3 — Validate the URL and absorb it into the Spec
 

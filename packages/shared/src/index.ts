@@ -8,3 +8,11 @@ export {
   type AppError,
 } from './errors/app-error.js'
 export { createId, isCuid } from './ids/ids.js'
+export {
+  ConsentTypeSchema,
+  EmailSchema,
+  LocaleSchema,
+  PasswordSchema,
+  type ConsentType,
+  type Locale,
+} from './auth/schemas.js'
