@@ -26,6 +26,7 @@ Enable **Require status checks to pass before merging** and **Require branches t
 | `semgrep` | `.github/workflows/security.yml` (job `semgrep`) | SAST | Yes |
 | `gitleaks` | `.github/workflows/security.yml` (job `gitleaks`) | Secret scan | Yes |
 | `deps-audit` | `.github/workflows/security.yml` (job `deps-audit`) | Dependency CVE gate (High/Critical) | Yes |
+| `actions-pinning` | `.github/workflows/security.yml` (job `actions-pinning`) | Action SHA-pin gate (supply chain) | Yes |
 
 `claude-review` is intentionally advisory. Constitution principle 6 (determinism over sophistication) reserves blocking behavior for deterministic checks; the probabilistic AI review never gates merge. Human approvals do that.
 
@@ -83,3 +84,4 @@ Once `.github/rulesets/` reaches feature parity (GitHub Repository Rulesets, ava
 - Constitution principle 6 (determinism) — justifies `claude-review` being advisory.
 - Spec NFR-001 (5-min AI review SLA), NFR-002 (cost fail-closed — soft in MVP per §8), NFR-004 (external PRs / forks).
 - Spec SC-001, SC-002, SC-005.
+- Action SHA-pinning policy and bump process: `docs/devex/action-pinning.md`.

@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Run Semgrep CE
-        uses: returntocorp/semgrep-action@v1
+        uses: returntocorp/semgrep-action@713efdd345f3035192eaa63f56867b88e63e4e5d # v1
         with:
           config: >-
             p/typescript
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
@@ -48,13 +48,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@ac6db6d3c1f721f886538a378a2d73e85697340a # v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version-file: '.nvmrc'
 
@@ -77,3 +77,23 @@ jobs:
           echo ""
           echo "::error::High/Critical vulnerabilities found. Fix: upgrade the affected dependency, or add the 'security-exception' label to this PR (admin only). Exceptions are reviewed in the next monthly security sweep."
           exit 1
+
+  actions-pinning:
+    name: actions-pinning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Verify actions are pinned to a commit SHA
+        run: |
+          # Supply-chain hardening: every `uses:` must reference a 40-char commit
+          # SHA, never a mutable tag (@v1, @v2.3). A tag can be silently repointed
+          # by the action author; an immutable SHA cannot. Policy and bump process:
+          # docs/devex/action-pinning.md.
+          if matches=$(grep -rEn 'uses: .+@v[0-9]+' .github/workflows/); then
+            echo "::error::Unpinned GitHub Action reference(s) found — pin to a 40-char commit SHA (keep the '# vX' comment). See docs/devex/action-pinning.md."
+            echo "$matches"
+            exit 1
+          fi
+          echo "All workflow actions are pinned to a commit SHA."
