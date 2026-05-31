@@ -1,28 +1,27 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
   "files": {
-    "ignore": [
-      "**/dist/**",
-      "**/build/**",
-      "**/.turbo/**",
-      "**/node_modules/**",
-      "**/coverage/**",
-      "**/.vite/**",
-      "**/.routeTree.gen.ts",
-      "**/prisma/migrations/**",
-      "**/generated/**",
-      ".claude/settings.local.json",
-      ".claude/**/*.local.json"
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/build",
+      "!**/.turbo",
+      "!**/node_modules",
+      "!**/coverage",
+      "!**/.vite",
+      "!**/.routeTree.gen.ts",
+      "!**/prisma/migrations",
+      "!**/generated",
+      "!**/.claude/settings.local.json",
+      "!**/.claude/**/*.local.json"
     ]
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -57,7 +56,7 @@
   },
   "overrides": [
     {
-      "include": [
+      "includes": [
         "**/vite.config.*",
         "**/vitest.config.*",
         "**/tsup.config.*",
@@ -75,11 +74,21 @@
       }
     },
     {
-      "include": ["apps/web/**"],
+      "includes": ["**/apps/web/**"],
       "linter": {
         "rules": {
           "style": {
             "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/env/*.test.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noTemplateCurlyInString": "off"
           }
         }
       }
