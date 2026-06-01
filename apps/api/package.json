@@ -25,6 +25,7 @@
     "@trpc/server": "catalog:",
     "better-auth": "catalog:",
     "hono": "^4.12.23",
+    "resend": "^6.12.4",
     "zod": "catalog:"
   },
   "devDependencies": {
