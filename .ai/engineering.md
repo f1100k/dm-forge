@@ -80,6 +80,7 @@ Any dependency used in **more than one workspace** is pinned in the `catalog:` b
 
 - **All repo files in English** — constitution, engineering, README, `docs/*.md`, `.ai/skills/*.md`, ADRs, adapters in `.claude/` and `.cursor/`. One language for everything written for devs and agents.
 - **All codebase content in English** — identifiers, code comments, test descriptions, internal logs, and user-facing runtime strings (error messages returned via tRPC/REST, UI copy). The product targets Portuguese-speaking GMs, but UI copy translation is handled separately (i18n layer when introduced); source strings stay English.
+  - **Exception:** transactional email templates (`apps/api/src/email/`) render localized copy (pt-BR/en) inline at the source until the frontend i18n layer lands, per ADR 0007. This is the one place runtime copy is authored in PT-BR in source.
 - **Notion artifacts** (Specs, Tech Designs, Kanban cards) stay in PT-BR — default and confirmed team preference. Codebase language and Notion language are independent.
 
 When in doubt, copy the language of the closest sibling file.

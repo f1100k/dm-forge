@@ -9,7 +9,9 @@ loadEnv()
 
 // Environment variables required by apps/api. Validated at server boot.
 // See docs/resilience-observability.md for logging and secrets guidance.
-const ApiEnvSchema = z
+// Exported so the validation contract (incl. the resend superRefine) is
+// unit-testable without going through process.env / getEnv().
+export const ApiEnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     API_PORT: z.coerce.number().int().positive().default(3000),
