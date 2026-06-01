@@ -113,6 +113,38 @@ describe('EmailMessageSchema', () => {
     expect(result.success).toBe(false)
   })
 
+  it('rejects a javascript: scheme verification URL', () => {
+    // Arrange — z.string().url() alone would accept this WHATWG-valid URL.
+    const message = {
+      kind: 'email_verification',
+      to: 'gm@example.com',
+      locale: 'pt-BR',
+      verificationUrl: 'javascript:alert(1)',
+    }
+
+    // Act
+    const result = EmailMessageSchema.safeParse(message)
+
+    // Assert
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a data: scheme reset URL', () => {
+    // Arrange
+    const message = {
+      kind: 'password_reset',
+      to: 'gm@example.com',
+      locale: 'en',
+      resetUrl: 'data:text/html,<script>alert(1)</script>',
+    }
+
+    // Act
+    const result = EmailMessageSchema.safeParse(message)
+
+    // Assert
+    expect(result.success).toBe(false)
+  })
+
   it('rejects an unsupported locale', () => {
     // Arrange
     const message = {

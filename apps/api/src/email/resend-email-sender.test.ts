@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { EmailMessage } from './email-sender.js'
 import {
+  createResendEmailSender,
   EmailProviderError,
   type ResendEmailClient,
-  createResendEmailSender,
 } from './resend-email-sender.js'
 
 const FROM = 'DM Forge <no-reply@dmforge.app>'
@@ -39,6 +39,12 @@ function recordingClient(): { client: ResendEmailClient; sent: SentPayload[] } {
 
 function erroringClient(error: { name?: string; message?: string }): ResendEmailClient {
   return { emails: { send: () => Promise.resolve({ data: null, error }) } }
+}
+
+// Provider returns neither a delivery id nor an error — must not be treated as
+// a successful send.
+function emptyResultClient(): ResendEmailClient {
+  return { emails: { send: () => Promise.resolve({ data: null, error: null }) } }
 }
 
 function throwingClient(cause: unknown): ResendEmailClient {
@@ -109,6 +115,25 @@ describe('createResendEmailSender', () => {
       // No personal data or secret token leaks into the thrown error (SC-005).
       expect(caught.message).not.toContain('secret-token')
       expect(caught.message).not.toContain(verificationMessage.to)
+    }
+  })
+
+  it('throws when the provider returns neither a delivery id nor an error', async () => {
+    // Arrange
+    const sender = createResendEmailSender({ from: FROM, client: emptyResultClient() })
+
+    // Act
+    let caught: unknown
+    try {
+      await sender.send(verificationMessage)
+    } catch (error) {
+      caught = error
+    }
+
+    // Assert — no silent success: an empty response is a failed send.
+    expect(caught).toBeInstanceOf(EmailProviderError)
+    if (caught instanceof Error) {
+      expect(caught.message).toContain('missing_provider_id')
     }
   })
 
