@@ -64,6 +64,13 @@ export function createResendEmailSender({
       if (result.error) {
         throw new EmailProviderError(result.error.name ?? 'unknown_error')
       }
+      // Resend guarantees exactly one of { data, error } is set, but we own the
+      // interface (not the SDK type), so the contract is not enforced by the
+      // compiler. A { data: null, error: null } response must fail rather than
+      // silently report a send that never happened.
+      if (!result.data?.id) {
+        throw new EmailProviderError('missing_provider_id')
+      }
     },
   }
 }

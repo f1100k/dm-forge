@@ -10,20 +10,31 @@ import { z } from 'zod'
 // Lives in apps/api (not packages/shared): email is sent only server-side from
 // Better Auth hooks; apps/web never constructs an EmailMessage, so
 // docs/modular-principles.md keeps it out of the shared package.
+// Absolute http(s) URL. `z.string().url()` alone accepts any WHATWG-valid
+// scheme (including javascript: and data:); since the URL is rendered into an
+// email href, the scheme is constrained here at the boundary rather than
+// assumed from "Better Auth always emits https".
+const HttpUrlSchema = z
+  .string()
+  .url()
+  .refine((value) => value.startsWith('https://') || value.startsWith('http://'), {
+    message: 'must use the http(s) scheme',
+  })
+
 export const EmailMessageSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('email_verification'),
     to: EmailSchema,
     locale: LocaleSchema,
     // Absolute URL built by Better Auth; carries a single-use token (24h TTL).
-    verificationUrl: z.string().url(),
+    verificationUrl: HttpUrlSchema,
   }),
   z.object({
     kind: z.literal('password_reset'),
     to: EmailSchema,
     locale: LocaleSchema,
     // Absolute URL built by Better Auth; carries a single-use token (1h TTL).
-    resetUrl: z.string().url(),
+    resetUrl: HttpUrlSchema,
   }),
 ])
 
