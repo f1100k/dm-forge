@@ -38,7 +38,7 @@
     "@vitejs/plugin-react": "catalog:",
     "happy-dom": "catalog:",
     "typescript": "catalog:",
-    "vite": "^6.0.7",
+    "vite": "^8.0.16",
     "vitest": "catalog:"
   }
 }
