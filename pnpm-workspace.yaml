@@ -22,7 +22,7 @@ catalog:
   zod-prisma-types: ^3.2.4
 
   # Database
-  prisma: ^6.1.0
+  prisma: ^7.8.0
   "@prisma/client": ^7.8.0
 
   # Auth
