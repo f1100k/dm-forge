@@ -57,7 +57,7 @@ jobs:
       # never accumulate.
       - name: Restore cost ledger
         if: steps.skip.outputs.skip == 'false'
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ runner.temp }}/claude-cost-ledger.json
           key: claude-cost-ledger-${{ steps.month.outputs.month }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -171,7 +171,7 @@ jobs:
 
       - name: Save cost ledger
         if: ${{ !cancelled() && steps.skip.outputs.skip == 'false' && steps.budget.outputs.should_cancel == 'false' }}
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ runner.temp }}/claude-cost-ledger.json
           key: claude-cost-ledger-${{ steps.month.outputs.month }}-${{ github.run_id }}-${{ github.run_attempt }}
