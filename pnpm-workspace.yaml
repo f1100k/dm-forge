@@ -35,7 +35,7 @@ catalog:
 
   # Env loading (used by packages/shared and previously root)
   dotenv: ^17.4.2
-  dotenv-expand: ^12.0.1
+  dotenv-expand: ^13.0.0
 
   # Test helpers (owned by the new @dm-forge/tests package)
   "@testcontainers/postgresql": ^10.13.2
