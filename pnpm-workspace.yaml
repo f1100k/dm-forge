@@ -38,7 +38,7 @@ catalog:
   dotenv-expand: ^12.0.1
 
   # Test helpers (owned by the new @dm-forge/tests package)
-  "@testcontainers/postgresql": ^10.13.2
+  "@testcontainers/postgresql": ^12.0.1
   testcontainers: ^10.13.2
   "@faker-js/faker": ^10.4.0
   msw: ^2.14.6
