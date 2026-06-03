@@ -15,7 +15,8 @@ This folder is the **source of truth** for the technical configuration used by t
     ├── design-handoff.md         ← full content
     ├── tech-design-writer.md     ← full content
     ├── tasks-writer.md           ← full content
-    └── spec-implementer.md       ← full content
+    ├── spec-implementer.md       ← full content
+    └── dependabot-sweep.md       ← full content (engineering/ops)
 
 docs/
 ├── architecture-overview.md      ← bootstrap, BYOK, Tiptap, FTS, public wiki
