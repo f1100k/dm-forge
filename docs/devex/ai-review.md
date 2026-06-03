@@ -20,7 +20,7 @@ The custom prompt anchors judgments on the Source of truth hierarchy (Constituti
 
 Order of magnitude per PR (small/medium diffs touching application code): a handful of cents in OAuth-token-equivalent usage against the owner's Claude Pro/Max plan. Cost scales with the size of the diff and the number of `docs/*.md` files the agent decides to load — large refactors that span several detail docs sit at the upper end.
 
-Operational cap per PR: **1 automated review + 1 manual re-request**. Beyond that, the human reviewer drives the conversation. This per-PR cap is a convention; the per-month hard cap below (NFR-002) is enforced by the workflow.
+Operational cap per PR: **1 label-triggered review + 1 re-request**. Beyond that, the human reviewer drives the conversation. This per-PR cap is a convention; the per-month hard cap below (NFR-002) is enforced by the workflow.
 
 A latency goal of 5 minutes (NFR-001) is in place; the action's run time is visible in the GitHub Actions UI and is measured by Polish item P1 (latency metric, see below).
 
@@ -55,9 +55,9 @@ node scripts/check-review-budget.mjs record --budget 80 --ledger <path> --execut
 
 Add the **`skip-claude-review`** label to the PR. The workflow's first step inspects `github.event.pull_request.labels.*.name`, and if the label is present the job exits early with a notice line in the run log — no checkout, no action invocation, no cost.
 
-Use it for diffs where an AI pass would only add noise: mechanical renames, generated files (lockfiles, `pnpm-lock.yaml` already filtered out by path filters), large vendored snapshots, or release PRs that only bump versions.
+Since the review is opt-in (it only runs when you add the `claude-review` label), `skip-claude-review` is mostly a belt-and-suspenders guard: it hard-skips the job even if `claude-review` is also present, so it wins a labelling race and is the right tool for diffs where an AI pass would only add noise — mechanical renames, generated files (lockfiles; the prompt also stops on docs/lockfile-only diffs), large vendored snapshots, or release PRs that only bump versions.
 
-Removing the label and re-triggering the workflow runs the review normally — see the re-request flow below.
+To run the review on a PR that carries `skip-claude-review`, remove that label and add `claude-review` — see the request flow below.
 
 ## Request / re-request
 
@@ -91,7 +91,7 @@ Do **not** tune the prompt for a single bad suggestion. One outlier is noise; re
 1. Open a draft PR that intentionally exercises the area you changed — for example, a small diff that should trigger the new instruction or hit the new doc reference.
 2. Wait for `claude-review` to post. Read the inline comments and the top-level verdict.
 3. Confirm the agent (a) cites the right source, (b) follows the new format, and (c) stays silent where it should.
-4. If the result is still off, iterate on the prompt in the same PR; the workflow re-runs on every push.
+4. If the result is still off, iterate on the prompt in the same PR; the workflow does not re-run on push, so re-trigger each pass by removing and re-adding the `claude-review` label.
 5. Once green, merge the prompt change. Mention in the PR description what was tuned and why so the next maintainer has the trail.
 
 Avoid prompt changes that encode reviewer style preferences not grounded in the Constitution or `engineering.md` — the prompt's authority comes from anchoring on those documents.
