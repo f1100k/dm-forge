@@ -7,11 +7,31 @@ afterEach(async () => {
   await i18n.changeLanguage(DEFAULT_LOCALE)
 })
 
+// Collect every leaf key as a dotted path so two catalogs can be compared for
+// structural parity regardless of nesting (e.g. "nav.signIn").
+function collectKeys(obj: Record<string, unknown>, prefix = ''): string[] {
+  return Object.entries(obj).flatMap(([key, value]) => {
+    const path = prefix ? `${prefix}.${key}` : key
+    return value !== null && typeof value === 'object'
+      ? collectKeys(value as Record<string, unknown>, path)
+      : [path]
+  })
+}
+
 describe('i18n resources', () => {
   it('ships a common namespace for both supported locales', () => {
     // Arrange / Act / Assert
     expect(resources['pt-BR'].common).toBeDefined()
     expect(resources.en.common).toBeDefined()
+  })
+
+  it('keeps key parity between the en and pt-BR catalogs', () => {
+    // TypeScript only types call sites against pt-BR, so a missing en key
+    // compiles clean and silently falls back at runtime. Enforce parity here.
+    const ptKeys = collectKeys(resources['pt-BR'].common).sort()
+    const enKeys = collectKeys(resources.en.common).sort()
+
+    expect(enKeys).toEqual(ptKeys)
   })
 
   it('translates a key in pt-BR', () => {
@@ -53,7 +73,7 @@ describe('applyUserLocale', () => {
     // Act
     await applyUserLocale('es')
 
-    // Assert
-    expect(['pt-BR', 'en']).toContain(i18n.resolvedLanguage)
+    // Assert: an invalid user locale must not move the active language.
+    expect(i18n.resolvedLanguage).toBe('en')
   })
 })
