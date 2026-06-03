@@ -1,13 +1,17 @@
 name: claude-review
 
+# On-demand only. The advisory review runs solely when the PR carries the
+# 'claude-review' label — there is no 'synchronize' trigger, so pushing fixes
+# never re-runs it. This produces a single deliberate review per request
+# instead of a fresh round of comments on every commit. To re-review after
+# changes, remove and re-add the label (the 'labeled' event re-triggers).
+# The job-level `if` below scopes the run to the 'claude-review' label so
+# adding any other label is a no-op. Path scoping moved into the prompt
+# ("no relevant code changes -> stop") since the label is an explicit request.
 on:
   pull_request:
     branches: [master]
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - 'apps/**'
-      - 'packages/**'
-      - 'tests/**'
+    types: [opened, reopened, labeled]
 
 concurrency:
   group: claude-review-${{ github.event.pull_request.number }}
@@ -27,6 +31,12 @@ env:
 jobs:
   claude-review:
     name: claude-review
+    # Run only when the review is explicitly requested via the 'claude-review'
+    # label: on 'labeled' the just-added label must be it (so unrelated labels
+    # don't re-trigger); on open/reopen the label must already be present.
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'claude-review') ||
+      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'claude-review'))
     runs-on: ubuntu-latest
     steps:
       - name: Check skip conditions
@@ -96,7 +106,7 @@ jobs:
           BODY=$(printf '%s\n\n%s\n\n%s\n' \
             "⚠️ **Claude review skipped — monthly AI-review budget reached.**" \
             "This month's estimated AI-review spend (\$$MONTH_TOTAL) has reached the configured budget (\$$BUDGET), so the advisory review was not run (NFR-002, fail-closed)." \
-            "To run it anyway on this PR, add the \`claude-cost-high\` label and re-trigger — comment \`@claude review\` or re-run the workflow. See \`docs/devex/ai-review.md\`.")
+            "To run it anyway on this PR, add the \`claude-cost-high\` label, then re-trigger the review by removing and re-adding the \`claude-review\` label. See \`docs/devex/ai-review.md\`.")
           gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "$BODY"
           echo "::notice::Claude review cancelled — monthly budget reached (\$$MONTH_TOTAL of \$$BUDGET). Add 'claude-cost-high' to override."
 
@@ -114,6 +124,15 @@ jobs:
             merge — Constitution principle 6 (determinism over
             sophistication) reserves blocking behavior for deterministic
             checks. Your output is guidance for human reviewers.
+
+            This is a SINGLE, ON-DEMAND pass. It runs only when a human adds
+            the `claude-review` label; pushing later commits does NOT re-run
+            it. So be exhaustive in this one pass — review the ENTIRE diff,
+            not just the latest changes, and surface every issue you find
+            now (correctness, conformance, security, tests). Do not defer or
+            spread findings across rounds: there is no automatic second look.
+            A re-review only happens if a human removes and re-adds the
+            label, so treat this as your only opportunity to flag everything.
 
             Source of truth — apply this hierarchy when judgments conflict
             (higher items constrain lower; the Constitution always wins):

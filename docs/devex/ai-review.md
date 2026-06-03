@@ -4,7 +4,13 @@ Load this when working with the `claude-review` workflow on pull requests — us
 
 ## What it is
 
-`.github/workflows/claude-review.yml` runs `anthropics/claude-code-action@v1` on every PR that touches `apps/**`, `packages/**`, or `tests/**`. The action checks out the repo, posts inline comments on the PR via `mcp__github_inline_comment__create_inline_comment`, and finishes with a single top-level summary via `gh pr comment`.
+`.github/workflows/claude-review.yml` runs `anthropics/claude-code-action@v1` **on demand** — only when a PR carries the **`claude-review`** label. The action checks out the repo, posts inline comments on the PR via `mcp__github_inline_comment__create_inline_comment`, and finishes with a single top-level summary via `gh pr comment`.
+
+## How it triggers
+
+The review is **opt-in per request**, not automatic per push. The workflow listens for `opened`, `reopened`, and `labeled` events on PRs targeting `master`, and the job only runs when the **`claude-review`** label is present (on `labeled`, only when that exact label is the one just added — adding any other label is a no-op).
+
+There is deliberately **no `synchronize` trigger**: pushing fix commits never re-runs the review, so you get a single deliberate pass per request instead of a fresh round of comments on every commit. To re-review after addressing feedback, **remove and re-add the `claude-review` label** — the `labeled` event re-triggers a fresh pass against the current head. Path scoping (`apps/**`, `packages/**`, `tests/**`) moved out of the trigger into the prompt: since the label is an explicit request, a docs/lockfile-only diff still starts the action, which then posts a brief "no relevant code changes" note and stops.
 
 The review is **advisory only** — Constitution principle 6 (determinism over sophistication) reserves blocking behavior for deterministic checks, so `claude-review` never gates merge. The branch protection rule lists it without the *Required* flag (see `docs/devex/branch-protection.md`).
 
@@ -25,7 +31,7 @@ The workflow enforces a **monthly hard cap** on AI-review spend. It fails closed
 - **Budget.** `CLAUDE_MONTHLY_BUDGET_USD`, an `env` value at the top of `.github/workflows/claude-review.yml` (default **`80`**). It is a conservative guardrail — at a few cents per PR, normal months stay far below it; the cap exists to stop runaway loops (large PRs re-requested repeatedly). Raise or lower it by editing that one line.
 - **How spend is measured.** Each review's cost is the `total_cost_usd` reported in the action's `execution_file` (the claude-code execution log). The *Record review cost* step adds it to a running monthly total.
 - **Gate.** Before invoking the action, the *Budget gate* step compares the month's accumulated spend against the budget. If it has reached the budget and the PR lacks the override label, the workflow posts a guidance comment and stops — no checkout cost beyond the gate, no action invocation.
-- **Override.** Add the **`claude-cost-high`** label to a PR to bypass the cap for that PR, then re-trigger (comment `@claude review` or re-run the workflow). Use it for a PR that genuinely needs the review despite the month being over budget.
+- **Override.** Add the **`claude-cost-high`** label to a PR to bypass the cap for that PR, then re-trigger by removing and re-adding the **`claude-review`** label. Use it for a PR that genuinely needs the review despite the month being over budget.
 
 ### Where the running total lives
 
@@ -53,12 +59,10 @@ Use it for diffs where an AI pass would only add noise: mechanical renames, gene
 
 Removing the label and re-triggering the workflow runs the review normally — see the re-request flow below.
 
-## Re-request
+## Request / re-request
 
-Two paths, both supported by `anthropics/claude-code-action@v1`:
-
-1. **Comment trigger** — post `@claude review` as a PR comment. The action picks the comment up and runs a fresh review against the current head.
-2. **Re-run from the Actions UI** — open the workflow run for the PR and click *Re-run jobs*. Useful when the failure was transient (rate limit, network) rather than something that needs a new prompt.
+1. **Label trigger (canonical)** — add the **`claude-review`** label to run the first review. To run another pass after pushing fixes, **remove and re-add** the label; the `labeled` event runs a fresh review against the current head. This is the only way to get a second pass — pushes alone never re-trigger.
+2. **Re-run from the Actions UI** — open the workflow run for the PR and click *Re-run jobs*. Useful when the failure was transient (rate limit, network) rather than something that needs a new prompt. (Re-run replays the original triggering event, so the label must still be present.)
 
 The `concurrency` block (`group: claude-review-${{ github.event.pull_request.number }}`, `cancel-in-progress: false`) lets re-requests queue without cancelling an in-flight review.
 
