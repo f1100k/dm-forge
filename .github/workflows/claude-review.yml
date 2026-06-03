@@ -29,10 +29,21 @@ jobs:
     name: claude-review
     runs-on: ubuntu-latest
     steps:
-      - name: Check skip label
+      - name: Check skip conditions
         id: skip
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'skip-claude-review') }}" == "true" ]]; then
+          # Skip for bot-authored PRs (e.g. Dependabot). Runs triggered by
+          # Dependabot cannot read this repo's Actions secrets, so
+          # CLAUDE_CODE_OAUTH_TOKEN would be empty and the action fails closed;
+          # the action also refuses non-human actors by default. Dependency
+          # bumps are deps-only and covered by deps-audit/semgrep, so the
+          # advisory AI review adds no value here.
+          if [[ "$PR_AUTHOR" == "dependabot[bot]" || "$PR_AUTHOR" == *"[bot]" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Claude review skipped — PR authored by a bot ($PR_AUTHOR)."
+          elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'skip-claude-review') }}" == "true" ]]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "::notice::Claude review skipped — PR carries the 'skip-claude-review' label."
           else
@@ -57,7 +68,7 @@ jobs:
       # never accumulate.
       - name: Restore cost ledger
         if: steps.skip.outputs.skip == 'false'
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ runner.temp }}/claude-cost-ledger.json
           key: claude-cost-ledger-${{ steps.month.outputs.month }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -92,7 +103,7 @@ jobs:
       - name: Claude review
         if: steps.skip.outputs.skip == 'false' && steps.budget.outputs.should_cancel == 'false'
         id: review
-        uses: anthropics/claude-code-action@537ffff2eff706bd7e3e1c3daf2d4b39067a9f85 # v1
+        uses: anthropics/claude-code-action@787c5a0ce96a9a6cfb050ea0c8f4c05f2447c251 # v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
@@ -171,7 +182,7 @@ jobs:
 
       - name: Save cost ledger
         if: ${{ !cancelled() && steps.skip.outputs.skip == 'false' && steps.budget.outputs.should_cancel == 'false' }}
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ runner.temp }}/claude-cost-ledger.json
           key: claude-cost-ledger-${{ steps.month.outputs.month }}-${{ github.run_id }}-${{ github.run_attempt }}

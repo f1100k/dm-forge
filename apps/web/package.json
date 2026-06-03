@@ -20,25 +20,25 @@
   "dependencies": {
     "@dm-forge/shared": "workspace:*",
     "@tanstack/react-query": "^5.100.14",
-    "@tanstack/react-router": "^1.170.8",
+    "@tanstack/react-router": "^1.170.10",
     "@trpc/client": "catalog:",
     "@trpc/react-query": "catalog:",
     "@trpc/server": "catalog:",
     "better-auth": "catalog:",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "zod": "catalog:",
-    "zustand": "^5.0.13"
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@dm-forge/api": "workspace:*",
     "@testing-library/react": "catalog:",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@types/react": "^19.2.16",
+    "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "catalog:",
     "happy-dom": "catalog:",
     "typescript": "catalog:",
-    "vite": "^6.0.7",
+    "vite": "^8.0.16",
     "vitest": "catalog:"
   }
 }
