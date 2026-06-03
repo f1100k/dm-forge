@@ -15,7 +15,8 @@ This folder is the **source of truth** for the technical configuration used by t
     ├── design-handoff.md         ← full content
     ├── tech-design-writer.md     ← full content
     ├── tasks-writer.md           ← full content
-    └── spec-implementer.md       ← full content
+    ├── spec-implementer.md       ← full content
+    └── dependabot-sweep.md       ← full content (engineering/ops)
 
 docs/
 ├── architecture-overview.md      ← bootstrap, BYOK, Tiptap, FTS, public wiki
@@ -175,6 +176,7 @@ Skills consume the **artifacts** stored in Notion (PRD, Specs, Tech Designs, Kan
 | `tech-design-writer` | Create a Tech Design (requires Spec `Done`) |
 | `tasks-writer` | Break a Tech Design's Execution Plan into Kanban cards (requires Tech Design `Done`) |
 | `spec-implementer` | Implement a single Kanban card end-to-end (one task per invocation) |
+| `dependabot-sweep` | Resolve **all** open Dependabot PRs at once — consolidate into one tested branch, open a single PR, close the originals (engineering/ops; not part of the SDD pipeline) |
 
 ## SDD workflow
 
