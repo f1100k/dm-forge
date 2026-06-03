@@ -1,3 +1,7 @@
+// Side-effect import: initialises i18next before the first render, mirroring
+// apps/web/src/main.tsx. RootRoute calls useTranslation(), so the harness must
+// bootstrap i18n the same way production does.
+import '@dm-forge/web/i18n'
 import { Route as IndexRoute } from '@dm-forge/web/routes/index'
 import { Route as LoginRoute } from '@dm-forge/web/routes/login'
 import { Route as RootRoute } from '@dm-forge/web/routes/__root'

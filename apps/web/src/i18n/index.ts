@@ -17,7 +17,7 @@ export const resources = {
 // covers the Accept-Language step and fallbackLng covers the default; the
 // authenticated user's locale takes priority and is applied after the session
 // hydrates via applyUserLocale (Tech Design §3.2 resolution order).
-void i18next
+i18next
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -32,6 +32,11 @@ void i18next
     detection: { order: ['navigator'], caches: [] },
     react: { useSuspense: false },
     returnNull: false,
+  })
+  // Inline resources make init synchronous, so this realistically never
+  // rejects — but surface any future failure instead of swallowing it.
+  .catch((error) => {
+    console.error('i18next initialisation failed', error)
   })
 
 /**
