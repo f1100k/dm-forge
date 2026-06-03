@@ -29,11 +29,22 @@ export function resolveLocale(input: {
   return DEFAULT_LOCALE
 }
 
+// Lowercased primary subtag of a BCP-47 tag ("en-US" → "en"). split() always
+// yields at least one element; the fallback only satisfies the
+// noUncheckedIndexedAccess compiler check.
+function primarySubtag(tag: string): string {
+  return tag.trim().toLowerCase().split('-')[0] ?? ''
+}
+
+// Primary subtag → supported Locale, derived from SUPPORTED_LOCALES so adding a
+// locale to the shared LocaleSchema automatically extends matching with no
+// second drift point to maintain by hand.
+const LOCALE_BY_PRIMARY_SUBTAG: ReadonlyMap<string, Locale> = new Map(
+  SUPPORTED_LOCALES.map((locale) => [primarySubtag(locale), locale]),
+)
+
 // Map a BCP-47 language tag to a supported Locale by its primary subtag
 // (e.g. "en-US" → "en", "pt-PT" → "pt-BR"), or null when unsupported.
 function matchSupported(tag: string): Locale | null {
-  const normalized = tag.trim().toLowerCase()
-  if (normalized === 'pt' || normalized.startsWith('pt-')) return 'pt-BR'
-  if (normalized === 'en' || normalized.startsWith('en-')) return 'en'
-  return null
+  return LOCALE_BY_PRIMARY_SUBTAG.get(primarySubtag(tag)) ?? null
 }
