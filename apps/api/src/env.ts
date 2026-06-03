@@ -28,23 +28,50 @@ export const ApiEnvSchema = z
     // constrained to a bare email.
     RESEND_API_KEY: z.string().min(1).optional(),
     EMAIL_FROM: z.string().min(1).optional(),
+    // OAuth social providers (ADR 0003). Optional: a provider is registered in
+    // Better Auth only when both halves of its credential pair are present, so
+    // dev/test/CI boot without OAuth secrets (cf. EMAIL_PROVIDER=noop). The
+    // pairing is enforced below — a half-configured provider fails at boot.
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    GITHUB_CLIENT_ID: z.string().min(1).optional(),
+    GITHUB_CLIENT_SECRET: z.string().min(1).optional(),
   })
-  // Fail loudly at boot when the real provider is selected without its config,
-  // rather than at the first send (ADR 0005: misconfiguration surfaces at boot).
+  // Fail loudly at boot when a provider is partially configured, rather than at
+  // the first request (ADR 0005: misconfiguration surfaces at boot).
   .superRefine((env, ctx) => {
-    if (env.EMAIL_PROVIDER !== 'resend') return
-    if (!env.RESEND_API_KEY) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['RESEND_API_KEY'],
-        message: 'RESEND_API_KEY is required when EMAIL_PROVIDER=resend',
-      })
+    if (env.EMAIL_PROVIDER === 'resend') {
+      if (!env.RESEND_API_KEY) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['RESEND_API_KEY'],
+          message: 'RESEND_API_KEY is required when EMAIL_PROVIDER=resend',
+        })
+      }
+      if (!env.EMAIL_FROM) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['EMAIL_FROM'],
+          message: 'EMAIL_FROM is required when EMAIL_PROVIDER=resend',
+        })
+      }
     }
-    if (!env.EMAIL_FROM) {
+
+    // Each OAuth provider needs its id and secret together or not at all.
+    const oauthPairs = [
+      ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'],
+      ['GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET'],
+    ] as const
+    for (const [idKey, secretKey] of oauthPairs) {
+      const hasId = Boolean(env[idKey])
+      const hasSecret = Boolean(env[secretKey])
+      if (hasId === hasSecret) continue
+      const missingKey = hasId ? secretKey : idKey
+      const presentKey = hasId ? idKey : secretKey
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['EMAIL_FROM'],
-        message: 'EMAIL_FROM is required when EMAIL_PROVIDER=resend',
+        path: [missingKey],
+        message: `${missingKey} is required when ${presentKey} is set`,
       })
     }
   })
