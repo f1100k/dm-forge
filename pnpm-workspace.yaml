@@ -42,5 +42,5 @@ catalog:
   testcontainers: ^12.0.1
   "@faker-js/faker": ^10.4.0
   msw: ^2.14.6
-  happy-dom: ^20.8.9
+  happy-dom: ^20.10.2
   "@testing-library/react": ^16.1.0
