@@ -10,7 +10,7 @@ packages:
 catalog:
   # Toolchain (devDeps)
   typescript: ^6.0.3
-  vitest: ^4.1.0
+  vitest: ^4.1.9
   tsx: ^4.22.4
   "@types/node": ^22.10.5
   # Plugin used by both apps/web and the root vitest workspace (unit:web /
@@ -26,21 +26,21 @@ catalog:
   "@prisma/client": ^7.8.0
 
   # Auth
-  better-auth: ^1.6.13
+  better-auth: ^1.6.22
 
   # tRPC (the 11.0.0-rc.660 line co-versions server + client + react-query)
-  "@trpc/server": ^11.0.0-rc.660
-  "@trpc/client": ^11.0.0-rc.660
-  "@trpc/react-query": ^11.0.0-rc.660
+  "@trpc/server": ^11.18.0
+  "@trpc/client": ^11.18.0
+  "@trpc/react-query": ^11.18.0
 
   # Env loading (used by packages/shared and previously root)
   dotenv: ^17.4.2
   dotenv-expand: ^13.0.0
 
   # Test helpers (owned by the new @dm-forge/tests package)
-  "@testcontainers/postgresql": ^12.0.1
-  testcontainers: ^12.0.1
-  "@faker-js/faker": ^10.4.0
+  "@testcontainers/postgresql": ^12.0.3
+  testcontainers: ^12.0.3
+  "@faker-js/faker": ^10.5.0
   msw: ^2.14.6
-  happy-dom: ^20.8.9
+  happy-dom: ^20.10.6
   "@testing-library/react": ^16.1.0
