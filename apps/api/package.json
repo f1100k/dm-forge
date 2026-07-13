@@ -21,11 +21,11 @@
     "@dm-forge/ai": "workspace:*",
     "@dm-forge/db": "workspace:*",
     "@dm-forge/shared": "workspace:*",
-    "@hono/node-server": "^2.0.4",
+    "@hono/node-server": "^2.0.8",
     "@trpc/server": "catalog:",
     "better-auth": "catalog:",
-    "hono": "^4.12.23",
-    "resend": "^6.12.4",
+    "hono": "^4.12.30",
+    "resend": "^6.17.2",
     "zod": "catalog:"
   },
   "devDependencies": {
