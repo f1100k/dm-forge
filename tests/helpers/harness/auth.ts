@@ -1,3 +1,4 @@
+import { prisma } from '@dm-forge/db'
 import { faker } from '@faker-js/faker'
 import { createApp } from './app.js'
 
@@ -15,9 +16,12 @@ export type AuthedUser = {
 //     headers: { cookie },
 //   })
 //
-// Better Auth's email-password config has `autoSignIn: true`, so sign-up
-// produces a session cookie in one round-trip. If a test needs an existing
-// user, call signIn() instead.
+// Since card S1.2 turned on `requireEmailVerification`, sign-up no longer
+// establishes a session — Better Auth blocks sign-in until the address is
+// verified. Tests can't click the emailed link, so we mark the row verified
+// directly (the equivalent of a completed verification) and then sign in. The
+// dedicated block-until-verified behavior is covered by the auth integration
+// test, not here. If a test needs to sign in a second time, call signIn().
 export async function loginAndGetCookie(
   overrides: Partial<Pick<AuthedUser, 'email' | 'password'>> = {},
 ): Promise<AuthedUser> {
@@ -39,11 +43,9 @@ export async function loginAndGetCookie(
     throw new Error(`loginAndGetCookie: sign-up failed (${res.status}): ${await res.text()}`)
   }
 
-  const cookie = res.headers.get('set-cookie')
-  if (!cookie) {
-    throw new Error('loginAndGetCookie: sign-up succeeded but no Set-Cookie was returned')
-  }
+  await prisma.user.update({ where: { email }, data: { emailVerified: true } })
 
+  const cookie = await signIn(email, password)
   return { email, password, cookie }
 }
 
