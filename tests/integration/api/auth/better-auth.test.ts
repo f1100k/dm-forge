@@ -19,15 +19,24 @@ function freshCredentials(overrides: Partial<Credentials> = {}): Credentials {
   }
 }
 
-function signUp(app: App, credentials: Credentials): Promise<Response> {
+async function signUp(app: App, credentials: Credentials): Promise<Response> {
   return app.request('/api/auth/sign-up/email', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ name: faker.person.fullName(), ...credentials }),
+    body: JSON.stringify({
+      name: faker.person.fullName(),
+      // Card S1.3 requires an adult DOB + consent on the sign-up body; this
+      // suite exercises the password/verification policy, not the age gate.
+      dateOfBirth: '1990-01-01',
+      locale: 'pt-BR',
+      acceptedTerms: true,
+      acceptedPrivacy: true,
+      ...credentials,
+    }),
   })
 }
 
-function signIn(app: App, credentials: Credentials): Promise<Response> {
+async function signIn(app: App, credentials: Credentials): Promise<Response> {
   return app.request('/api/auth/sign-in/email', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },

@@ -2,15 +2,17 @@
 // apps/web/src/main.tsx. RootRoute calls useTranslation(), so the harness must
 // bootstrap i18n the same way production does.
 import '@dm-forge/web/i18n'
+import { Route as RootRoute } from '@dm-forge/web/routes/__root'
 import { Route as IndexRoute } from '@dm-forge/web/routes/index'
 import { Route as LoginRoute } from '@dm-forge/web/routes/login'
-import { Route as RootRoute } from '@dm-forge/web/routes/__root'
+import { Route as RegisterRoute } from '@dm-forge/web/routes/register'
+import { Route as VerifyEmailRoute } from '@dm-forge/web/routes/verify-email'
 import { trpc } from '@dm-forge/web/trpc'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { RouterProvider, createMemoryHistory, createRouter } from '@tanstack/react-router'
-import { httpBatchLink } from '@trpc/client'
+import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router'
 import { render, screen, waitFor } from '@testing-library/react'
-import { http, HttpResponse } from 'msw'
+import { httpBatchLink } from '@trpc/client'
+import { HttpResponse, http } from 'msw'
 import { describe, expect, it } from 'vitest'
 import { server } from '../../helpers/harness/msw-server.js'
 
@@ -22,7 +24,7 @@ function renderApp(initialPath = '/') {
   const trpcClient = trpc.createClient({
     links: [httpBatchLink({ url: 'http://localhost:3000/trpc' })],
   })
-  const routeTree = RootRoute.addChildren([IndexRoute, LoginRoute])
+  const routeTree = RootRoute.addChildren([IndexRoute, LoginRoute, RegisterRoute, VerifyEmailRoute])
   const router = createRouter({
     routeTree,
     history: createMemoryHistory({ initialEntries: [initialPath] }),

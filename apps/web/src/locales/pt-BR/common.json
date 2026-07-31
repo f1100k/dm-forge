@@ -1,6 +1,59 @@
 {
   "nav": {
     "home": "Início",
-    "signIn": "Entrar"
+    "signIn": "Entrar",
+    "register": "Criar conta",
+    "signOut": "Sair"
+  },
+  "auth": {
+    "or": "ou",
+    "social": {
+      "google": "Continuar com Google",
+      "github": "Continuar com GitHub"
+    },
+    "login": {
+      "title": "Entrar",
+      "description": "Acesse sua conta do DM Forge.",
+      "emailLabel": "E-mail",
+      "passwordLabel": "Senha",
+      "submit": "Entrar",
+      "submitting": "Entrando…",
+      "invalid": "E-mail ou senha inválidos.",
+      "unverified": "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.",
+      "genericError": "Não foi possível entrar. Tente novamente.",
+      "noAccount": "Ainda não tem conta?",
+      "registerLink": "Criar conta"
+    },
+    "register": {
+      "title": "Criar conta",
+      "description": "Comece a mestrar suas campanhas com o DM Forge.",
+      "nameLabel": "Nome",
+      "emailLabel": "E-mail",
+      "passwordLabel": "Senha",
+      "passwordHint": "Mínimo de 10 caracteres.",
+      "dateOfBirthLabel": "Data de nascimento",
+      "consentLabel": "Li e aceito os Termos de Uso e a Política de Privacidade.",
+      "submit": "Criar conta",
+      "submitting": "Criando conta…",
+      "haveAccount": "Já tem conta?",
+      "loginLink": "Entrar",
+      "errors": {
+        "ageNotAllowed": "Você precisa ter pelo menos 13 anos para criar uma conta.",
+        "userExists": "Já existe uma conta com este e-mail.",
+        "userExistsOAuth": "Este e-mail já está cadastrado com um provedor social. Use \"Continuar com Google\" ou \"Continuar com GitHub\".",
+        "generic": "Não foi possível criar a conta. Verifique os dados e tente novamente.",
+        "validation": "Confira os campos destacados."
+      }
+    },
+    "verify": {
+      "title": "Confirme seu e-mail",
+      "description": "Enviamos um link de verificação para {{email}}. Clique no link para ativar sua conta.",
+      "descriptionNoEmail": "Enviamos um link de verificação para o seu e-mail. Clique no link para ativar sua conta.",
+      "resend": "Reenviar e-mail",
+      "resending": "Reenviando…",
+      "resent": "E-mail reenviado. Verifique sua caixa de entrada.",
+      "resendError": "Não foi possível reenviar agora. Tente novamente em instantes.",
+      "backToLogin": "Voltar para entrar"
+    }
   }
 }

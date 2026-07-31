@@ -36,6 +36,13 @@ export async function loginAndGetCookie(
       name: faker.person.fullName(),
       email,
       password,
+      // Card S1.3 gates sign-up on a minimum-age declaration and Terms/Privacy
+      // consent; supply an adult DOB and accepted flags so the harness produces
+      // a usable session. Age/consent behavior is asserted in its own test.
+      dateOfBirth: '1990-01-01',
+      locale: 'pt-BR',
+      acceptedTerms: true,
+      acceptedPrivacy: true,
     }),
   })
 

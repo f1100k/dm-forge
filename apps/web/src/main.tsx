@@ -4,6 +4,8 @@ import { httpBatchLink } from '@trpc/client'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { env } from './env.js'
+// Tailwind + design tokens (card S1.4). Global stylesheet loaded before render.
+import './index.css'
 // Side-effect import: initialises i18next before the first render.
 import './i18n/index.js'
 import { router } from './router.js'
