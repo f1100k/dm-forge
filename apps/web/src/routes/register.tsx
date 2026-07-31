@@ -3,7 +3,7 @@ import { createRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type ChangeEvent, type FormEvent, type ReactNode, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { signIn, signUp } from '../auth/auth-client.js'
-import { AlertIcon, GoogleIcon, LockIcon, MailIcon } from '../components/dmf/icons.js'
+import { AlertIcon, GoogleIcon, MailIcon } from '../components/dmf/icons.js'
 import {
   AuthShell,
   Button,
@@ -13,6 +13,7 @@ import {
   Input,
   LabeledDivider,
   OrnDivider,
+  PasswordInput,
   PasswordStrength,
 } from '../components/dmf/index.js'
 import { Route as RootRoute } from './__root.js'
@@ -211,16 +212,15 @@ function RegisterPage() {
             hintMeta={`${form.password.length} / 10${form.password.length >= 10 ? ' ✓' : ''}`}
             htmlFor="password"
           >
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="new-password"
               placeholder="••••••••••"
-              icon={<LockIcon />}
               minLength={10}
               required
               value={form.password}
               onChange={update('password')}
+              labels={{ show: t('auth.password.show'), hide: t('auth.password.hide') }}
             />
             {form.password.length > 0 && <PasswordStrength score={score} label={strengthLabel} />}
           </Field>
