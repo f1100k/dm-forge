@@ -44,6 +44,10 @@ function RegisterPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
   const [emailTouched, setEmailTouched] = useState(false)
+  // Server-reported problems tied to the email (already registered, or already
+  // linked to Google). Held separately from format validation but rendered in
+  // the same place, so every email error looks and behaves the same way.
+  const [emailServerError, setEmailServerError] = useState<string | null>(null)
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,13 +57,21 @@ function RegisterPage() {
     setForm((prev) => ({ ...prev, [field]: event.target.value }))
   }
 
-  // Inline email validation: silent until the field is touched (blurred or a
-  // submit attempt), then live on every keystroke so the message clears the
-  // instant the address becomes valid.
-  const emailError =
+  const onEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    // Editing the address clears a stale server conflict; format validation
+    // (below) re-evaluates live.
+    setEmailServerError(null)
+    setForm((prev) => ({ ...prev, email: event.target.value }))
+  }
+
+  // Every email error surfaces on the email field, consistently: a server
+  // conflict takes precedence, otherwise the format check (silent until the
+  // field is touched or submit is attempted, then live on each keystroke).
+  const emailFormatError =
     emailTouched && !EmailSchema.safeParse(form.email).success
       ? t('auth.register.errors.emailInvalid')
       : null
+  const emailError = emailServerError ?? emailFormatError
 
   const score = useMemo(() => passwordScore(form.password), [form.password])
   const strengthNames = ['veryWeak', 'weak', 'fair', 'strong'] as const
@@ -69,6 +81,7 @@ function RegisterPage() {
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
+    setEmailServerError(null)
     // Reveal any inline email error on submit, even if the field was never blurred.
     setEmailTouched(true)
 
@@ -106,15 +119,17 @@ function RegisterPage() {
 
     if (signUpError) {
       const code = (signUpError as { code?: string }).code
-      setError(
-        code === 'AGE_NOT_ALLOWED'
-          ? t('auth.register.errors.ageNotAllowed')
-          : code === 'USER_EXISTS_OAUTH'
-            ? t('auth.register.errors.userExistsOAuth')
-            : code === 'USER_ALREADY_EXISTS'
-              ? t('auth.register.errors.userExists')
-              : t('auth.register.errors.generic'),
-      )
+      // Email conflicts belong on the email field (same place as a format
+      // error); everything else is a form-level message in the banner.
+      if (code === 'USER_EXISTS_OAUTH') {
+        setEmailServerError(t('auth.register.errors.userExistsOAuth'))
+      } else if (code === 'USER_ALREADY_EXISTS') {
+        setEmailServerError(t('auth.register.errors.userExists'))
+      } else if (code === 'AGE_NOT_ALLOWED') {
+        setError(t('auth.register.errors.ageNotAllowed'))
+      } else {
+        setError(t('auth.register.errors.generic'))
+      }
       return
     }
 
@@ -180,7 +195,7 @@ function RegisterPage() {
               required
               error={Boolean(emailError)}
               value={form.email}
-              onChange={update('email')}
+              onChange={onEmailChange}
               onBlur={() => setEmailTouched(true)}
             />
           </Field>

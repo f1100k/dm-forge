@@ -100,4 +100,29 @@ describe('register screen', () => {
       expect(screen.queryByText(/válido|valid/i)).toBeNull()
     })
   })
+
+  it('surfaces an already-linked-account conflict on the email field', async () => {
+    // The server rejects an email already registered via Google.
+    server.use(
+      http.post('http://localhost:3000/api/auth/sign-up/email', () =>
+        HttpResponse.json(
+          { code: 'USER_EXISTS_OAUTH', message: 'exists via social provider' },
+          { status: 400 },
+        ),
+      ),
+    )
+    const { container } = renderApp('/register')
+    await screen.findByRole('heading')
+
+    fireEvent.change(field(container, 'email'), { target: { value: 'ada@example.com' } })
+    fireEvent.change(field(container, 'password'), { target: { value: 'correct horse battery' } })
+    fireEvent.click(field(container, 'age'))
+    fireEvent.click(field(container, 'consent'))
+    fireEvent.click(submitButton(container))
+
+    // The conflict is shown as an email-field error, the same channel as a
+    // format error — not a separate generic banner. Match copy unique to the
+    // conflict message (pt-BR or en) so it can't collide with the Google button.
+    expect(await screen.findByText(/já tem conta|already has an account/i)).toBeTruthy()
+  })
 })
