@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { DEFAULT_LOCALE } from './resolve-locale.js'
 import { applyUserLocale, i18n, resources } from './index.js'
+import { DEFAULT_LOCALE } from './resolve-locale.js'
 
 afterEach(async () => {
   // Keep tests order-independent: restore the default language after any switch.
@@ -39,10 +39,10 @@ describe('i18n resources', () => {
     const t = i18n.getFixedT('pt-BR', 'common')
 
     // Act
-    const value = t('nav.signIn')
+    const value = t('auth.login.title')
 
     // Assert
-    expect(value).toBe('Entrar')
+    expect(value).toBe('Bem-vindo de volta.')
   })
 
   it('translates the same key in en', () => {
@@ -50,10 +50,10 @@ describe('i18n resources', () => {
     const t = i18n.getFixedT('en', 'common')
 
     // Act
-    const value = t('nav.signIn')
+    const value = t('auth.login.title')
 
     // Assert
-    expect(value).toBe('Sign in')
+    expect(value).toBe('Welcome back.')
   })
 })
 

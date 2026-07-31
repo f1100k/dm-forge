@@ -16,10 +16,8 @@ function signUpBody(overrides: Record<string, unknown> = {}) {
     name: faker.person.fullName(),
     email: faker.internet.email().toLowerCase(),
     password: faker.internet.password({ length: 16 }),
-    dateOfBirth: '1990-01-01',
+    ageConfirmed: true,
     locale: 'pt-BR',
-    acceptedTerms: true,
-    acceptedPrivacy: true,
     ...overrides,
   }
 }
@@ -72,12 +70,10 @@ describe('sign-up consent + age gate', () => {
     expect(row.locale).toBe('en')
   })
 
-  it('rejects a sign-up from someone under the minimum age', async () => {
+  it('rejects a sign-up when the age is not confirmed', async () => {
     // Arrange
     const app = createApp()
-    const underage = new Date()
-    underage.setUTCFullYear(underage.getUTCFullYear() - 10)
-    const body = signUpBody({ dateOfBirth: underage.toISOString().slice(0, 10) })
+    const body = signUpBody({ ageConfirmed: false })
 
     // Act
     const res = await signUp(app, body)
@@ -88,10 +84,10 @@ describe('sign-up consent + age gate', () => {
     expect(row).toBeNull()
   })
 
-  it('fails closed when no date of birth is declared', async () => {
+  it('fails closed when the age declaration is missing', async () => {
     // Arrange
     const app = createApp()
-    const { dateOfBirth: _omitted, ...body } = signUpBody()
+    const { ageConfirmed: _omitted, ...body } = signUpBody()
 
     // Act
     const res = await signUp(app, body)
@@ -105,7 +101,7 @@ describe('sign-up consent + age gate', () => {
   it('does not record consent when the sign-up is rejected', async () => {
     // Arrange
     const app = createApp()
-    const body = signUpBody({ dateOfBirth: '2020-01-01' })
+    const body = signUpBody({ ageConfirmed: false })
 
     // Act
     await signUp(app, body)

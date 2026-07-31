@@ -1,21 +1,20 @@
 import { SignUpInputSchema } from '@dm-forge/shared'
 import { createRoute, Link, useNavigate } from '@tanstack/react-router'
-import { type ChangeEvent, type FormEvent, useState } from 'react'
+import { type ChangeEvent, type FormEvent, type ReactNode, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { signUp } from '../auth/auth-client.js'
-import { SocialButtons } from '../components/auth/SocialButtons.js'
-import { Button } from '../components/ui/button.js'
+import { signIn, signUp } from '../auth/auth-client.js'
+import { AlertIcon, GoogleIcon, LockIcon, MailIcon } from '../components/dmf/icons.js'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '../components/ui/card.js'
-import { Checkbox } from '../components/ui/checkbox.js'
-import { Input } from '../components/ui/input.js'
-import { Label } from '../components/ui/label.js'
+  AuthShell,
+  Button,
+  CheckRow,
+  Display,
+  Field,
+  Input,
+  LabeledDivider,
+  OrnDivider,
+  PasswordStrength,
+} from '../components/dmf/index.js'
 import { Route as RootRoute } from './__root.js'
 
 export const Route = createRoute({
@@ -24,16 +23,28 @@ export const Route = createRoute({
   component: RegisterPage,
 })
 
-// dateOfBirth is validated server-side (age gate) but is not a persisted column,
-// so it is absent from Better Auth's typed sign-up body — extend it at the call
-// site (a third-party boundary cast, allowed by engineering.md).
+// ageConfirmed is a server-validated declaration (the "13+" checkbox) but not a
+// stored column, so it is not part of Better Auth's typed sign-up body — pass it
+// through explicitly at this third-party boundary.
 type SignUpEmailBody = Parameters<typeof signUp.email>[0]
+
+// Lightweight visual strength heuristic for the meter (0..3). Not a security
+// control — the real minimum is enforced by PasswordSchema and Better Auth.
+function passwordScore(pw: string): number {
+  let score = 0
+  if (pw.length >= 10) score += 1
+  if (pw.length >= 14) score += 1
+  if (/[^a-zA-Z0-9]/.test(pw) || (/[a-z]/.test(pw) && /[A-Z]/.test(pw) && /\d/.test(pw))) score += 1
+  return Math.min(3, score)
+}
 
 function RegisterPage() {
   const { t, i18n } = useTranslation()
+  const lang = i18n.resolvedLanguage === 'en' ? 'en' : 'pt'
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', password: '', dateOfBirth: '' })
-  const [consent, setConsent] = useState(false)
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -41,38 +52,42 @@ function RegisterPage() {
     setForm((prev) => ({ ...prev, [field]: event.target.value }))
   }
 
+  const score = useMemo(() => passwordScore(form.password), [form.password])
+  const strengthNames = ['veryWeak', 'weak', 'fair', 'strong'] as const
+  const strengthLabel = t(`auth.password.strength.${strengthNames[score] ?? 'veryWeak'}`)
+  const canSubmit = ageConfirmed && acceptedTerms && !submitting
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
 
-    const locale = i18n.resolvedLanguage === 'en' ? 'en' : 'pt-BR'
+    const locale = lang === 'en' ? 'en' : 'pt-BR'
     const parsed = SignUpInputSchema.safeParse({
-      ...form,
+      email: form.email,
+      password: form.password,
       locale,
-      // A single combined consent checkbox covers both documents (Story 6
+      ageConfirmed,
+      // A single "Terms + Privacy" checkbox covers both documents (Story 6
       // cenário 1); the server records TERMS and PRIVACY separately.
-      acceptedTerms: consent,
-      acceptedPrivacy: consent,
+      acceptedTerms,
+      acceptedPrivacy: acceptedTerms,
     })
     if (!parsed.success) {
-      const hasAgeIssue = parsed.error.issues.some((issue) => issue.path[0] === 'dateOfBirth')
-      setError(
-        hasAgeIssue
-          ? t('auth.register.errors.ageNotAllowed')
-          : t('auth.register.errors.validation'),
-      )
+      setError(t('auth.register.errors.validation'))
       return
     }
 
     setSubmitting(true)
     const { error: signUpError } = await signUp.email({
-      name: parsed.data.name,
+      // The design collects no name on sign-up; derive a placeholder from the
+      // email local part — the Mestre renames it later in the profile (US3).
+      name: parsed.data.email.split('@')[0] || parsed.data.email,
       email: parsed.data.email,
       password: parsed.data.password,
       locale: parsed.data.locale,
-      dateOfBirth: form.dateOfBirth,
+      ageConfirmed: true,
       callbackURL: '/',
-    } as SignUpEmailBody & { dateOfBirth: string })
+    } as SignUpEmailBody & { ageConfirmed: boolean })
     setSubmitting(false)
 
     if (signUpError) {
@@ -93,92 +108,136 @@ function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] w-full max-w-md items-center">
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>{t('auth.register.title')}</CardTitle>
-          <CardDescription>{t('auth.register.description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="name">{t('auth.register.nameLabel')}</Label>
-              <Input
-                id="name"
-                autoComplete="name"
-                required
-                value={form.name}
-                onChange={update('name')}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="email">{t('auth.register.emailLabel')}</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={form.email}
-                onChange={update('email')}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="password">{t('auth.register.passwordLabel')}</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                minLength={10}
-                required
-                value={form.password}
-                onChange={update('password')}
-              />
-              <p className="text-xs text-muted-foreground">{t('auth.register.passwordHint')}</p>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="dateOfBirth">{t('auth.register.dateOfBirthLabel')}</Label>
-              <Input
-                id="dateOfBirth"
-                type="date"
-                required
-                value={form.dateOfBirth}
-                onChange={update('dateOfBirth')}
-              />
-            </div>
-            <div className="flex items-start gap-2">
-              <Checkbox
-                id="consent"
-                className="mt-0.5"
-                checked={consent}
-                onChange={(event) => setConsent(event.target.checked)}
-              />
-              <Label htmlFor="consent" className="font-normal leading-snug">
-                {t('auth.register.consentLabel')}
-              </Label>
-            </div>
-            {error ? (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            ) : null}
-            <Button type="submit" disabled={!consent || submitting}>
-              {submitting ? t('auth.register.submitting') : t('auth.register.submit')}
-            </Button>
-          </form>
-          <div className="my-4 text-center text-xs uppercase text-muted-foreground">
-            {t('auth.or')}
-          </div>
-          <SocialButtons />
-        </CardContent>
-        <CardFooter>
-          <p className="text-sm text-muted-foreground">
-            {t('auth.register.haveAccount')}{' '}
-            <Link to="/login" className="font-medium text-foreground underline">
-              {t('auth.register.loginLink')}
-            </Link>
+    <AuthShell
+      lang={lang}
+      topBarRight={
+        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+          {t('auth.register.haveAccount')}{' '}
+          <Link to="/login" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+            {t('auth.register.loginLink')}
+          </Link>
+        </span>
+      }
+    >
+      <div
+        style={{ width: 440, maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <Display size={36} italic>
+            {t('auth.register.title')}
+          </Display>
+          <OrnDivider />
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0, lineHeight: 1.55 }}>
+            {t('auth.register.description')}
           </p>
-        </CardFooter>
-      </Card>
+        </div>
+
+        <Button
+          variant="oauth"
+          full
+          size="lg"
+          icon={<GoogleIcon size={18} />}
+          onClick={() => {
+            void signIn.social({ provider: 'google', callbackURL: '/' })
+          }}
+        >
+          {t('auth.social.google')}
+        </Button>
+
+        <LabeledDivider>{t('auth.register.orEmail')}</LabeledDivider>
+
+        <form
+          style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
+          onSubmit={onSubmit}
+          noValidate
+        >
+          <Field
+            label={t('auth.register.emailLabel')}
+            hint={t('auth.register.emailHint')}
+            htmlFor="email"
+          >
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="voce@exemplo.com"
+              icon={<MailIcon />}
+              required
+              value={form.email}
+              onChange={update('email')}
+            />
+          </Field>
+
+          <Field
+            label={t('auth.register.passwordLabel')}
+            hint={t('auth.register.passwordHint')}
+            hintMeta={`${form.password.length} / 10${form.password.length >= 10 ? ' ✓' : ''}`}
+            htmlFor="password"
+          >
+            <Input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="••••••••••"
+              icon={<LockIcon />}
+              minLength={10}
+              required
+              value={form.password}
+              onChange={update('password')}
+            />
+            {form.password.length > 0 && <PasswordStrength score={score} label={strengthLabel} />}
+          </Field>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+              padding: '14px 16px',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+            }}
+          >
+            <CheckRow id="age" checked={ageConfirmed} onChange={setAgeConfirmed}>
+              {t('auth.register.ageLabel')}
+            </CheckRow>
+            <CheckRow id="consent" checked={acceptedTerms} onChange={setAcceptedTerms}>
+              {t('auth.register.consentLabel')}
+            </CheckRow>
+          </div>
+
+          {error && <ErrorNote>{error}</ErrorNote>}
+
+          <Button type="submit" variant="primary" size="lg" full disabled={!canSubmit}>
+            {submitting ? t('auth.register.submitting') : t('auth.register.submit')}
+          </Button>
+        </form>
+      </div>
+    </AuthShell>
+  )
+}
+
+function ErrorNote({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        padding: '12px 14px',
+        borderRadius: 6,
+        background: 'var(--danger-surface)',
+        border: '1px solid color-mix(in srgb, var(--danger) 35%, transparent)',
+        fontSize: 13,
+        color: 'var(--text)',
+        display: 'flex',
+        gap: 10,
+        alignItems: 'flex-start',
+      }}
+      role="alert"
+    >
+      <span style={{ color: 'var(--danger)', flexShrink: 0, marginTop: 1 }}>
+        <AlertIcon size={14} />
+      </span>
+      <span>{children}</span>
     </div>
   )
 }

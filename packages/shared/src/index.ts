@@ -2,12 +2,6 @@
 // (loadEnv, etc.) live in `@dm-forge/shared/node` (`./node.ts`).
 
 export {
-  computeAge,
-  DateOfBirthSchema,
-  isOldEnough,
-  MINIMUM_AGE,
-} from './auth/age.js'
-export {
   type AcceptedVersions,
   PRIVACY_VERSION,
   requiresTermsReAcceptance,
@@ -19,7 +13,6 @@ export {
   EmailSchema,
   type Locale,
   LocaleSchema,
-  NameSchema,
   PasswordSchema,
   type SignUpInput,
   SignUpInputSchema,

@@ -1,19 +1,17 @@
 import { createRoute, Link, useNavigate } from '@tanstack/react-router'
-import { type ChangeEvent, type FormEvent, useState } from 'react'
+import { type ChangeEvent, type FormEvent, type ReactNode, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { signIn } from '../auth/auth-client.js'
-import { SocialButtons } from '../components/auth/SocialButtons.js'
-import { Button } from '../components/ui/button.js'
+import { AlertIcon, GoogleIcon, LockIcon, MailIcon } from '../components/dmf/icons.js'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '../components/ui/card.js'
-import { Input } from '../components/ui/input.js'
-import { Label } from '../components/ui/label.js'
+  AuthShell,
+  Button,
+  Display,
+  Field,
+  Input,
+  LabeledDivider,
+  OrnDivider,
+} from '../components/dmf/index.js'
 import { Route as RootRoute } from './__root.js'
 
 export const Route = createRoute({
@@ -23,10 +21,11 @@ export const Route = createRoute({
 })
 
 function LoginPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.resolvedLanguage === 'en' ? 'en' : 'pt'
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<'invalid' | 'unverified' | 'generic' | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   const update = (field: keyof typeof form) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -47,13 +46,7 @@ function LoginPage() {
       // 403 = email not verified yet (Spec Story 1); 401 = bad credentials. The
       // brute-force block (429) is wired in US2 and shown generically here.
       const status = signInError.status
-      setError(
-        status === 403
-          ? t('auth.login.unverified')
-          : status === 401
-            ? t('auth.login.invalid')
-            : t('auth.login.genericError'),
-      )
+      setError(status === 403 ? 'unverified' : status === 401 ? 'invalid' : 'generic')
       return
     }
 
@@ -61,59 +54,128 @@ function LoginPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] w-full max-w-md items-center">
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>{t('auth.login.title')}</CardTitle>
-          <CardDescription>{t('auth.login.description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="email">{t('auth.login.emailLabel')}</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={form.email}
-                onChange={update('email')}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="password">{t('auth.login.passwordLabel')}</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={form.password}
-                onChange={update('password')}
-              />
-            </div>
-            {error ? (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            ) : null}
-            <Button type="submit" disabled={submitting}>
-              {submitting ? t('auth.login.submitting') : t('auth.login.submit')}
-            </Button>
-          </form>
-          <div className="my-4 text-center text-xs uppercase text-muted-foreground">
-            {t('auth.or')}
-          </div>
-          <SocialButtons />
-        </CardContent>
-        <CardFooter>
-          <p className="text-sm text-muted-foreground">
-            {t('auth.login.noAccount')}{' '}
-            <Link to="/register" className="font-medium text-foreground underline">
-              {t('auth.login.registerLink')}
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
+    <AuthShell
+      lang={lang}
+      topBarRight={
+        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+          {t('auth.login.noAccount')}{' '}
+          <Link to="/register" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+            {t('auth.login.registerLink')}
+          </Link>
+        </span>
+      }
+    >
+      <div
+        style={{ width: 420, maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Display size={36} italic>
+            {t('auth.login.title')}
+          </Display>
+          <OrnDivider />
+        </div>
+
+        <Button
+          variant="oauth"
+          full
+          size="lg"
+          icon={<GoogleIcon size={18} />}
+          onClick={() => {
+            void signIn.social({ provider: 'google', callbackURL: '/' })
+          }}
+        >
+          {t('auth.social.google')}
+        </Button>
+
+        <LabeledDivider>{t('auth.login.or')}</LabeledDivider>
+
+        <form
+          style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
+          onSubmit={onSubmit}
+          noValidate
+        >
+          {(error === 'unverified' || error === 'generic') && (
+            <ErrorNote>
+              {error === 'unverified' ? t('auth.login.unverified') : t('auth.login.genericError')}
+            </ErrorNote>
+          )}
+
+          <Field label={t('auth.login.emailLabel')} htmlFor="email">
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              icon={<MailIcon />}
+              required
+              value={form.email}
+              onChange={update('email')}
+            />
+          </Field>
+
+          <Field
+            label={t('auth.login.passwordLabel')}
+            htmlFor="password"
+            error={error === 'invalid' ? t('auth.login.invalid') : null}
+            labelRight={
+              // Forgot-password flow ships with US2; kept visible for design
+              // fidelity, inert until then.
+              <button
+                type="button"
+                style={{
+                  fontSize: 12,
+                  color: 'var(--accent)',
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                }}
+              >
+                {t('auth.login.forgot')}
+              </button>
+            }
+          >
+            <Input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              icon={<LockIcon />}
+              required
+              error={error === 'invalid'}
+              value={form.password}
+              onChange={update('password')}
+            />
+          </Field>
+
+          <Button type="submit" variant="primary" size="lg" full disabled={submitting}>
+            {submitting ? t('auth.login.submitting') : t('auth.login.submit')}
+          </Button>
+        </form>
+      </div>
+    </AuthShell>
+  )
+}
+
+function ErrorNote({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        padding: '12px 14px',
+        borderRadius: 6,
+        background: 'var(--danger-surface)',
+        border: '1px solid color-mix(in srgb, var(--danger) 35%, transparent)',
+        fontSize: 13,
+        color: 'var(--text)',
+        display: 'flex',
+        gap: 10,
+        alignItems: 'flex-start',
+      }}
+      role="alert"
+    >
+      <span style={{ color: 'var(--danger)', flexShrink: 0, marginTop: 1 }}>
+        <AlertIcon size={14} />
+      </span>
+      <span>{children}</span>
     </div>
   )
 }

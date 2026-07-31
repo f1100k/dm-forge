@@ -25,12 +25,10 @@ async function signUp(app: App, credentials: Credentials): Promise<Response> {
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       name: faker.person.fullName(),
-      // Card S1.3 requires an adult DOB + consent on the sign-up body; this
-      // suite exercises the password/verification policy, not the age gate.
-      dateOfBirth: '1990-01-01',
+      // Card S1.3 requires the "13+" declaration on the sign-up body; this suite
+      // exercises the password/verification policy, not the age gate.
+      ageConfirmed: true,
       locale: 'pt-BR',
-      acceptedTerms: true,
-      acceptedPrivacy: true,
       ...credentials,
     }),
   })

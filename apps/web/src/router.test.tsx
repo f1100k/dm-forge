@@ -31,11 +31,12 @@ describe('router', () => {
     expect(screen.getByRole('textbox')).toBeTruthy()
   })
 
-  it('renders the register form with an unchecked consent gate', async () => {
+  it('renders the register form with unchecked consent gates', async () => {
     render(<RouterProvider router={buildRouter('/register')} />)
-    // The consent checkbox gates submission (Story 6 cenário 1): it starts
-    // unchecked, which disables the submit button.
-    const checkbox = await screen.findByRole('checkbox')
-    expect((checkbox as HTMLInputElement).checked).toBe(false)
+    // Two gates start unchecked (Story 6 cenário 1 + age declaration), which
+    // disables the submit button until both are ticked.
+    const checkboxes = await screen.findAllByRole('checkbox')
+    expect(checkboxes).toHaveLength(2)
+    expect(checkboxes.every((c) => !(c as HTMLInputElement).checked)).toBe(true)
   })
 })

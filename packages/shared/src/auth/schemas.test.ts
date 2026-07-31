@@ -7,17 +7,12 @@ import {
   SignUpInputSchema,
 } from './schemas.js'
 
-// A date of birth comfortably above the minimum age, so these cases isolate
-// the field under test rather than tripping the age refinement.
-const ADULT_DOB = '1990-01-01'
-
 function validSignUp(overrides: Record<string, unknown> = {}) {
   return {
-    name: 'Ada Lovelace',
     email: 'ada@example.com',
     password: 'correct horse',
     locale: 'pt-BR',
-    dateOfBirth: ADULT_DOB,
+    ageConfirmed: true,
     acceptedTerms: true,
     acceptedPrivacy: true,
     ...overrides,
@@ -167,22 +162,16 @@ describe('SignUpInputSchema', () => {
     expect(parsed.email).toBe('ada@example.com')
   })
 
+  it('rejects when the age is not confirmed', () => {
+    expect(() => SignUpInputSchema.parse(validSignUp({ ageConfirmed: false }))).toThrow()
+  })
+
   it('rejects when the terms box is not checked', () => {
     expect(() => SignUpInputSchema.parse(validSignUp({ acceptedTerms: false }))).toThrow()
   })
 
   it('rejects when the privacy box is not checked', () => {
     expect(() => SignUpInputSchema.parse(validSignUp({ acceptedPrivacy: false }))).toThrow()
-  })
-
-  it('rejects an under-age registration', () => {
-    const dob = new Date()
-    dob.setUTCFullYear(dob.getUTCFullYear() - 10)
-    expect(() => SignUpInputSchema.parse(validSignUp({ dateOfBirth: dob }))).toThrow()
-  })
-
-  it('rejects an empty name', () => {
-    expect(() => SignUpInputSchema.parse(validSignUp({ name: '   ' }))).toThrow()
   })
 
   it('rejects a password below the minimum length', () => {
