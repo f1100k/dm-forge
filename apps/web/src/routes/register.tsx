@@ -180,25 +180,30 @@ function RegisterPage() {
           onSubmit={onSubmit}
           noValidate
         >
-          <Field
-            label={t('auth.register.emailLabel')}
-            hint={t('auth.register.emailHint')}
-            error={emailError}
-            htmlFor="email"
-          >
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="voce@exemplo.com"
-              icon={<MailIcon />}
-              required
-              error={Boolean(emailError)}
-              value={form.email}
-              onChange={onEmailChange}
-              onBlur={() => setEmailTouched(true)}
-            />
-          </Field>
+          {/* Every email error — invalid format or an account conflict — uses the
+              same representation as the design: a red-bordered input plus a
+              danger box below it (not the small inline field text). */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Field
+              label={t('auth.register.emailLabel')}
+              hint={t('auth.register.emailHint')}
+              htmlFor="email"
+            >
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="voce@exemplo.com"
+                icon={<MailIcon />}
+                required
+                error={Boolean(emailError)}
+                value={form.email}
+                onChange={onEmailChange}
+                onBlur={() => setEmailTouched(true)}
+              />
+            </Field>
+            {emailError && <ErrorNote>{emailError}</ErrorNote>}
+          </div>
 
           <Field
             label={t('auth.register.passwordLabel')}
