@@ -17,6 +17,7 @@
       "!**/.routeTree.gen.ts",
       "!**/prisma/migrations",
       "!**/generated",
+      "!**/apps/web/src/index.css",
       "!**/.claude/settings.local.json",
       "!**/.claude/**/*.local.json"
     ]

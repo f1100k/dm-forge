@@ -4,7 +4,25 @@ import {
   EmailSchema,
   LocaleSchema,
   PasswordSchema,
+  SignUpInputSchema,
 } from './schemas.js'
+
+// A date of birth comfortably above the minimum age, so these cases isolate
+// the field under test rather than tripping the age refinement.
+const ADULT_DOB = '1990-01-01'
+
+function validSignUp(overrides: Record<string, unknown> = {}) {
+  return {
+    name: 'Ada Lovelace',
+    email: 'ada@example.com',
+    password: 'correct horse',
+    locale: 'pt-BR',
+    dateOfBirth: ADULT_DOB,
+    acceptedTerms: true,
+    acceptedPrivacy: true,
+    ...overrides,
+  }
+}
 
 // E.B.C.D. — black-box: a trimmed/lowercased string that must be a valid
 // email. Cover the two observable transforms (trim, lowercase) and the
@@ -136,5 +154,38 @@ describe('ConsentTypeSchema', () => {
 
   it('rejects a non-string value', () => {
     expect(() => ConsentTypeSchema.parse(42)).toThrow()
+  })
+})
+
+// E.B.C.D. — the register form contract. Happy path plus the consent gate
+// (both booleans must be literal `true`) and the age refinement, which are the
+// behaviors the Spec puts on this form (FR-004, Story 6 cenário 1, Story 1
+// age edge case).
+describe('SignUpInputSchema', () => {
+  it('accepts a fully valid registration', () => {
+    const parsed = SignUpInputSchema.parse(validSignUp())
+    expect(parsed.email).toBe('ada@example.com')
+  })
+
+  it('rejects when the terms box is not checked', () => {
+    expect(() => SignUpInputSchema.parse(validSignUp({ acceptedTerms: false }))).toThrow()
+  })
+
+  it('rejects when the privacy box is not checked', () => {
+    expect(() => SignUpInputSchema.parse(validSignUp({ acceptedPrivacy: false }))).toThrow()
+  })
+
+  it('rejects an under-age registration', () => {
+    const dob = new Date()
+    dob.setUTCFullYear(dob.getUTCFullYear() - 10)
+    expect(() => SignUpInputSchema.parse(validSignUp({ dateOfBirth: dob }))).toThrow()
+  })
+
+  it('rejects an empty name', () => {
+    expect(() => SignUpInputSchema.parse(validSignUp({ name: '   ' }))).toThrow()
+  })
+
+  it('rejects a password below the minimum length', () => {
+    expect(() => SignUpInputSchema.parse(validSignUp({ password: 'short' }))).toThrow()
   })
 })

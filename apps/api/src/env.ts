@@ -28,6 +28,14 @@ export const ApiEnvSchema = z
     // constrained to a bare email.
     RESEND_API_KEY: z.string().min(1).optional(),
     EMAIL_FROM: z.string().min(1).optional(),
+    // OAuth social providers (card S1.1, ADR 0003). All optional: a provider is
+    // registered only when both its id and secret are present, so local dev and
+    // tests boot without OAuth configured. Deployments that want social login
+    // must supply the matching pair (both, or neither).
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    GITHUB_CLIENT_ID: z.string().min(1).optional(),
+    GITHUB_CLIENT_SECRET: z.string().min(1).optional(),
   })
   // Fail loudly at boot when the real provider is selected without its config,
   // rather than at the first send (ADR 0005: misconfiguration surfaces at boot).

@@ -1,6 +1,59 @@
 {
   "nav": {
     "home": "Home",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "register": "Create account",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "or": "or",
+    "social": {
+      "google": "Continue with Google",
+      "github": "Continue with GitHub"
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Access your DM Forge account.",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "invalid": "Invalid email or password.",
+      "unverified": "Confirm your email before signing in. Check your inbox.",
+      "genericError": "Could not sign in. Please try again.",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Create account"
+    },
+    "register": {
+      "title": "Create account",
+      "description": "Start running your campaigns with DM Forge.",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "passwordHint": "At least 10 characters.",
+      "dateOfBirthLabel": "Date of birth",
+      "consentLabel": "I have read and accept the Terms of Use and the Privacy Policy.",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "errors": {
+        "ageNotAllowed": "You must be at least 13 years old to create an account.",
+        "userExists": "An account with this email already exists.",
+        "userExistsOAuth": "This email is already registered with a social provider. Use \"Continue with Google\" or \"Continue with GitHub\".",
+        "generic": "Could not create the account. Check your details and try again.",
+        "validation": "Please review the highlighted fields."
+      }
+    },
+    "verify": {
+      "title": "Confirm your email",
+      "description": "We sent a verification link to {{email}}. Click the link to activate your account.",
+      "descriptionNoEmail": "We sent a verification link to your email. Click the link to activate your account.",
+      "resend": "Resend email",
+      "resending": "Resending…",
+      "resent": "Email resent. Check your inbox.",
+      "resendError": "Could not resend right now. Try again in a moment.",
+      "backToLogin": "Back to sign in"
+    }
   }
 }
