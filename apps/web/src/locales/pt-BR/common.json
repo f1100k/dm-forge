@@ -1,37 +1,39 @@
 {
-  "nav": {
-    "home": "Início",
-    "signIn": "Entrar",
-    "register": "Criar conta",
-    "signOut": "Sair"
-  },
   "auth": {
-    "or": "ou",
     "social": {
-      "google": "Continuar com Google",
-      "github": "Continuar com GitHub"
+      "google": "Continuar com Google"
+    },
+    "password": {
+      "strength": {
+        "veryWeak": "Muito fraca",
+        "weak": "Fraca",
+        "fair": "Média",
+        "strong": "Forte"
+      }
     },
     "login": {
-      "title": "Entrar",
-      "description": "Acesse sua conta do DM Forge.",
+      "title": "Bem-vindo de volta.",
+      "or": "OU",
       "emailLabel": "E-mail",
       "passwordLabel": "Senha",
+      "forgot": "Esqueci minha senha",
       "submit": "Entrar",
       "submitting": "Entrando…",
-      "invalid": "E-mail ou senha inválidos.",
+      "invalid": "E-mail ou senha incorretos.",
       "unverified": "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.",
       "genericError": "Não foi possível entrar. Tente novamente.",
-      "noAccount": "Ainda não tem conta?",
+      "noAccount": "Novo por aqui?",
       "registerLink": "Criar conta"
     },
     "register": {
-      "title": "Criar conta",
-      "description": "Comece a mestrar suas campanhas com o DM Forge.",
-      "nameLabel": "Nome",
+      "title": "Forje sua mesa.",
+      "description": "Em poucos cliques você está dentro. Comece com Google ou e-mail.",
+      "orEmail": "OU COM E-MAIL",
       "emailLabel": "E-mail",
+      "emailHint": "Usamos para login e comunicações da conta.",
       "passwordLabel": "Senha",
-      "passwordHint": "Mínimo de 10 caracteres.",
-      "dateOfBirthLabel": "Data de nascimento",
+      "passwordHint": "Mínimo 10 caracteres. Use algo memorável.",
+      "ageLabel": "Tenho 13 anos ou mais.",
       "consentLabel": "Li e aceito os Termos de Uso e a Política de Privacidade.",
       "submit": "Criar conta",
       "submitting": "Criando conta…",
@@ -40,20 +42,22 @@
       "errors": {
         "ageNotAllowed": "Você precisa ter pelo menos 13 anos para criar uma conta.",
         "userExists": "Já existe uma conta com este e-mail.",
-        "userExistsOAuth": "Este e-mail já está cadastrado com um provedor social. Use \"Continuar com Google\" ou \"Continuar com GitHub\".",
+        "userExistsOAuth": "Este e-mail já tem conta criada com Google. Use Continuar com Google.",
         "generic": "Não foi possível criar a conta. Verifique os dados e tente novamente.",
         "validation": "Confira os campos destacados."
       }
     },
     "verify": {
-      "title": "Confirme seu e-mail",
-      "description": "Enviamos um link de verificação para {{email}}. Clique no link para ativar sua conta.",
-      "descriptionNoEmail": "Enviamos um link de verificação para o seu e-mail. Clique no link para ativar sua conta.",
+      "title": "Verifique seu e-mail.",
+      "description": "Enviamos um link de confirmação para {{email}}. Clique no link para entrar no DM Forge.",
+      "descriptionNoEmail": "Enviamos um link de confirmação para o seu e-mail. Clique no link para entrar no DM Forge.",
+      "hint": "Pode levar até 2 minutos. Confira spam / promoções.",
       "resend": "Reenviar e-mail",
       "resending": "Reenviando…",
       "resent": "E-mail reenviado. Verifique sua caixa de entrada.",
       "resendError": "Não foi possível reenviar agora. Tente novamente em instantes.",
-      "backToLogin": "Voltar para entrar"
+      "useAnotherEmail": "Usar outro e-mail",
+      "signOut": "Sair"
     }
   }
 }

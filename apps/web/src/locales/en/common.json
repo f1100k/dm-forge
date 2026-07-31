@@ -1,37 +1,39 @@
 {
-  "nav": {
-    "home": "Home",
-    "signIn": "Sign in",
-    "register": "Create account",
-    "signOut": "Sign out"
-  },
   "auth": {
-    "or": "or",
     "social": {
-      "google": "Continue with Google",
-      "github": "Continue with GitHub"
+      "google": "Continue with Google"
+    },
+    "password": {
+      "strength": {
+        "veryWeak": "Very weak",
+        "weak": "Weak",
+        "fair": "Fair",
+        "strong": "Strong"
+      }
     },
     "login": {
-      "title": "Sign in",
-      "description": "Access your DM Forge account.",
+      "title": "Welcome back.",
+      "or": "OR",
       "emailLabel": "Email",
       "passwordLabel": "Password",
+      "forgot": "Forgot my password",
       "submit": "Sign in",
       "submitting": "Signing in…",
-      "invalid": "Invalid email or password.",
+      "invalid": "Incorrect email or password.",
       "unverified": "Confirm your email before signing in. Check your inbox.",
       "genericError": "Could not sign in. Please try again.",
-      "noAccount": "Don't have an account?",
+      "noAccount": "New here?",
       "registerLink": "Create account"
     },
     "register": {
-      "title": "Create account",
-      "description": "Start running your campaigns with DM Forge.",
-      "nameLabel": "Name",
+      "title": "Forge your table.",
+      "description": "You're in within a few clicks. Start with Google or email.",
+      "orEmail": "OR WITH EMAIL",
       "emailLabel": "Email",
+      "emailHint": "Used for login and account communications.",
       "passwordLabel": "Password",
-      "passwordHint": "At least 10 characters.",
-      "dateOfBirthLabel": "Date of birth",
+      "passwordHint": "At least 10 characters. Use something memorable.",
+      "ageLabel": "I am 13 years or older.",
       "consentLabel": "I have read and accept the Terms of Use and the Privacy Policy.",
       "submit": "Create account",
       "submitting": "Creating account…",
@@ -40,20 +42,22 @@
       "errors": {
         "ageNotAllowed": "You must be at least 13 years old to create an account.",
         "userExists": "An account with this email already exists.",
-        "userExistsOAuth": "This email is already registered with a social provider. Use \"Continue with Google\" or \"Continue with GitHub\".",
+        "userExistsOAuth": "This email already has an account created with Google. Use Continue with Google.",
         "generic": "Could not create the account. Check your details and try again.",
         "validation": "Please review the highlighted fields."
       }
     },
     "verify": {
-      "title": "Confirm your email",
-      "description": "We sent a verification link to {{email}}. Click the link to activate your account.",
-      "descriptionNoEmail": "We sent a verification link to your email. Click the link to activate your account.",
+      "title": "Verify your email.",
+      "description": "We sent a confirmation link to {{email}}. Click the link to enter DM Forge.",
+      "descriptionNoEmail": "We sent a confirmation link to your email. Click the link to enter DM Forge.",
+      "hint": "It can take up to 2 minutes. Check spam / promotions.",
       "resend": "Resend email",
       "resending": "Resending…",
       "resent": "Email resent. Check your inbox.",
       "resendError": "Could not resend right now. Try again in a moment.",
-      "backToLogin": "Back to sign in"
+      "useAnotherEmail": "Use another email",
+      "signOut": "Sign out"
     }
   }
 }

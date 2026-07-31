@@ -55,6 +55,9 @@ describe('register screen', () => {
 
     expect(submitButton(container).disabled).toBe(true)
 
+    // Both gates (age + terms) must be ticked to enable submission.
+    fireEvent.click(field(container, 'age'))
+    expect(submitButton(container).disabled).toBe(true)
     fireEvent.click(field(container, 'consent'))
 
     expect(submitButton(container).disabled).toBe(false)
@@ -71,10 +74,9 @@ describe('register screen', () => {
     const { container } = renderApp('/register')
     await screen.findByRole('heading')
 
-    fireEvent.change(field(container, 'name'), { target: { value: 'Ada Lovelace' } })
     fireEvent.change(field(container, 'email'), { target: { value: 'ada@example.com' } })
     fireEvent.change(field(container, 'password'), { target: { value: 'correct horse battery' } })
-    fireEvent.change(field(container, 'dateOfBirth'), { target: { value: '1990-01-01' } })
+    fireEvent.click(field(container, 'age'))
     fireEvent.click(field(container, 'consent'))
     fireEvent.click(submitButton(container))
 

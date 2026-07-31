@@ -3,10 +3,10 @@ import { createApp } from '../../../helpers/harness/app.js'
 
 type App = ReturnType<typeof createApp>
 
-// Card S1.1 (Spec Story 1): Google and GitHub OAuth are registered. A full
-// OAuth round-trip needs the live provider, so these tests verify the wiring —
-// that Better Auth produces the provider authorization redirect for each
-// configured provider (dummy credentials come from the test global-setup). The
+// Card S1.1 (Spec Story 1): Google OAuth is registered (the sole social
+// provider). A full OAuth round-trip needs the live provider, so this test
+// verifies the wiring — that Better Auth produces the provider authorization
+// redirect (dummy credentials come from the test global-setup). The
 // callback/linking behavior is covered where feasible in signup-consent-age and
 // documented as wiring-level in the PR.
 
@@ -36,20 +36,6 @@ describe('social sign-in wiring', () => {
     const url = await redirectUrl(res)
     expect(url).toContain('accounts.google.com')
     expect(url).toContain('test-google-client-id')
-  })
-
-  it('produces a GitHub authorization redirect for the configured client', async () => {
-    // Arrange
-    const app = createApp()
-
-    // Act
-    const res = await startSocialSignIn(app, 'github')
-
-    // Assert
-    expect(res.ok).toBe(true)
-    const url = await redirectUrl(res)
-    expect(url).toContain('github.com')
-    expect(url).toContain('test-github-client-id')
   })
 
   it('rejects an unknown provider', async () => {

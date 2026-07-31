@@ -3,10 +3,8 @@ import {
   type ConsentType,
   createId,
   EmailSchema,
-  isOldEnough,
   type Locale,
   LocaleSchema,
-  MINIMUM_AGE,
   PRIVACY_VERSION,
   TERMS_VERSION,
 } from '@dm-forge/shared'
@@ -27,16 +25,14 @@ const emailSender = createEmailSender({
   from: env.EMAIL_FROM,
 })
 
-// Register a social provider only when both halves of its credential pair are
-// present (Tech Design §3.1, card S1.1). Configuring one without the other is a
-// deployment mistake we'd rather surface as "provider absent" than as a runtime
-// OAuth failure. Spread keeps the object literal typed for Better Auth.
+// Register Google only when its credential pair is present (Tech Design §3.1,
+// card S1.1). Configuring half a pair is a deployment mistake we'd rather
+// surface as "provider absent" than as a runtime OAuth failure. GitHub is out of
+// scope for this product — the canonical design offers Google as the sole social
+// provider. Spread keeps the object literal typed for Better Auth.
 const socialProviders = {
   ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
     ? { google: { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET } }
-    : {}),
-  ...(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
-    ? { github: { clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET } }
     : {}),
 }
 
@@ -85,7 +81,7 @@ export const auth = betterAuth({
     // trusted so the link is honoured on their verified emails.
     accountLinking: {
       enabled: true,
-      trustedProviders: ['google', 'github'],
+      trustedProviders: ['google'],
     },
   },
   user: {
@@ -130,16 +126,17 @@ export const auth = betterAuth({
     // Guards applied to email sign-up before Better Auth creates the user.
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path !== '/sign-up/email') return
-      const body = ctx.body as { dateOfBirth?: unknown; email?: unknown } | undefined
+      const body = ctx.body as { ageConfirmed?: unknown; email?: unknown } | undefined
 
       // Enforce the minimum-age declaration server-side (Spec Story 1 edge case,
-      // FR-018, LGPD Art. 14). Fail-closed: a body without a valid date of birth
-      // is rejected. OAuth signups do not collect age and are not gated here —
-      // the declaration lives on the email register form (Tech Design §6.8).
-      if (!isOldEnough(body?.dateOfBirth, MINIMUM_AGE, new Date())) {
+      // FR-018, LGPD Art. 14). The register form collects it as a "13 anos ou
+      // mais" checkbox; fail-closed here — anything but an explicit `true` is
+      // rejected. OAuth signups do not collect age and are not gated (Tech
+      // Design §6.8).
+      if (body?.ageConfirmed !== true) {
         throw new APIError('BAD_REQUEST', {
           code: 'AGE_NOT_ALLOWED',
-          message: `You must be at least ${MINIMUM_AGE} years old to create an account.`,
+          message: 'You must confirm you are at least 13 years old to create an account.',
         })
       }
 

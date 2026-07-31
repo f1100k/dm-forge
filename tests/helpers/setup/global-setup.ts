@@ -13,13 +13,11 @@ export async function setup() {
   process.env.BETTER_AUTH_URL ??= 'http://localhost:3000'
   process.env.WEB_ORIGIN ??= 'http://localhost:5173'
   process.env.ENCRYPTION_KEY ??= Buffer.alloc(32, 1).toString('base64')
-  // Dummy OAuth credentials so Better Auth registers the Google/GitHub
-  // providers under test (card S1.1). No real OAuth call is made — tests assert
-  // the provider redirect URL is produced and mock the callback boundary.
+  // Dummy Google OAuth credentials so Better Auth registers the provider under
+  // test (card S1.1). No real OAuth call is made — tests assert the provider
+  // redirect URL is produced and mock the callback boundary.
   process.env.GOOGLE_CLIENT_ID ??= 'test-google-client-id'
   process.env.GOOGLE_CLIENT_SECRET ??= 'test-google-client-secret'
-  process.env.GITHUB_CLIENT_ID ??= 'test-github-client-id'
-  process.env.GITHUB_CLIENT_SECRET ??= 'test-github-client-secret'
 
   return async () => {
     await ctx.stop()
