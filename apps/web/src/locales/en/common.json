@@ -4,6 +4,8 @@
       "google": "Continue with Google"
     },
     "password": {
+      "show": "Show password",
+      "hide": "Hide password",
       "strength": {
         "veryWeak": "Very weak",
         "weak": "Weak",

@@ -101,6 +101,23 @@ describe('register screen', () => {
     })
   })
 
+  it('toggles password visibility with a persistent reveal button', async () => {
+    const { container } = renderApp('/register')
+    await screen.findByRole('heading')
+    const password = field(container, 'password')
+    const toggle = screen.getByRole('button', { name: /senha|password/i })
+
+    expect(password.getAttribute('type')).toBe('password')
+
+    fireEvent.click(toggle)
+    expect(password.getAttribute('type')).toBe('text')
+
+    // The button stays after the input loses focus, and toggles back.
+    fireEvent.blur(password)
+    fireEvent.click(toggle)
+    expect(password.getAttribute('type')).toBe('password')
+  })
+
   it('surfaces an already-linked-account conflict on the email field', async () => {
     // The server rejects an email already registered via Google.
     server.use(

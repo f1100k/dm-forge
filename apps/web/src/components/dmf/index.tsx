@@ -4,7 +4,8 @@
 // faithfully to the design. Default theme is Obsidian dark, editorial type.
 
 import type { ButtonHTMLAttributes, CSSProperties, InputHTMLAttributes, ReactNode } from 'react'
-import { CheckIcon } from './icons.js'
+import { useState } from 'react'
+import { CheckIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.js'
 
 // ── Logo / wordmark ──────────────────────────────────────────────
 export function Logo({ size = 20 }: { size?: number }) {
@@ -318,11 +319,60 @@ export function Input({ icon, suffix, error, style, ...rest }: InputProps) {
         {...rest}
       />
       {suffix && (
-        <span style={{ color: 'var(--text-dim)', fontSize: 12, fontFamily: 'var(--font-mono)' }}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            color: 'var(--text-dim)',
+            fontSize: 12,
+            fontFamily: 'var(--font-mono)',
+          }}
+        >
           {suffix}
         </span>
       )}
     </div>
+  )
+}
+
+// Password field with a persistent show/hide toggle. Replaces the browser's
+// native reveal control (suppressed in index.css), which is low-contrast on the
+// dark theme and vanishes on blur. The toggle sits in the label colour and is
+// always visible; keeping mousedown from stealing focus lets the input stay
+// focused while toggling.
+type PasswordInputProps = Omit<InputProps, 'icon' | 'suffix' | 'type'> & {
+  labels: { show: string; hide: string }
+}
+
+export function PasswordInput({ labels, ...rest }: PasswordInputProps) {
+  const [visible, setVisible] = useState(false)
+  return (
+    <Input
+      {...rest}
+      type={visible ? 'text' : 'password'}
+      icon={<LockIcon />}
+      suffix={
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => setVisible((value) => !value)}
+          aria-label={visible ? labels.hide : labels.show}
+          aria-pressed={visible}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            margin: 0,
+            cursor: 'pointer',
+            color: 'var(--text-muted)',
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}
+        >
+          {visible ? <EyeOffIcon /> : <EyeIcon />}
+        </button>
+      }
+    />
   )
 }
 

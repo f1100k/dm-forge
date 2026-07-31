@@ -43,6 +43,14 @@
     opacity: 1;
   }
 
+  /* Hide the browser's native password reveal/clear controls (Edge): low
+     contrast on the dark theme and they vanish on blur. We provide our own
+     always-visible show/hide toggle (dmf PasswordInput). */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+
   *::selection {
     background: var(--accent);
     color: #0E0F12;

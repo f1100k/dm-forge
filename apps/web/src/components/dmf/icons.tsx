@@ -105,6 +105,45 @@ export function AlertIcon({ size = 14 }: IconProps) {
   )
 }
 
+export function EyeIcon({ size = 16 }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M1 8s2.5-4.5 7-4.5 7 4.5 7 4.5-2.5 4.5-7 4.5S1 8 1 8Z" />
+      <circle cx="8" cy="8" r="2" />
+    </svg>
+  )
+}
+
+export function EyeOffIcon({ size = 16 }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6.6 3.2A6.7 6.7 0 0 1 8 3c4.5 0 7 5 7 5a12.6 12.6 0 0 1-2.1 2.6" />
+      <path d="M3.3 4.3A12.6 12.6 0 0 0 1 8s2.5 5 7 5a6.7 6.7 0 0 0 2.7-.55" />
+      <path d="M2 2l12 12" />
+    </svg>
+  )
+}
+
 export function MailBadgeIcon({ size = 26 }: IconProps) {
   return (
     <svg
