@@ -119,7 +119,17 @@ function RegisterPage() {
     setSubmitting(false)
 
     if (signUpError) {
-      const code = (signUpError as { code?: string }).code
+      const details = signUpError as { status?: number; code?: string; message?: string }
+      const code = details.code
+      // Surface the real cause in dev so a generic failure is diagnosable; the
+      // user-facing copy stays typed and stable (docs/resilience-observability.md).
+      if (import.meta.env.DEV) {
+        console.error('[register] sign-up failed', {
+          status: details.status,
+          code,
+          message: details.message,
+        })
+      }
       // Email conflicts belong on the email field (same place as a format
       // error); everything else is a form-level message in the banner.
       if (code === 'USER_EXISTS_OAUTH') {
