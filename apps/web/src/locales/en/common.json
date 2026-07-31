@@ -40,6 +40,7 @@
       "haveAccount": "Already have an account?",
       "loginLink": "Sign in",
       "errors": {
+        "emailInvalid": "Enter a valid email address.",
         "ageNotAllowed": "You must be at least 13 years old to create an account.",
         "userExists": "An account with this email already exists.",
         "userExistsOAuth": "This email already has an account created with Google. Use Continue with Google.",

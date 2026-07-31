@@ -7,7 +7,7 @@ import { Route as VerifyEmailRoute } from '@dm-forge/web/routes/verify-email'
 import { trpc } from '@dm-forge/web/trpc'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { httpBatchLink } from '@trpc/client'
 import { HttpResponse, http } from 'msw'
 import { describe, expect, it } from 'vitest'
@@ -82,5 +82,22 @@ describe('register screen', () => {
 
     // The verify-email screen echoes the address the link was sent to.
     expect(await screen.findByText(/ada@example.com/)).toBeTruthy()
+  })
+
+  it('validates the email inline, without waiting for submit', async () => {
+    const { container } = renderApp('/register')
+    await screen.findByRole('heading')
+    const email = field(container, 'email')
+
+    // Invalid address surfaces an inline error on blur (matches pt-BR/en copy).
+    fireEvent.change(email, { target: { value: 'not-an-email' } })
+    fireEvent.blur(email)
+    expect(await screen.findByText(/válido|valid/i)).toBeTruthy()
+
+    // The error clears live once the address becomes valid — no submit needed.
+    fireEvent.change(email, { target: { value: 'ada@example.com' } })
+    await waitFor(() => {
+      expect(screen.queryByText(/válido|valid/i)).toBeNull()
+    })
   })
 })

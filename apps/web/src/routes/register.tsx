@@ -1,4 +1,4 @@
-import { SignUpInputSchema } from '@dm-forge/shared'
+import { EmailSchema, SignUpInputSchema } from '@dm-forge/shared'
 import { createRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type ChangeEvent, type FormEvent, type ReactNode, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -43,6 +43,7 @@ function RegisterPage() {
   const lang = i18n.resolvedLanguage === 'en' ? 'en' : 'pt'
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
+  const [emailTouched, setEmailTouched] = useState(false)
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,6 +53,14 @@ function RegisterPage() {
     setForm((prev) => ({ ...prev, [field]: event.target.value }))
   }
 
+  // Inline email validation: silent until the field is touched (blurred or a
+  // submit attempt), then live on every keystroke so the message clears the
+  // instant the address becomes valid.
+  const emailError =
+    emailTouched && !EmailSchema.safeParse(form.email).success
+      ? t('auth.register.errors.emailInvalid')
+      : null
+
   const score = useMemo(() => passwordScore(form.password), [form.password])
   const strengthNames = ['veryWeak', 'weak', 'fair', 'strong'] as const
   const strengthLabel = t(`auth.password.strength.${strengthNames[score] ?? 'veryWeak'}`)
@@ -60,6 +69,8 @@ function RegisterPage() {
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
+    // Reveal any inline email error on submit, even if the field was never blurred.
+    setEmailTouched(true)
 
     const locale = lang === 'en' ? 'en' : 'pt-BR'
     const parsed = SignUpInputSchema.safeParse({
@@ -73,7 +84,10 @@ function RegisterPage() {
       acceptedPrivacy: acceptedTerms,
     })
     if (!parsed.success) {
-      setError(t('auth.register.errors.validation'))
+      // A bad email is shown inline on its field; only fall back to the generic
+      // banner for other problems.
+      const emailIssue = parsed.error.issues.some((issue) => issue.path[0] === 'email')
+      if (!emailIssue) setError(t('auth.register.errors.validation'))
       return
     }
 
@@ -154,6 +168,7 @@ function RegisterPage() {
           <Field
             label={t('auth.register.emailLabel')}
             hint={t('auth.register.emailHint')}
+            error={emailError}
             htmlFor="email"
           >
             <Input
@@ -163,8 +178,10 @@ function RegisterPage() {
               placeholder="voce@exemplo.com"
               icon={<MailIcon />}
               required
+              error={Boolean(emailError)}
               value={form.email}
               onChange={update('email')}
+              onBlur={() => setEmailTouched(true)}
             />
           </Field>
 
