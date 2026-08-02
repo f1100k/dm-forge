@@ -33,7 +33,7 @@ Everything about how AI agents (Claude Code, Cursor) operate in this project is 
 - `.ai/constitution.md` — principles
 - `.ai/engineering.md` — stack and standards
 - `.ai/skills/` — full-content skills
-- `.ai/mcp.json` — MCP server config (Notion, context7, GitHub)
+- `.ai/mcp.json` — MCP server config (Notion, context7). GitHub is **not** an MCP server: every GitHub operation goes through the `gh` CLI.
 
 When changing how the agent works, edit `.ai/`. The `.claude/` and `.cursor/` folders contain only thin adapters that point back to `.ai/`.
 

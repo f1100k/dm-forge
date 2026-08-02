@@ -7,10 +7,6 @@
     "context7": {
       "command": "./scripts/mcp-launch.sh",
       "args": ["@upstash/context7-mcp"]
-    },
-    "github": {
-      "command": "./scripts/mcp-launch.sh",
-      "args": ["@modelcontextprotocol/server-github"]
     }
   }
 }
