@@ -26,7 +26,7 @@ catalog:
   "@prisma/client": ^7.8.0
 
   # Auth
-  better-auth: ^1.6.13
+  better-auth: ^1.6.22
 
   # tRPC (the 11.0.0-rc.660 line co-versions server + client + react-query)
   "@trpc/server": ^11.0.0-rc.660
