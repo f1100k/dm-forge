@@ -170,15 +170,23 @@ The last line of the body (or footer) references the Kanban card — ID or link.
 git push -u origin <branch>
 ```
 
-### 11. Open the PR via the GitHub MCP
+### 11. Open the PR with the `gh` CLI
 
-Via the **GitHub MCP** (`create_pull_request`), open the PR against `master`:
+**Always use `gh`** — never a GitHub MCP server. `gh` is the single supported path for every GitHub operation in this project (PRs, issues, reviews, checks). It shares the shell's existing authentication, so there is no separate token to keep in sync.
 
-- **Repo:** `f1100k/dm-forge` (or whatever `git remote -v` shows)
+Open the PR against `master`:
+
+```bash
+gh pr create --base master --head <branch> \
+  --title "<type>(<scope>): <description>" \
+  --body-file <path>
+```
+
+- **Repo:** inferred from `git remote -v` (`f1100k/dm-forge`). Pass `--repo` only when the inference is wrong.
 - **Head:** the branch published in step 10
 - **Base:** `master`
 - **Title:** Conventional Commits — `<type>(<scope>): <description>`. Use the appropriate type (`feat`, `fix`, `docs`, `refactor`, `chore`, etc.) and scope (package or area). No card ID in the title — that goes in the body.
-- **Body:**
+- **Body:** write it to a file and pass `--body-file`. Inline `--body` mangles multi-line Markdown. Include:
   - Link to the Kanban card
   - Link to the Spec
   - Link to the Tech Design
@@ -186,7 +194,7 @@ Via the **GitHub MCP** (`create_pull_request`), open the PR against `master`:
   - `## Why` section (link to the Spec; don't repeat the Spec)
   - `## Test plan` section (manual or automatic checks)
 
-If the call fails (token without permission, branch without upstream, etc.), stop and report the error to the user — don't try a workaround.
+If the command fails (not authenticated, branch without upstream, etc.), stop and report the error to the user — don't fall back to an MCP server or any other workaround.
 
 ### 12. Update the card in the Kanban
 
@@ -206,11 +214,11 @@ Report to the user in up to 5 lines:
 ## Available resources
 
 - **Notion MCP** — read card/Spec/Tech Design, move the card in the Kanban, paste links
-- **GitHub MCP** — create the PR (`create_pull_request`); read files via API if needed; comment on PRs/issues
+- **`gh` CLI** — every GitHub operation: create the PR, read files, comment on PRs/issues. Never a GitHub MCP server.
 - **context7 MCP** — current library/SDK/CLI docs (use when touching external APIs instead of guessing from memory)
 - **Diagrams** — Tech Design diagrams are Mermaid `mermaid` code blocks; read them inline in Notion. This skill doesn't create diagrams.
 - **Filesystem** — Constitution, engineering, relevant `docs/*.md`, ADRs, code
-- **Bash** — project commands (pnpm, git). Code push goes via `git` + SSH (existing setup).
+- **Bash** — project commands (pnpm, git, gh). Code push goes via `git` + SSH (existing setup).
 
 ## On error
 

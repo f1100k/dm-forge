@@ -201,10 +201,12 @@ Code + PR
 - **Notion MCP** — read/create pages in `Docs`, move `Kanban` cards, retrieve database schemas
 - **Mermaid (diagrams-as-code)** — diagrams (flow, architecture, sequence, state) authored as `mermaid` code blocks in the Notion artifact; Notion renders them natively, so no MCP/server is needed (see ADR 0006)
 - **context7 MCP** — current library/framework docs (preferred over web search for SDK/API references)
-- **GitHub MCP** — create/comment on PRs and issues, read files via API. Code push still via `git` + SSH (the MCP does not replace `git push`).
+- **`gh` CLI** — every GitHub operation: create/comment on PRs and issues, read files, inspect checks. Code push still via `git` + SSH (`gh` does not replace `git push`).
 - **Filesystem** — code, ADRs in `docs/adr/`, Constitution in `.ai/constitution.md`, Engineering rules in `.ai/engineering.md`, detail docs in `docs/*.md`
 
-> **GitHub MCP setup** — server: `@modelcontextprotocol/server-github`. Auth: `GITHUB_PERSONAL_ACCESS_TOKEN` in `.env` (fine-grained PAT, scoped to `f1100k/dm-forge`, with at minimum `Pull requests: read/write`, `Contents: read`, `Issues: read/write`, `Metadata: read`).
+> **GitHub access is `gh`-only.** There is no GitHub MCP server, and agents must not add one. `gh` uses the shell's own authentication (`gh auth status` to check, `gh auth login` to fix), so there is no second credential to keep in sync with the app's `.env` — the failure mode that retired the MCP server was a PAT that had gone stale while `gh` kept working.
+>
+> Prefer `--body-file` over `--body` when a command takes Markdown; inline bodies mangle multi-line content.
 
 ## Principles
 
