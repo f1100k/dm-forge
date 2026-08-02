@@ -60,6 +60,7 @@ Any dependency used in **more than one workspace** is pinned in the `catalog:` b
 
 ## Standards
 
+- **Unit of work = vertical slice.** Each PR delivers one user story end-to-end across every layer it touches (UI → API → domain → data → tests), not an isolated horizontal layer. The story's tests ship in that same PR. If a story won't fit one clean PR, split the story upstream (Spec), not into layer tasks. See Constitution principle 9.
 - **TypeScript strict** (`strict`, `noUncheckedIndexedAccess`). No `any`. Use `unknown` and narrow when needed. `as` only at boundaries (parsing, third-party). `@ts-expect-error` requires a comment explaining why.
 - **ESM only** (`"type": "module"`).
 - **File names**: `kebab-case.ts`. React components and their files: `PascalCase.tsx`.

@@ -34,6 +34,9 @@ No Redis, queue, vector DB, or WebSocket without an ADR and a concrete problem t
 ### 8. Every complexity has permanent cost; every simplicity preserves optionality
 Code is added in minutes and lived with for years. When in doubt, choose the path that keeps doors open and removes the fewest.
 
+### 9. Vertical slices are the unit of delivery
+Work ships as **vertical slices**: one user story cut end-to-end through every layer it touches (UI → API → domain → data → tests), in a single PR. Never as horizontal layers ("do the backend", "do the frontend") that are individually unusable. Tests for the story's behavior ship inside the same slice — never as a separate card or PR. If a story can't fit one clean PR, the story is too big: split it into **independent stories at the Spec**, never into layer tasks. The only work that isn't a slice is a minimal **Foundational** prerequisite genuinely shared across slices (e.g., a new table, an encryption helper) — kept as small as possible.
+
 ## How to use this document
 
 - **Always read together with `engineering.md`.** This file is the principles; `engineering.md` is the stack, structure, and standards the principles imply.

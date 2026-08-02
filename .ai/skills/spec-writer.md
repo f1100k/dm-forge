@@ -259,7 +259,7 @@ A Spec usually does not need diagrams — textual scenarios (section 3) are enou
 ## Best practices
 
 - **Focus on "what" and "why", never on "how".** Architecture, database, algorithm is Tech Design — move it there.
-- **User stories as MVP slices.** Each P1/P2/P3 story should deliver value alone. If story 2 can't ship without story 1, it's not really independent — rethink the slice.
+- **User stories as vertical slices.** Each story is the unit of delivery (Constitution principle 9): it ships end-to-end through every layer in one PR. Each P1/P2/P3 story must deliver value alone — if story 2 can't ship without story 1, it's not independent; rethink the slice. Size each story so its slice fits one clean PR; if a story is too big to fit, split it into smaller independent stories here, never leave the split to be done by layer downstream.
 - **Success Criteria are user-facing metrics.** "Users complete setup in <2 min", "campaign opens with <500ms perceived latency". Tech metrics belong in the Tech Design.
 - **Acceptance Scenarios in Given/When/Then.** Forces concrete preconditions and outcomes; vague ones don't survive the format.
 - **Write "Out of Scope" early.** Prevents misunderstandings. "Does this fit?" → into that section.
