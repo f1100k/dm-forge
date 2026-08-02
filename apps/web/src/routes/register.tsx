@@ -3,6 +3,7 @@ import { createRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type ChangeEvent, type FormEvent, type ReactNode, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { signIn, signUp } from '../auth/auth-client.js'
+import { appCallbackUrl } from '../auth/callback-url.js'
 import { AlertIcon, GoogleIcon, MailIcon } from '../components/dmf/icons.js'
 import {
   AuthShell,
@@ -114,7 +115,7 @@ function RegisterPage() {
       password: parsed.data.password,
       locale: parsed.data.locale,
       ageConfirmed: true,
-      callbackURL: '/',
+      callbackURL: appCallbackUrl(),
     } as SignUpEmailBody & { ageConfirmed: boolean })
     setSubmitting(false)
 
@@ -178,7 +179,7 @@ function RegisterPage() {
           size="lg"
           icon={<GoogleIcon size={18} />}
           onClick={() => {
-            void signIn.social({ provider: 'google', callbackURL: '/' })
+            void signIn.social({ provider: 'google', callbackURL: appCallbackUrl() })
           }}
         >
           {t('auth.social.google')}
