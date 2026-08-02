@@ -17,12 +17,12 @@ Use when the user asks to:
 
 ## Core principle
 
-**Each item in section 9 (Execution plan) of the Tech Design becomes one card in the Kanban.** The Skill does not invent tasks, doesn't merge items, doesn't split items — granularity comes from the Tech Design. If the Execution Plan has wrong granularity, **stop and ask the user to adjust the Tech Design** instead of improvising here.
+**Each item in section 9 (Execution plan) of the Tech Design becomes one card in the Kanban**, and each user-story item is a **vertical slice** — one card that owns the whole story end-to-end (UI → API → domain → data → tests) and ships in a single PR (Constitution principle 9). The Skill does not invent tasks, doesn't merge items, doesn't split items — granularity comes from the Tech Design. In particular, **never split a story's slice into per-layer cards** ("backend card" + "frontend card"): that is the horizontal antipattern the project rejects. If the Execution Plan is fatally granular (sliced by layer) or has any other wrong granularity, **stop and ask the user to adjust the Tech Design** instead of improvising here.
 
 The cards inherit three things from the Tech Design:
-- **Phase** (Foundational / User Story P1 / User Story P2 / Polish) — user stories ship as MVP slices
-- **`[P]` parallel marker** — tasks that can run alongside other `[P]` tasks in the same group
-- **Dependencies** — tasks that must complete first (e.g., a User Story task usually depends on the Foundational phase)
+- **Phase** (Foundational / User Story P1 / User Story P2 / Polish) — each user story is one vertical slice card
+- **`[P]` parallel marker** — slices that can run alongside other `[P]` slices (different stories, no shared mutation); never between layers of one slice
+- **Dependencies** — slices that must complete first (e.g., a user-story slice usually depends on the Foundational phase)
 
 ## Prerequisites
 
@@ -80,41 +80,40 @@ Via Notion MCP, read the related Spec. In particular:
 
 Before creating cards, validate the Execution Plan:
 
-- ✅ Each item describes a reasonably independent unit of work (1 PR each, ideally)
+- ✅ Each user-story item is **one vertical slice** — a single card delivering that story end-to-end (UI → API → domain → data → tests) in one PR. Spanning multiple layers is expected and correct, not a smell.
 - ✅ Items are grouped by phase (Foundational / User Stories / Polish) — if not, ask the user to adjust the Tech Design
-- ✅ Each User Story phase contains tasks that, together, deliver that story end-to-end (so each P1/P2/P3 story is a usable MVP slice when done)
-- ✅ `[P]` markers are present on items the Tech Design judged parallelizable — if missing entirely, ask the user whether to infer (rule: tasks touching different files with no shared mutation can be `[P]`)
-- ❌ Giant item mixing backend + frontend + migration + tests
-- ❌ Vague item ("do the backend") with no scope indication
-- ❌ User Story phase with no test coverage
+- ✅ Foundational is minimal — only prerequisites genuinely shared across slices; per-story work lives inside its slice, not here
+- ✅ `[P]` markers are present on slices the Tech Design judged parallelizable — if missing entirely, ask the user whether to infer (rule: slices for different stories with no shared mutation / file overlap can be `[P]`)
+- ❌ A story split into per-layer cards ("backend for US1", "frontend for US1") — horizontal slicing, rejected by Constitution principle 9
+- ❌ Vague item ("do the backend") with no observable behavior delivered on its own
+- ❌ A slice so big it can't fit one clean PR — means the **story** is too big; send it back to `spec-writer` to split into independent stories
+- ❌ User Story slice with no test coverage in the same card
 
-If granularity, phasing, or parallelism is wrong, **stop and tell the user**. Suggest updating the Tech Design.
+If granularity, phasing, or parallelism is wrong, **stop and tell the user**. Suggest updating the Tech Design (or the Spec, if a story itself is oversized).
 
-### 5. Plan tests per User Story phase
+### 5. Plan tests inside each slice
 
-**Tests for new behavior are not optional.** For each User Story phase, ensure at least one card has a `## Tests` section listing:
+**Tests for new behavior are not optional, and they live inside the slice — never as a separate card or PR** (Constitution principle 9). Each user-story slice card carries its own `## Tests` section listing:
 - Unit/integration coverage for the new behavior (Vitest)
 - Mapping to Acceptance scenarios (the Given/When/Then from the Spec)
 - No E2E (MVP rule)
 
-If a user-story task is too small to deserve a separate test card, the test goes inline in the implementation card. The test is part of the same PR.
+The test is part of the same PR as the slice it covers. There is no "test card" concept in this project.
 
 ### 6. Confirm the list with the user
 
 Before creating any card, build and show the user, **grouped by phase**:
 
 ```
-Foundational:
+Foundational (minimal shared prerequisites):
   - [ ] Card 1 — short scope (Priority: High)
   - [ ] Card 2 [P] — short scope (Priority: High)
 
 User Story 1 (P1) — [Story title]:
-  - [ ] Card 3 — short scope (Priority: High, depends on: Card 1)
-  - [ ] Card 4 [P] — short scope (Priority: High, depends on: Card 2)
-  - [ ] Card 5 — tests for US1
+  - [ ] Card 3 — vertical slice for US1, end-to-end + tests (Priority: High, depends on: Card 1)
 
-User Story 2 (P2) — ...:
-  - ...
+User Story 2 (P2) — [Story title]:
+  - [ ] Card 4 [P] — vertical slice for US2, end-to-end + tests (Priority: Medium, depends on: Card 1)
 
 Polish:
   - [ ] ...
@@ -149,7 +148,7 @@ This guarantees bidirectional traceability: Tech Design → cards and card → T
 Before closing:
 - [ ] Each item in section 9 of the Tech Design has exactly 1 card in the Kanban
 - [ ] Each card carries Phase, User Story (mandatory), Parallel info, Depends-on, Acceptance, Tests, References
-- [ ] Each User Story phase has test coverage represented (separate card or inline)
+- [ ] Each user-story slice card carries its own test coverage (never a separate test card)
 - [ ] Each card points to the Tech Design and the Spec
 - [ ] The Tech Design was updated with card links grouped by phase
 - [ ] No card was created without corresponding to an Execution Plan item
@@ -222,10 +221,10 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 
 ## Best practices
 
-- **Granularity = 1 PR.** If the task doesn't fit in one reasonable PR, it's too big — go back to the Tech Design.
+- **One card = one vertical slice = one PR.** A user-story card spans every layer the story touches (UI → API → domain → data → tests). If a slice won't fit one clean PR, the story is too big — send it back to `spec-writer`, don't split it by layer.
 - **Phases drive Priority.** Foundational and P1 User Story → High. P2 → Medium. P3/Polish → Low. Implementer naturally drains the queue in MVP order.
-- **`[P]` only when truly parallel.** Different files, no shared mutation, no shared DB transaction. When in doubt, mark No.
-- **Tests in every User Story phase.** No exceptions. Either as separate test cards or inline test items in implementation cards.
+- **`[P]` only between independent slices.** Different stories, no shared mutation, no file overlap, no shared DB transaction. Never between layers of one slice. When in doubt, mark No.
+- **Tests inside every slice.** No exceptions, and never a separate test card — the story's tests ship in the same card/PR as the slice.
 - **Acceptance criteria on the card.** Pulled from the Spec's User Story scenarios. Implementer doesn't need to round-trip to the Spec.
 - **Bidirectional traceability.** Card points to Tech Design and Spec. Tech Design points back to the cards (grouped by phase).
 - **Confirmation before bulk creation.** Always show the grouped list and ask for OK.
@@ -240,8 +239,9 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 - ❌ **Card body written in markdown.** Notion content must be native blocks, not markdown syntax.
 - ❌ **Card with `User Story: N/A`.** Every card must map to at least one Spec User Story.
 - ❌ **Card called "polish" or "final adjustments".** Too vague. Split it or attach to a specific phase.
-- ❌ **Card mixing areas (back + front + DB).** Almost always too big.
-- ❌ **Generic cards** ("do backend", "do frontend"). No scope = TODO list, not Kanban.
+- ❌ **A story split into per-layer cards** ("backend for US1" + "frontend for US1"). Horizontal slicing — rejected by Constitution principle 9. One story = one vertical slice card spanning all its layers.
+- ❌ **Separate test card.** Tests belong inside the slice they cover, same card/PR.
+- ❌ **Generic cards** ("do backend", "do frontend"). A card that delivers no observable behavior on its own is a layer, not a slice.
 - ❌ **Inventing tasks outside the Execution Plan.** If tasks are missing, the Tech Design is incomplete — update the Tech Design, don't invent cards.
 - ❌ **All cards marked `[P]`.** Real parallelism is rare. Default is sequential within a phase.
 - ❌ **User Story cards without dependency on Foundational.** They'll fail when the implementer picks them up out of order.
@@ -250,11 +250,11 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 ## Final checklist before handoff
 
 - [ ] Tech Design and Spec both `Done`
-- [ ] Execution Plan has phase grouping (Foundational / US1..N / Polish) and healthy granularity
+- [ ] Execution Plan has phase grouping (Foundational / US1..N / Polish), one vertical slice per user story, no story split by layer, Foundational minimal
 - [ ] List of cards confirmed with the user before creation
 - [ ] Each card carries Phase, US label (mandatory), Parallel info, Depends-on, Acceptance, Success Criteria touchpoint, Tests, Constitution complexity (if any), References
 - [ ] No card body uses markdown syntax; content is in Notion-native blocks
-- [ ] Each User Story phase has test coverage represented
+- [ ] Each user-story slice card carries its own tests (no separate test card)
 - [ ] Tech Design updated with card links grouped by phase
 - [ ] No duplicate cards from previous runs
 - [ ] Notion contract validated for the `Kanban` database
@@ -292,9 +292,14 @@ If this card implements a violation declared in section 12 of the Tech Design, s
 - Suggest updating the Tech Design before creating cards
 - Don't improvise splits, merges, or paralellism inference (unless the user explicitly asks)
 
-**If a User Story phase has no test representation:**
-- Stop and ask: which task carries the tests, or should we add a dedicated test card?
+**If a user-story slice has no tests in its own card:**
+- Stop and ask the user to add the test coverage to that slice's `## Tests` section — tests ship inside the slice, never as a separate card
 - Don't create cards without resolving this
+
+**If a story is sliced by layer in the Execution Plan (backend card + frontend card):**
+- Stop and point it out — this is the horizontal antipattern (Constitution principle 9)
+- Send the user back to `tech-design-writer` to collapse it into one vertical slice per story
+- Don't merge the layer items yourself unless the user explicitly asks
 
 **If cards already exist in the Kanban linked to this Tech Design:**
 - List them for the user
