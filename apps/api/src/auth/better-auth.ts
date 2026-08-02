@@ -13,8 +13,18 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { createEmailSender } from '../email/create-email-sender.js'
 import { getEnv } from '../env.js'
+import {
+  assertSignInAllowed,
+  clearSignInAttempts,
+  registerSignInFailure,
+  signInAttemptKey,
+} from './login-attempts.js'
 
 const env = getEnv()
+
+// Better Auth types the sign-in body loosely at the hook boundary; narrow to the
+// one field the rate limiter keys on.
+type SignInBody = { email?: unknown } | undefined
 
 // Transactional sender resolved once at boot from EMAIL_PROVIDER (noop offline,
 // Resend in staging/prod — F4/F5, ADR 0007). The verification and reset hooks
@@ -59,6 +69,15 @@ export const auth = betterAuth({
         locale: await resolveUserLocale(user.id),
         resetUrl: url,
       })
+    },
+    // Spec FR-006 / Story 2 cenário 3: completing a reset invalidates every
+    // existing session, so a stolen cookie dies with the old password.
+    revokeSessionsOnPasswordReset: true,
+    onPasswordReset: async ({ user }) => {
+      // Metadata only — never the token or the new password (NFR-003).
+      console.info(
+        JSON.stringify({ level: 'info', action: 'auth.password.reset', userId: user.id }),
+      )
     },
   },
   emailVerification: {
@@ -123,8 +142,16 @@ export const auth = betterAuth({
     },
   },
   hooks: {
-    // Guards applied to email sign-up before Better Auth creates the user.
+    // Guards applied before Better Auth runs the endpoint.
     before: createAuthMiddleware(async (ctx) => {
+      // Reject a password sign-in while its (IP, email) pair is blocked, before
+      // the password is even checked (Spec FR-005, card US2).
+      if (ctx.path === '/sign-in/email') {
+        const key = signInAttemptKey(ctx.headers ?? new Headers(), (ctx.body as SignInBody)?.email)
+        if (key) await assertSignInAllowed(key, new Date())
+        return
+      }
+
       if (ctx.path !== '/sign-up/email') return
       const body = ctx.body as { ageConfirmed?: unknown; email?: unknown } | undefined
 
@@ -160,6 +187,20 @@ export const auth = betterAuth({
           })
         }
       }
+    }),
+    // Advance or clear the brute-force counter once the sign-in outcome is
+    // known. `ctx.context.returned` is the endpoint's result — an APIError for
+    // any rejection (bad password, unverified address), a response otherwise.
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== '/sign-in/email') return
+      const key = signInAttemptKey(ctx.headers ?? new Headers(), (ctx.body as SignInBody)?.email)
+      if (!key) return
+
+      if (ctx.context.returned instanceof APIError) {
+        await registerSignInFailure(key, new Date())
+        return
+      }
+      await clearSignInAttempts(key)
     }),
   },
   advanced: {

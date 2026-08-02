@@ -20,6 +20,10 @@ export const ApiEnvSchema = z
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.string().url().default('http://localhost:3000'),
     ENCRYPTION_KEY: z.string().min(1),
+    // Salt for the (IP, email) digest behind the sign-in brute-force counter
+    // (Tech Design §14.2). Required so the digest is never an unsalted hash of
+    // a guessable pair; rotating it just resets in-flight windows.
+    IP_HASH_SALT: z.string().min(32),
     // Transactional email provider (ADR 0007). `noop` is the offline default
     // for dev/test; `resend` activates the real provider in staging/prod.
     EMAIL_PROVIDER: z.enum(['noop', 'resend']).default('noop'),
