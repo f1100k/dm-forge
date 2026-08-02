@@ -13,6 +13,11 @@ export async function setup() {
   process.env.BETTER_AUTH_URL ??= 'http://localhost:3000'
   process.env.WEB_ORIGIN ??= 'http://localhost:5173'
   process.env.ENCRYPTION_KEY ??= Buffer.alloc(32, 1).toString('base64')
+  // Pinned, not defaulted: a developer running with EMAIL_PROVIDER=resend in
+  // their local .env would otherwise have the suite attempt real provider
+  // sends on every sign-up — and fail the assertions that read the offline
+  // sender's stdout events (ADR 0007). Tests never talk to a mail provider.
+  process.env.EMAIL_PROVIDER = 'noop'
   // Dummy Google OAuth credentials so Better Auth registers the provider under
   // test (card S1.1). No real OAuth call is made — tests assert the provider
   // redirect URL is produced and mock the callback boundary.
