@@ -114,7 +114,7 @@ Main textual documentation database.
 - Tech Designs: `Tech Design - [Feature name]`
 
 #### Kanban
-Tasks and execution. Skills create cards here derived from the "Plano de execução" of Tech Designs.
+Tasks and execution. Skills create cards here derived from the "Plano de execução" of Tech Designs. Each user-story card is a **vertical slice** — one card owning the whole story end-to-end (UI → API → domain → data → tests) in a single PR, not a per-layer task (Constitution principle 9). Because slices are larger than the old per-layer cards, `Effort level` (`Small`/`Medium`/`Large`) is worth filling.
 
 **Database ID:** `3510ea46-68e8-80a5-bcb3-c6c9fc054517`
 **Data source ID:** `3510ea46-68e8-8055-a15f-000b5660109f`

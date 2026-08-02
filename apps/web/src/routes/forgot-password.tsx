@@ -3,6 +3,7 @@ import { createRoute, Link } from '@tanstack/react-router'
 import { type ChangeEvent, type FormEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { requestPasswordReset } from '../auth/auth-client.js'
+import { appCallbackUrl } from '../auth/callback-url.js'
 import { MailBadgeIcon, MailIcon } from '../components/dmf/icons.js'
 import { AuthShell, Button, Display, Field, Input, OrnDivider } from '../components/dmf/index.js'
 import { Route as RootRoute } from './__root.js'
@@ -12,13 +13,6 @@ export const Route = createRoute({
   path: '/forgot-password',
   component: ForgotPasswordPage,
 })
-
-// Where the emailed link lands after Better Auth validates the token. Read from
-// the browser rather than an env var so preview deployments and localhost each
-// get a link back to themselves.
-function resetRedirectUrl(): string {
-  return `${window.location.origin}/reset-password`
-}
 
 function ForgotPasswordPage() {
   const { t, i18n } = useTranslation()
@@ -42,7 +36,12 @@ function ForgotPasswordPage() {
     if (!parsed.success) return
 
     setSubmitting(true)
-    await requestPasswordReset({ email: parsed.data, redirectTo: resetRedirectUrl() })
+    // Absolute, web-origin URL: Better Auth redirects to `redirectTo` verbatim,
+    // so a relative path would resolve against the API origin (callback-url.ts).
+    await requestPasswordReset({
+      email: parsed.data,
+      redirectTo: appCallbackUrl('/reset-password'),
+    })
     setSubmitting(false)
 
     // Always confirm, never branch on the result: showing "no such account"

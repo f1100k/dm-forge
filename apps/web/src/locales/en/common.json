@@ -77,6 +77,8 @@
       "loginLink": "Sign in",
       "errors": {
         "emailInvalid": "Enter a valid email address.",
+        "passwordTooShort": "Your password must be at least 10 characters long.",
+        "passwordTooLong": "Your password can be at most 128 characters long.",
         "ageNotAllowed": "You must be at least 13 years old to create an account.",
         "userExists": "An account with this email already exists.",
         "userExistsOAuth": "This email already has an account created with Google. Use Continue with Google.",

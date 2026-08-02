@@ -2,6 +2,7 @@ import { createRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type ChangeEvent, type FormEvent, type ReactNode, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { signIn } from '../auth/auth-client.js'
+import { appCallbackUrl } from '../auth/callback-url.js'
 import { AlertIcon, GoogleIcon, MailIcon } from '../components/dmf/icons.js'
 import {
   AuthShell,
@@ -85,7 +86,7 @@ function LoginPage() {
           size="lg"
           icon={<GoogleIcon size={18} />}
           onClick={() => {
-            void signIn.social({ provider: 'google', callbackURL: '/' })
+            void signIn.social({ provider: 'google', callbackURL: appCallbackUrl() })
           }}
         >
           {t('auth.social.google')}

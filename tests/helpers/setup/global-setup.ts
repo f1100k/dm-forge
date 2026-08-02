@@ -14,10 +14,10 @@ export async function setup() {
   process.env.WEB_ORIGIN ??= 'http://localhost:5173'
   process.env.ENCRYPTION_KEY ??= Buffer.alloc(32, 1).toString('base64')
   process.env.IP_HASH_SALT ??= 's'.repeat(32)
-  // Pinned, not defaulted: `loadEnv` walks up from cwd, so a developer `.env`
-  // higher in the tree would otherwise select the real provider and make the
-  // suite send live email. External boundaries are always mocked in
-  // integration (docs/testing.md).
+  // Pinned, not defaulted: a developer running with EMAIL_PROVIDER=resend in
+  // their local .env would otherwise have the suite attempt real provider
+  // sends on every sign-up — and fail the assertions that read the offline
+  // sender's stdout events (ADR 0007). Tests never talk to a mail provider.
   process.env.EMAIL_PROVIDER = 'noop'
   // Dummy Google OAuth credentials so Better Auth registers the provider under
   // test (card S1.1). No real OAuth call is made — tests assert the provider

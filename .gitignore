@@ -46,3 +46,6 @@ coverage/
 
 # pnpm
 .pnpm-store/
+
+# Worktrees criados pelo agente dentro do repo
+.claude/worktrees/
