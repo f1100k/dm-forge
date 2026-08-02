@@ -1,8 +1,9 @@
-import { EmailSchema, SignUpInputSchema } from '@dm-forge/shared'
+import { EmailSchema, PasswordSchema, SignUpInputSchema } from '@dm-forge/shared'
 import { createRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type ChangeEvent, type FormEvent, type ReactNode, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { signIn, signUp } from '../auth/auth-client.js'
+import { appCallbackUrl } from '../auth/callback-url.js'
 import { AlertIcon, GoogleIcon, MailIcon } from '../components/dmf/icons.js'
 import {
   AuthShell,
@@ -49,6 +50,7 @@ function RegisterPage() {
   // linked to Google). Held separately from format validation but rendered in
   // the same place, so every email error looks and behaves the same way.
   const [emailServerError, setEmailServerError] = useState<string | null>(null)
+  const [passwordTouched, setPasswordTouched] = useState(false)
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -74,6 +76,18 @@ function RegisterPage() {
       : null
   const emailError = emailServerError ?? emailFormatError
 
+  // Same contract as the email field: silent until the field is blurred or a
+  // submit is attempted, then live on each keystroke. Without this the only
+  // feedback for a rejected password was the "check the highlighted fields"
+  // banner — which highlighted nothing, since no field carried the error.
+  const passwordError = useMemo(() => {
+    if (!passwordTouched) return null
+    const result = PasswordSchema.safeParse(form.password)
+    if (result.success) return null
+    const tooLong = result.error.issues.some((issue) => issue.code === 'too_big')
+    return t(`auth.register.errors.${tooLong ? 'passwordTooLong' : 'passwordTooShort'}`)
+  }, [form.password, passwordTouched, t])
+
   const score = useMemo(() => passwordScore(form.password), [form.password])
   const strengthNames = ['veryWeak', 'weak', 'fair', 'strong'] as const
   const strengthLabel = t(`auth.password.strength.${strengthNames[score] ?? 'veryWeak'}`)
@@ -83,8 +97,9 @@ function RegisterPage() {
     event.preventDefault()
     setError(null)
     setEmailServerError(null)
-    // Reveal any inline email error on submit, even if the field was never blurred.
+    // Reveal any inline field error on submit, even if the field was never blurred.
     setEmailTouched(true)
+    setPasswordTouched(true)
 
     const locale = lang === 'en' ? 'en' : 'pt-BR'
     const parsed = SignUpInputSchema.safeParse({
@@ -98,10 +113,14 @@ function RegisterPage() {
       acceptedPrivacy: acceptedTerms,
     })
     if (!parsed.success) {
-      // A bad email is shown inline on its field; only fall back to the generic
-      // banner for other problems.
-      const emailIssue = parsed.error.issues.some((issue) => issue.path[0] === 'email')
-      if (!emailIssue) setError(t('auth.register.errors.validation'))
+      // Email and password errors render inline on their own fields. The banner
+      // says "check the highlighted fields", so it may only appear when some
+      // issue is NOT already highlighted — otherwise it points at nothing.
+      const inlineFields = new Set(['email', 'password'])
+      const hasUnhighlightedIssue = parsed.error.issues.some(
+        (issue) => !inlineFields.has(String(issue.path[0])),
+      )
+      if (hasUnhighlightedIssue) setError(t('auth.register.errors.validation'))
       return
     }
 
@@ -114,7 +133,7 @@ function RegisterPage() {
       password: parsed.data.password,
       locale: parsed.data.locale,
       ageConfirmed: true,
-      callbackURL: '/',
+      callbackURL: appCallbackUrl(),
     } as SignUpEmailBody & { ageConfirmed: boolean })
     setSubmitting(false)
 
@@ -178,7 +197,7 @@ function RegisterPage() {
           size="lg"
           icon={<GoogleIcon size={18} />}
           onClick={() => {
-            void signIn.social({ provider: 'google', callbackURL: '/' })
+            void signIn.social({ provider: 'google', callbackURL: appCallbackUrl() })
           }}
         >
           {t('auth.social.google')}
@@ -216,24 +235,31 @@ function RegisterPage() {
             {emailError && <ErrorNote>{emailError}</ErrorNote>}
           </div>
 
-          <Field
-            label={t('auth.register.passwordLabel')}
-            hint={t('auth.register.passwordHint')}
-            hintMeta={`${form.password.length} / 10${form.password.length >= 10 ? ' ✓' : ''}`}
-            htmlFor="password"
-          >
-            <PasswordInput
-              id="password"
-              autoComplete="new-password"
-              placeholder="••••••••••"
-              minLength={10}
-              required
-              value={form.password}
-              onChange={update('password')}
-              labels={{ show: t('auth.password.show'), hide: t('auth.password.hide') }}
-            />
-            {form.password.length > 0 && <PasswordStrength score={score} label={strengthLabel} />}
-          </Field>
+          {/* Mirrors the email field: red-bordered input plus a danger box, so
+              a rejected password is visibly "highlighted" as the banner claims. */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Field
+              label={t('auth.register.passwordLabel')}
+              hint={t('auth.register.passwordHint')}
+              hintMeta={`${form.password.length} / 10${form.password.length >= 10 ? ' ✓' : ''}`}
+              htmlFor="password"
+            >
+              <PasswordInput
+                id="password"
+                autoComplete="new-password"
+                placeholder="••••••••••"
+                minLength={10}
+                required
+                error={Boolean(passwordError)}
+                value={form.password}
+                onChange={update('password')}
+                onBlur={() => setPasswordTouched(true)}
+                labels={{ show: t('auth.password.show'), hide: t('auth.password.hide') }}
+              />
+              {form.password.length > 0 && <PasswordStrength score={score} label={strengthLabel} />}
+            </Field>
+            {passwordError && <ErrorNote>{passwordError}</ErrorNote>}
+          </div>
 
           <div
             style={{

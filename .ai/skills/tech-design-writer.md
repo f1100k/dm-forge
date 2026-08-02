@@ -239,23 +239,22 @@ Other approaches evaluated and why each was not chosen. Prevents the discussion 
 - Attention points for performance, security, scalability
 
 ## 9. Execution plan
-Break into phases or main tasks (becomes the basis of cards in the Kanban via `tasks-writer`). **Mirror the user-story priority from the Spec** — group items by which user story they unblock.
+The unit of work is the **vertical slice** (Constitution principle 9): one user story cut end-to-end through every layer it touches (UI → API → domain → data → tests), shipped in a single PR. Each entry here becomes exactly one card in the Kanban via `tasks-writer`. **Do not decompose a story into per-layer tasks** ("backend for US1", "frontend for US1") — that is the horizontal antipattern the project rejects. One slice per story; the slice owns all its layers and its tests.
 
-**Foundational** (blocking prerequisites — must complete before user stories can start):
-- [ ] Foundational task A
-- [ ] Foundational task B
+**Foundational** (only the minimal prerequisites genuinely shared across slices — a new table, an encryption helper, a shared contract — that must exist before the first slice can start; keep this list as short as possible):
+- [ ] Foundational prerequisite A
+- [ ] Foundational prerequisite B
 
-**User Story 1 (P1) — [title from Spec]:**
-- [ ] Task for US1
-- [ ] Task for US1
+**Slice — User Story 1 (P1) — [title from Spec]:**
+- [ ] One end-to-end slice delivering US1 (UI → API → domain → data → tests). Note the layers it spans and the acceptance scenarios it closes.
 
-**User Story 2 (P2) — [title from Spec]:**
-- [ ] Task for US2
+**Slice — User Story 2 (P2) — [title from Spec]:**
+- [ ] One end-to-end slice delivering US2.
 
 **Polish (cross-cutting, post-MVP):**
-- [ ] Polish task
+- [ ] Polish item
 
-For each task, when known, mark **`[P]`** if it can run in parallel with other `[P]` tasks of the same group (different files, no shared mutation). The `tasks-writer` will use this to coordinate parallel work.
+For each **slice**, mark **`[P]`** if it can run in parallel with other `[P]` slices — i.e., it targets a different user story with no shared mutation or file overlap with another slice. `[P]` is parallelism **between slices**, never between layers of one slice. If a slice looks too big for one clean PR, the **story** is too big: send it back to `spec-writer` to split into independent stories — do not split it into layer tasks here.
 
 ## 10. Observability and rollout
 - How we'll monitor (structured logs, metrics) — see `docs/resilience-observability.md`
@@ -283,8 +282,9 @@ Links to: Spec, related ADRs, external docs, PoCs, loaded `docs/*.md` files.
 - **Start with architecture, not details.** If the architecture is wrong, no detail saves it. Sketch first, refine later.
 - **Always list considered alternatives.** Even if the choice seems obvious, recording prevents the discussion from coming back in 3 months.
 - **Trade-offs are mandatory.** Every technical decision has a cost. If you can't list trade-offs, you haven't thought enough.
-- **Mirror the Spec's user-story structure in section 9.** Foundational → P1 → P2 → P3 → Polish. Implementer can ship MVP after P1 alone.
-- **Mark parallelism in section 9.** `[P]` on tasks that touch different files and have no shared mutation. The `tasks-writer` consumes this.
+- **One slice per user story in section 9.** Foundational → P1 → P2 → P3 → Polish, where each P-story is a single vertical slice, not a bag of layer tasks. Implementer can ship MVP after the P1 slice alone.
+- **Keep Foundational minimal.** Only prerequisites truly shared across slices belong there. If something is used by a single story, it belongs inside that story's slice, not in Foundational.
+- **Mark parallelism between slices in section 9.** `[P]` on slices for different stories with no shared mutation or file overlap. `[P]` is never used between the layers of one slice.
 - **Diagrams are worth a thousand words.** But only when they help. Author them as **Mermaid** code blocks (rendered natively in Notion).
 - **Stay focused on "how", not "what".** Behavior is Spec — go back and adjust there.
 - **Big decisions become ADRs.** The Tech Design describes the full solution; the ADR records a specific decision that lasts.
@@ -300,6 +300,8 @@ Links to: Spec, related ADRs, external docs, PoCs, loaded `docs/*.md` files.
 - ❌ **Architectural decision hidden in the Tech Design** — promote to ADR.
 - ❌ **Hidden Constitution violation** — pretending the rule doesn't apply. Either comply, declare in section 12, or open an ADR.
 - ❌ **Execution plan as a flat TODO list** — without user-story grouping, the implementer can't ship MVP early.
+- ❌ **Slicing a story by layer** — "backend for US1" + "frontend for US1" as separate items. A story is one vertical slice; splitting it horizontally is exactly what the project rejects (Constitution principle 9).
+- ❌ **Fat Foundational** — pushing per-story work into Foundational so slices look small. Foundational is only what's genuinely shared and blocking.
 
 ## Final checklist before approving
 
@@ -311,7 +313,7 @@ Links to: Spec, related ADRs, external docs, PoCs, loaded `docs/*.md` files.
 - [ ] Happy path and main errors mapped
 - [ ] At least 1-2 considered alternatives listed
 - [ ] Trade-offs explicit
-- [ ] Execution plan grouped by user story (Foundational → P1 → P2 → ... → Polish), with `[P]` markers where applicable
+- [ ] Execution plan is one vertical slice per user story (Foundational → P1 → P2 → ... → Polish), no story split by layer, Foundational minimal, with `[P]` markers between independent slices where applicable
 - [ ] Rollout and observability strategy defined
 - [ ] Decisions that become ADRs identified
 - [ ] Section 12 (Complexity Tracking) is either empty or filled with justification for every Constitution/engineering rule violated

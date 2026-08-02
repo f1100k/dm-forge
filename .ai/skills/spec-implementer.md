@@ -141,7 +141,8 @@ Branch naming convention: `feature/<slug>` derived from the card title. If the c
 Implement **only the scope of the Execution Plan item matching the card**.
 
 Operating principles:
-- **Surgical** — touch only what the task asks for. Don't "improve" adjacent code.
+- **The card is a vertical slice** — implement the story end-to-end across every layer it touches (UI → API → domain → data → tests) in this one PR. Spanning multiple layers is the expected shape (Constitution principle 9), not scope creep. What stays out of bounds is other stories and unrequested refactors.
+- **Surgical within the slice** — touch what the slice needs across its layers, but don't "improve" adjacent code or reach into other stories' territory.
 - **No invention** — if a non-trivial decision shows up that isn't covered, apply the **Clarification protocol** (step 5.1). Don't decide silently.
 - **Patterns before new code** — before creating something new (component, hook, utility), look for an equivalent in the codebase. Reuse.
 - **Tests are mandatory, not optional** — every new behavior on this card ships with test coverage in the same PR. Vitest unit and/or integration. The card's `## Tests` section lists what's required; complete it. Acceptance scenarios from the Spec map to test cases. No E2E (MVP rule).
@@ -235,10 +236,10 @@ Report to the user in up to 5 lines:
 - Suggest: (a) adjust the Tech Design, or (b) propose an ADR + Constitution update
 - Don't proceed silently against it
 
-**If the task scope turns out to exceed one card during implementation:**
-- Stop and warn
-- Suggest splitting the card (`tasks-writer` or manual edit in the Kanban)
-- Don't blow the scope without aligning
+**If the slice turns out too big for one clean PR during implementation:**
+- Stop and warn — a slice that won't fit one PR usually means the underlying **story** is too big
+- Suggest splitting the **story** upstream (`spec-writer` → re-run `tech-design-writer`/`tasks-writer`), producing two independent vertical slices — not splitting this card into horizontal layer cards
+- Don't blow the scope or fall back to layer-slicing without aligning
 
 **If the Tech Design has a hole (uncovered decision) during implementation:**
 - Stop and ask the user

@@ -2,6 +2,7 @@ import { createRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { sendVerificationEmail } from '../auth/auth-client.js'
+import { appCallbackUrl } from '../auth/callback-url.js'
 import { MailBadgeIcon } from '../components/dmf/icons.js'
 import { AuthShell, Button, Display, OrnDivider } from '../components/dmf/index.js'
 import { Route as RootRoute } from './__root.js'
@@ -27,7 +28,7 @@ function VerifyEmailPage() {
   async function resend() {
     if (!email) return
     setStatus('sending')
-    const { error } = await sendVerificationEmail({ email, callbackURL: '/' })
+    const { error } = await sendVerificationEmail({ email, callbackURL: appCallbackUrl() })
     setStatus(error ? 'error' : 'sent')
   }
 

@@ -101,6 +101,42 @@ describe('register screen', () => {
     })
   })
 
+  it('highlights the password field instead of a banner that points at nothing', async () => {
+    const { container } = renderApp('/register')
+    await screen.findByRole('heading')
+
+    // A password below the 10-character minimum, submitted with both gates
+    // ticked so the button is enabled.
+    fireEvent.change(field(container, 'email'), { target: { value: 'ada@example.com' } })
+    fireEvent.change(field(container, 'password'), { target: { value: 'short' } })
+    fireEvent.click(field(container, 'age'))
+    fireEvent.click(field(container, 'consent'))
+    fireEvent.click(submitButton(container))
+
+    // The reason is stated on the field itself. Matched on copy unique to the
+    // error — the field hint also mentions "10 characters".
+    expect(await screen.findByText(/precisa ter pelo menos|must be at least/i)).toBeTruthy()
+    // And the "check the highlighted fields" banner stays away: every issue
+    // here is already highlighted, so the banner would point at nothing.
+    expect(screen.queryByText(/destacados|highlighted/i)).toBeNull()
+  })
+
+  it('validates the password inline on blur and clears it live', async () => {
+    const { container } = renderApp('/register')
+    await screen.findByRole('heading')
+    const password = field(container, 'password')
+
+    fireEvent.change(password, { target: { value: 'short' } })
+    fireEvent.blur(password)
+    expect(await screen.findByText(/precisa ter pelo menos|must be at least/i)).toBeTruthy()
+
+    // Reaching the minimum clears the error without another submit.
+    fireEvent.change(password, { target: { value: 'correct horse battery' } })
+    await waitFor(() => {
+      expect(screen.queryByText(/precisa ter pelo menos|must be at least/i)).toBeNull()
+    })
+  })
+
   it('toggles password visibility with a persistent reveal button', async () => {
     const { container } = renderApp('/register')
     await screen.findByRole('heading')

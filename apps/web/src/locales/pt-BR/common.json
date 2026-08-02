@@ -43,6 +43,8 @@
       "loginLink": "Entrar",
       "errors": {
         "emailInvalid": "Informe um e-mail válido.",
+        "passwordTooShort": "A senha precisa ter pelo menos 10 caracteres.",
+        "passwordTooLong": "A senha pode ter no máximo 128 caracteres.",
         "ageNotAllowed": "Você precisa ter pelo menos 13 anos para criar uma conta.",
         "userExists": "Já existe uma conta com este e-mail.",
         "userExistsOAuth": "Este e-mail já tem conta criada com Google. Use Continuar com Google.",
