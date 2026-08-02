@@ -24,8 +24,42 @@
       "invalid": "E-mail ou senha incorretos.",
       "unverified": "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.",
       "genericError": "Não foi possível entrar. Tente novamente.",
+      "locked": "Muitas tentativas de acesso. Aguarde alguns minutos e tente novamente.",
       "noAccount": "Novo por aqui?",
       "registerLink": "Criar conta"
+    },
+    "forgot": {
+      "title": "Esqueceu a senha?",
+      "description": "Informe o e-mail da sua conta e enviamos um link para você criar uma nova senha.",
+      "emailLabel": "E-mail",
+      "submit": "Enviar link de recuperação",
+      "submitting": "Enviando…",
+      "backToLogin": "Voltar para o login",
+      "sentTitle": "Link enviado.",
+      "sentDescription": "Se houver uma conta associada a {{email}}, você receberá um link para redefinir a senha.",
+      "sentHint": "O link expira em 1 hora. Confira spam / promoções.",
+      "useAnotherEmail": "Usar outro e-mail",
+      "errors": {
+        "emailInvalid": "Informe um e-mail válido."
+      }
+    },
+    "reset": {
+      "title": "Crie uma nova senha.",
+      "description": "Escolha uma senha nova para sua conta. Ela substitui a anterior imediatamente.",
+      "passwordLabel": "Nova senha",
+      "passwordHint": "Mínimo 10 caracteres. Use algo memorável.",
+      "submit": "Redefinir senha",
+      "submitting": "Redefinindo…",
+      "expiredTitle": "Link inválido ou expirado.",
+      "expiredDescription": "Este link de redefinição não é mais válido. Peça um novo para continuar.",
+      "requestNewLink": "Pedir novo link",
+      "doneTitle": "Senha redefinida.",
+      "doneDescription": "Sua senha foi alterada e todas as sessões anteriores foram encerradas. Entre novamente com a nova senha.",
+      "goToLogin": "Ir para o login",
+      "errors": {
+        "passwordTooShort": "A senha precisa ter no mínimo 10 caracteres.",
+        "generic": "Não foi possível redefinir a senha. Tente novamente."
+      }
     },
     "register": {
       "title": "Forje sua mesa.",

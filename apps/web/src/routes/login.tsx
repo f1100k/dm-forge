@@ -26,7 +26,7 @@ function LoginPage() {
   const lang = i18n.resolvedLanguage === 'en' ? 'en' : 'pt'
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
-  const [error, setError] = useState<'invalid' | 'unverified' | 'generic' | null>(null)
+  const [error, setError] = useState<'invalid' | 'unverified' | 'locked' | 'generic' | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   const update = (field: keyof typeof form) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -44,10 +44,13 @@ function LoginPage() {
     setSubmitting(false)
 
     if (signInError) {
-      // 403 = email not verified yet (Spec Story 1); 401 = bad credentials. The
-      // brute-force block (429) is wired in US2 and shown generically here.
+      // 403 = email not verified yet (Spec Story 1); 401 = bad credentials;
+      // 429 = the (IP, email) pair is rate-limited (Spec FR-005).
       const status = signInError.status
-      setError(status === 403 ? 'unverified' : status === 401 ? 'invalid' : 'generic')
+      if (status === 429) setError('locked')
+      else if (status === 403) setError('unverified')
+      else if (status === 401) setError('invalid')
+      else setError('generic')
       return
     }
 
@@ -95,11 +98,9 @@ function LoginPage() {
           onSubmit={onSubmit}
           noValidate
         >
-          {(error === 'unverified' || error === 'generic') && (
-            <ErrorNote>
-              {error === 'unverified' ? t('auth.login.unverified') : t('auth.login.genericError')}
-            </ErrorNote>
-          )}
+          {error === 'unverified' && <ErrorNote>{t('auth.login.unverified')}</ErrorNote>}
+          {error === 'locked' && <ErrorNote>{t('auth.login.locked')}</ErrorNote>}
+          {error === 'generic' && <ErrorNote>{t('auth.login.genericError')}</ErrorNote>}
 
           <Field label={t('auth.login.emailLabel')} htmlFor="email">
             <Input
@@ -118,22 +119,12 @@ function LoginPage() {
             htmlFor="password"
             error={error === 'invalid' ? t('auth.login.invalid') : null}
             labelRight={
-              // Forgot-password flow ships with US2; kept visible for design
-              // fidelity, inert until then.
-              <button
-                type="button"
-                style={{
-                  fontSize: 12,
-                  color: 'var(--accent)',
-                  background: 'none',
-                  border: 'none',
-                  padding: 0,
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                }}
+              <Link
+                to="/forgot-password"
+                style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'none' }}
               >
                 {t('auth.login.forgot')}
-              </button>
+              </Link>
             }
           >
             <PasswordInput
