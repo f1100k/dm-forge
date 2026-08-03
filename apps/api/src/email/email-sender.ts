@@ -36,6 +36,17 @@ export const EmailMessageSchema = z.discriminatedUnion('kind', [
     // Absolute URL built by Better Auth; carries a single-use token (1h TTL).
     resetUrl: HttpUrlSchema,
   }),
+  // Confirmation of an email change, addressed to the *new* address (card US3,
+  // Spec Story 3 cenário 3). The account keeps the old address until this link
+  // is opened, so the copy has to name the address being moved away from.
+  z.object({
+    kind: z.literal('email_change'),
+    to: EmailSchema,
+    locale: LocaleSchema,
+    previousEmail: EmailSchema,
+    // Absolute URL built by Better Auth; carries a single-use token (24h TTL).
+    verificationUrl: HttpUrlSchema,
+  }),
 ])
 
 export type EmailMessage = z.infer<typeof EmailMessageSchema>

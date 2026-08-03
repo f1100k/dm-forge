@@ -411,6 +411,75 @@ export function PasswordStrength({ score, label }: { score: number; label: strin
   )
 }
 
+// ── Avatar (initials placeholder) ────────────────────────────────
+export function Avatar({ size = 32, initials }: { size?: number; initials: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 999,
+        background: 'var(--surface-hi)',
+        border: '1px solid var(--border)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: size * 0.36,
+        fontWeight: 500,
+        fontFamily: 'var(--font-body)',
+        color: 'var(--accent)',
+        letterSpacing: '0.02em',
+        flexShrink: 0,
+      }}
+    >
+      {initials}
+    </span>
+  )
+}
+
+// ── Auto-save indicator ──────────────────────────────────────────
+// The status line that replaces a save button on auto-saving screens
+// (docs/coding-patterns.md). `role="status"` so a screen reader announces the
+// outcome of an edit nobody explicitly submitted.
+export type SaveState = 'saved' | 'saving' | 'error'
+
+const SAVE_STATE_COLORS: Record<SaveState, { color: string; dot: string }> = {
+  saved: { color: 'var(--text-dim)', dot: 'var(--success)' },
+  saving: { color: 'var(--text-muted)', dot: 'var(--accent)' },
+  error: { color: 'var(--danger)', dot: 'var(--danger)' },
+}
+
+export function AutoSave({ state, label }: { state: SaveState; label: string }) {
+  const tone = SAVE_STATE_COLORS[state]
+  return (
+    <span
+      role="status"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        fontSize: 11,
+        color: tone.color,
+        fontFamily: 'var(--font-mono)',
+        letterSpacing: '0.02em',
+      }}
+    >
+      <span
+        aria-hidden="true"
+        style={{
+          width: 5,
+          height: 5,
+          borderRadius: 999,
+          background: tone.dot,
+          animation: state === 'saving' ? 'dmf-pulse 1.2s infinite' : 'none',
+        }}
+      />
+      {label}
+    </span>
+  )
+}
+
 // ── Ornamental divider (diamond flanked by rules) ────────────────
 export function OrnDivider({
   width = 72,

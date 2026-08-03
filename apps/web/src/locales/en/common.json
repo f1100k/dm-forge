@@ -98,5 +98,58 @@
       "useAnotherEmail": "Use another email",
       "signOut": "Sign out"
     }
+  },
+  "account": {
+    "nav": {
+      "eyebrow": "Settings",
+      "profile": {
+        "label": "Profile",
+        "sub": "Name, email, language"
+      },
+      "security": {
+        "label": "Security",
+        "sub": "Password, OAuth, sessions"
+      },
+      "privacy": {
+        "label": "Privacy",
+        "sub": "Data, telemetry, deletion"
+      }
+    },
+    "autoSave": {
+      "saved": "Saved",
+      "saving": "Saving…",
+      "error": "Could not save"
+    },
+    "profile": {
+      "title": "Your profile",
+      "subtitle": "How you appear inside DM Forge.",
+      "loading": "Loading your profile…",
+      "loadError": "Could not load your profile. Reload the page.",
+      "identity": "Identity",
+      "photo": {
+        "label": "Profile picture",
+        "hint": "For now we use your initials."
+      },
+      "name": {
+        "label": "Display name",
+        "sub": "Visible in shared campaigns (future)."
+      },
+      "email": {
+        "label": "Email",
+        "sub": "Used to sign in. Changing it sends a verification to the new address.",
+        "change": "Change email",
+        "new": "New email",
+        "placeholder": "new@example.com",
+        "submit": "Send verification",
+        "sending": "Sending…",
+        "cancel": "Cancel",
+        "sent": "We sent a confirmation link to {{email}}. Your current email keeps working until you confirm.",
+        "error": "Could not start the change. Check the address and try again."
+      },
+      "language": {
+        "label": "Interface language",
+        "sub": "Applied right away and saved to your account."
+      }
+    }
   }
 }

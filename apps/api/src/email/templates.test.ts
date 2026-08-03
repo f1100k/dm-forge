@@ -13,6 +13,16 @@ function reset(locale: EmailMessage['locale']): EmailMessage {
   return { kind: 'password_reset', to: 'gm@example.com', locale, resetUrl }
 }
 
+function emailChange(locale: EmailMessage['locale']): EmailMessage {
+  return {
+    kind: 'email_change',
+    to: 'new@example.com',
+    locale,
+    previousEmail: 'gm@example.com',
+    verificationUrl: verifyUrl,
+  }
+}
+
 describe('renderEmail', () => {
   it('renders the pt-BR verification subject and links the verification URL', () => {
     // Act
@@ -46,5 +56,30 @@ describe('renderEmail', () => {
 
     // Assert
     expect(rendered.subject).toBe('Reset your password — DM Forge')
+  })
+
+  it('renders the pt-BR email-change subject and links the verification URL', () => {
+    // Act
+    const rendered = renderEmail(emailChange('pt-BR'))
+
+    // Assert
+    expect(rendered.subject).toBe('Confirme seu novo e-mail — DM Forge')
+    expect(rendered.html).toContain(`href="${verifyUrl}"`)
+  })
+
+  it('renders the en email-change subject', () => {
+    // Act
+    const rendered = renderEmail(emailChange('en'))
+
+    // Assert
+    expect(rendered.subject).toBe('Confirm your new email — DM Forge')
+  })
+
+  it('names the address being replaced so the recipient can spot a change they did not ask for', () => {
+    // Act
+    const rendered = renderEmail(emailChange('pt-BR'))
+
+    // Assert
+    expect(rendered.html).toContain('gm@example.com')
   })
 })
