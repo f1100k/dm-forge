@@ -85,10 +85,28 @@ export const auth = betterAuth({
     // a blocked sign-in, so the user can act immediately (Spec Story 1).
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
+      const account = await readAccountAddressing(user.id)
+
+      // Better Auth routes the change-email flow through this same hook: it
+      // passes the *pending* address in `user.email` while the stored row still
+      // holds the current one, and only swaps the column once the link is
+      // opened. The payload carries no flag to tell the two apart, so the
+      // mismatch is the discriminator (card US3, Spec Story 3 cenário 3).
+      if (account.email && account.email !== user.email) {
+        await emailSender.send({
+          kind: 'email_change',
+          to: user.email,
+          locale: account.locale,
+          previousEmail: account.email,
+          verificationUrl: url,
+        })
+        return
+      }
+
       await emailSender.send({
         kind: 'email_verification',
         to: user.email,
-        locale: await resolveUserLocale(user.id),
+        locale: account.locale,
         verificationUrl: url,
       })
     },
@@ -104,6 +122,15 @@ export const auth = betterAuth({
     },
   },
   user: {
+    // Spec FR-008 / Story 3 cenário 3: the address can be changed, but only
+    // through a link opened on the new address. Leaving
+    // `sendChangeEmailConfirmation` unset is what keeps the old address live
+    // and usable until that confirmation lands, and
+    // `updateEmailWithoutVerification` stays off so an unverified account
+    // cannot silently rewrite its own email either.
+    changeEmail: {
+      enabled: true,
+    },
     additionalFields: {
       // Accepted from the sign-up body (register form) and validated in the
       // create hook below; drives i18n and transactional email language.
@@ -220,13 +247,23 @@ export type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>
 // Better Auth passes the email hooks only the user's base fields; the custom
 // `locale` column is read from the row so verification/reset emails render in the
 // account's language, defaulting to pt-BR when unset (parse at the edge —
-// docs/coding-patterns.md).
-async function resolveUserLocale(userId: string): Promise<Locale> {
+// docs/coding-patterns.md). The stored address comes back with it so the
+// verification hook can tell a first-time confirmation from an email change.
+async function readAccountAddressing(
+  userId: string,
+): Promise<{ locale: Locale; email: string | null }> {
   const row = await prisma.user.findUnique({
     where: { id: userId },
-    select: { locale: true },
+    select: { locale: true, email: true },
   })
-  return LocaleSchema.catch('pt-BR').parse(row?.locale)
+  return {
+    locale: LocaleSchema.catch('pt-BR').parse(row?.locale),
+    email: row?.email ?? null,
+  }
+}
+
+async function resolveUserLocale(userId: string): Promise<Locale> {
+  return (await readAccountAddressing(userId)).locale
 }
 
 // Persist the Terms + Privacy acceptance as immutable ConsentRecord rows at

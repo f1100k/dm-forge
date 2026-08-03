@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   ConsentTypeSchema,
+  DisplayNameSchema,
   EmailSchema,
   LocaleSchema,
   PasswordSchema,
   SignUpInputSchema,
+  UpdateProfileInputSchema,
 } from './schemas.js'
 
 function validSignUp(overrides: Record<string, unknown> = {}) {
@@ -176,5 +178,79 @@ describe('SignUpInputSchema', () => {
 
   it('rejects a password below the minimum length', () => {
     expect(() => SignUpInputSchema.parse(validSignUp({ password: 'short' }))).toThrow()
+  })
+})
+
+// E.B.C.D. — black-box: trim, then `min(1).max(80)`. The observable behavior
+// is the transform and the two length boundaries; whitespace-only is the case
+// that distinguishes "trim before validating" from "validate then trim".
+describe('DisplayNameSchema', () => {
+  it('accepts a normal name', () => {
+    expect(DisplayNameSchema.parse('Kael Aranha')).toBe('Kael Aranha')
+  })
+
+  it('trims surrounding whitespace', () => {
+    expect(DisplayNameSchema.parse('  Kael  ')).toBe('Kael')
+  })
+
+  it('accepts a name of exactly 80 characters', () => {
+    const name = 'a'.repeat(80)
+    expect(DisplayNameSchema.parse(name)).toBe(name)
+  })
+
+  it('rejects a name of 81 characters', () => {
+    expect(() => DisplayNameSchema.parse('a'.repeat(81))).toThrow()
+  })
+
+  it('rejects a whitespace-only name', () => {
+    expect(() => DisplayNameSchema.parse('   ')).toThrow()
+  })
+
+  it('rejects the empty string', () => {
+    expect(() => DisplayNameSchema.parse('')).toThrow()
+  })
+
+  it('rejects a non-string value', () => {
+    expect(() => DisplayNameSchema.parse(42)).toThrow()
+  })
+})
+
+// E.B.C.D. — the auto-save patch contract (Spec Story 3 cenários 1 e 2). Both
+// keys are optional, so the classes are: each field alone, both together, the
+// empty patch the refinement rejects, and an invalid value per field.
+describe('UpdateProfileInputSchema', () => {
+  it('accepts a name-only patch', () => {
+    expect(UpdateProfileInputSchema.parse({ name: 'Kael' })).toEqual({ name: 'Kael' })
+  })
+
+  it('accepts a locale-only patch', () => {
+    expect(UpdateProfileInputSchema.parse({ locale: 'en' })).toEqual({ locale: 'en' })
+  })
+
+  it('accepts both fields at once', () => {
+    expect(UpdateProfileInputSchema.parse({ name: 'Kael', locale: 'en' })).toEqual({
+      name: 'Kael',
+      locale: 'en',
+    })
+  })
+
+  it('rejects an empty patch', () => {
+    // A patch with nothing in it would be a write that changes nothing.
+    expect(() => UpdateProfileInputSchema.parse({})).toThrow()
+  })
+
+  it('rejects an unsupported locale', () => {
+    expect(() => UpdateProfileInputSchema.parse({ locale: 'es' })).toThrow()
+  })
+
+  it('rejects a blank name', () => {
+    expect(() => UpdateProfileInputSchema.parse({ name: '   ' })).toThrow()
+  })
+
+  it('drops keys the profile patch does not own', () => {
+    // Email moves only through the verification flow, never through this patch.
+    expect(UpdateProfileInputSchema.parse({ name: 'Kael', email: 'new@example.com' })).toEqual({
+      name: 'Kael',
+    })
   })
 })

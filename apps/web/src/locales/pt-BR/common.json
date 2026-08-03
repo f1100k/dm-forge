@@ -98,5 +98,58 @@
       "useAnotherEmail": "Usar outro e-mail",
       "signOut": "Sair"
     }
+  },
+  "account": {
+    "nav": {
+      "eyebrow": "Configurações",
+      "profile": {
+        "label": "Perfil",
+        "sub": "Nome, e-mail, idioma"
+      },
+      "security": {
+        "label": "Segurança",
+        "sub": "Senha, OAuth, sessões"
+      },
+      "privacy": {
+        "label": "Privacidade",
+        "sub": "Dados, telemetria, exclusão"
+      }
+    },
+    "autoSave": {
+      "saved": "Salvo",
+      "saving": "Salvando…",
+      "error": "Erro ao salvar"
+    },
+    "profile": {
+      "title": "Seu Perfil",
+      "subtitle": "Como você aparece dentro do DM Forge.",
+      "loading": "Carregando seu perfil…",
+      "loadError": "Não foi possível carregar seu perfil. Recarregue a página.",
+      "identity": "Identidade",
+      "photo": {
+        "label": "Foto de perfil",
+        "hint": "Por enquanto usamos suas iniciais."
+      },
+      "name": {
+        "label": "Nome de exibição",
+        "sub": "Visível em campanhas compartilhadas (futuro)."
+      },
+      "email": {
+        "label": "E-mail",
+        "sub": "Usado para login. Trocar dispara verificação no novo endereço.",
+        "change": "Trocar e-mail",
+        "new": "Novo e-mail",
+        "placeholder": "novo@exemplo.com",
+        "submit": "Enviar verificação",
+        "sending": "Enviando…",
+        "cancel": "Cancelar",
+        "sent": "Enviamos um link de confirmação para {{email}}. O e-mail atual continua valendo até você confirmar.",
+        "error": "Não foi possível iniciar a troca. Confira o endereço e tente novamente."
+      },
+      "language": {
+        "label": "Idioma da interface",
+        "sub": "Aplicado na hora e salvo na sua conta."
+      }
+    }
   }
 }

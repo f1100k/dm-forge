@@ -28,3 +28,29 @@ export const SignUpInputSchema = z.object({
   acceptedPrivacy: z.literal(true),
 })
 export type SignUpInput = z.infer<typeof SignUpInputSchema>
+
+// Display name shown wherever the account appears (Spec FR-002, Story 3
+// cenário 1). Trimmed first so a whitespace-only value fails `min(1)` instead
+// of being stored as blanks; the ceiling keeps a single row from carrying an
+// unbounded string into every UI that renders it.
+export const DisplayNameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Name must not be empty')
+  .max(80, 'Name must be at most 80 characters long')
+
+// Partial patch for account.updateProfile (Tech Design §14.1). Auto-save sends
+// only the field that changed — never the whole profile
+// (docs/coding-patterns.md), so both keys are optional and the refinement
+// rejects the empty patch that would otherwise be a silent no-op write.
+// Email is deliberately absent: changing it goes through Better Auth's
+// verification flow (Spec Story 3 cenário 3), never a direct column write.
+export const UpdateProfileInputSchema = z
+  .object({
+    name: DisplayNameSchema.optional(),
+    locale: LocaleSchema.optional(),
+  })
+  .refine((patch) => patch.name !== undefined || patch.locale !== undefined, {
+    message: 'Provide at least one field to update',
+  })
+export type UpdateProfileInput = z.infer<typeof UpdateProfileInputSchema>

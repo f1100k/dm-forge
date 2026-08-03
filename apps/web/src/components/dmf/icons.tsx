@@ -96,6 +96,24 @@ export function ArrowRight({ size = 14 }: IconProps) {
   )
 }
 
+export function ChevronDown({ size = 14 }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 6 L8 11 L13 6" />
+    </svg>
+  )
+}
+
 export function AlertIcon({ size = 14 }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">

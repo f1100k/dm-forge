@@ -10,12 +10,15 @@ export {
 export {
   type ConsentType,
   ConsentTypeSchema,
+  DisplayNameSchema,
   EmailSchema,
   type Locale,
   LocaleSchema,
   PasswordSchema,
   type SignUpInput,
   SignUpInputSchema,
+  type UpdateProfileInput,
+  UpdateProfileInputSchema,
 } from './auth/schemas.js'
 export { parseEnv } from './env/parse-env.js'
 export {

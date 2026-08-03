@@ -13,7 +13,8 @@
     "./routes/register": "./src/routes/register.tsx",
     "./routes/verify-email": "./src/routes/verify-email.tsx",
     "./routes/forgot-password": "./src/routes/forgot-password.tsx",
-    "./routes/reset-password": "./src/routes/reset-password.tsx"
+    "./routes/reset-password": "./src/routes/reset-password.tsx",
+    "./routes/account/profile": "./src/routes/account/profile.tsx"
   },
   "scripts": {
     "dev": "vite",
