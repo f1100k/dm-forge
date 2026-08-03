@@ -70,15 +70,13 @@ export const accountRouter = router({
 
   // The audit trail behind FR-011, newest first. Scoped to the session's own
   // rows; the cursor names a position, never another user's records.
-  listConsents: protectedProcedure
-    .input(ListConsentsInputSchema)
-    .query(({ ctx, input }) =>
-      listConsents({
-        userId: ctx.user.id,
-        limit: input.limit,
-        ...(input.cursor ? { cursor: input.cursor } : {}),
-      }),
-    ),
+  listConsents: protectedProcedure.input(ListConsentsInputSchema).query(({ ctx, input }) =>
+    listConsents({
+      userId: ctx.user.id,
+      limit: input.limit,
+      ...(input.cursor ? { cursor: input.cursor } : {}),
+    }),
+  ),
 
   // Portability (FR-009, Story 5 cenário 1). Idempotent: asking twice while an
   // export is still valid returns the one already made.
