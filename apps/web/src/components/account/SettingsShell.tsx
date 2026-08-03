@@ -6,7 +6,8 @@
 
 import { Link } from '@tanstack/react-router'
 import type { CSSProperties, ReactNode } from 'react'
-import { Avatar, Display, Eyebrow, Logo, OrnDivider } from '../dmf/index.js'
+import { Display, Eyebrow, Logo, OrnDivider } from '../dmf/index.js'
+import { AccountMenu } from './AccountMenu.js'
 
 // One entry per settings section. Only the sections whose route exists are
 // navigable — the remaining two ship with the slices that build them (US5
@@ -39,16 +40,12 @@ export function AppHeader({ userName, right }: { userName: string; right?: React
       <Link to="/" style={{ textDecoration: 'none' }}>
         <Logo size={18} />
       </Link>
-      {/* The design's campaign nav (Codex / Arcos / Sessões) and the account
-          dropdown belong to Specs that have not shipped: the nav to the
-          campaign Specs, the dropdown with its "Sair" item to card S4.1. Only
-          the identity chip is rendered here. */}
+      {/* The design's campaign nav (Codex / Arcos / Sessões) belongs to Specs
+          that have not shipped. The account dropdown is here, since it carries
+          the only way out of a session (Spec Story 4). */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         {right}
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <Avatar size={26} initials={initialsOf(userName)} />
-          <span style={{ fontSize: 13, color: 'var(--text)' }}>{userName}</span>
-        </span>
+        <AccountMenu userName={userName} />
       </div>
     </header>
   )

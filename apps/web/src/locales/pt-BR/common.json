@@ -26,7 +26,8 @@
       "genericError": "Não foi possível entrar. Tente novamente.",
       "locked": "Muitas tentativas de acesso. Aguarde alguns minutos e tente novamente.",
       "noAccount": "Novo por aqui?",
-      "registerLink": "Criar conta"
+      "registerLink": "Criar conta",
+      "sessionExpired": "Sua sessão expirou. Entre novamente para continuar."
     },
     "forgot": {
       "title": "Esqueceu a senha?",
@@ -114,6 +115,13 @@
         "label": "Privacidade",
         "sub": "Dados, telemetria, exclusão"
       }
+    },
+    "menu": {
+      "label": "Conta",
+      "settings": "Configurações da conta",
+      "signOut": "Sair",
+      "signingOut": "Saindo…",
+      "signOutError": "Não foi possível sair agora. Tente novamente."
     },
     "autoSave": {
       "saved": "Salvo",

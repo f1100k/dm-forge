@@ -7,6 +7,7 @@
     "./trpc": "./src/trpc.ts",
     "./i18n": "./src/i18n/index.ts",
     "./auth/auth-client": "./src/auth/auth-client.ts",
+    "./auth/session-expiry": "./src/auth/session-expiry.ts",
     "./routes/__root": "./src/routes/__root.tsx",
     "./routes/index": "./src/routes/index.tsx",
     "./routes/login": "./src/routes/login.tsx",

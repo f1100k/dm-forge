@@ -26,7 +26,8 @@
       "genericError": "Could not sign in. Please try again.",
       "locked": "Too many sign-in attempts. Wait a few minutes and try again.",
       "noAccount": "New here?",
-      "registerLink": "Create account"
+      "registerLink": "Create account",
+      "sessionExpired": "Your session expired. Sign in again to continue."
     },
     "forgot": {
       "title": "Forgot your password?",
@@ -114,6 +115,13 @@
         "label": "Privacy",
         "sub": "Data, telemetry, deletion"
       }
+    },
+    "menu": {
+      "label": "Account",
+      "settings": "Account settings",
+      "signOut": "Sign out",
+      "signingOut": "Signing out…",
+      "signOutError": "Could not sign you out right now. Try again."
     },
     "autoSave": {
       "saved": "Saved",

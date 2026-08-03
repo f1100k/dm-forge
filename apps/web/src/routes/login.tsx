@@ -3,6 +3,7 @@ import { type ChangeEvent, type FormEvent, type ReactNode, useState } from 'reac
 import { useTranslation } from 'react-i18next'
 import { signIn } from '../auth/auth-client.js'
 import { appCallbackUrl } from '../auth/callback-url.js'
+import { sessionExpiry } from '../auth/session-expiry.js'
 import { AlertIcon, GoogleIcon, MailIcon } from '../components/dmf/icons.js'
 import {
   AuthShell,
@@ -19,6 +20,11 @@ import { Route as RootRoute } from './__root.js'
 export const Route = createRoute({
   getParentRoute: () => RootRoute,
   path: '/login',
+  // Set by the global 401 handler when it evicts an expired session, so the
+  // login screen can say why the user is back here (Spec Story 4 cenário 2).
+  // Optional, so every other link into /login stays a plain `to="/login"`.
+  validateSearch: (search: Record<string, unknown>): { reason?: 'session-expired' } =>
+    search.reason === 'session-expired' ? { reason: 'session-expired' } : {},
   component: LoginPage,
 })
 
@@ -26,6 +32,7 @@ function LoginPage() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage === 'en' ? 'en' : 'pt'
   const navigate = useNavigate()
+  const { reason } = Route.useSearch()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState<'invalid' | 'unverified' | 'locked' | 'generic' | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -55,6 +62,8 @@ function LoginPage() {
       return
     }
 
+    // The app holds a session again, so the next expiry has to be able to fire.
+    sessionExpiry.rearm()
     await navigate({ to: '/' })
   }
 
@@ -73,6 +82,11 @@ function LoginPage() {
       <div
         style={{ width: 420, maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}
       >
+        {/* Above the fold rather than inside the form: the user did not fail at
+            anything here, they were sent back — the notice explains the
+            navigation, it does not annotate a field. */}
+        {reason === 'session-expired' && <ErrorNote>{t('auth.login.sessionExpired')}</ErrorNote>}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Display size={36} italic>
             {t('auth.login.title')}
