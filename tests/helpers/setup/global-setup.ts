@@ -13,6 +13,7 @@ export async function setup() {
   process.env.BETTER_AUTH_URL ??= 'http://localhost:3000'
   process.env.WEB_ORIGIN ??= 'http://localhost:5173'
   process.env.ENCRYPTION_KEY ??= Buffer.alloc(32, 1).toString('base64')
+  process.env.IP_HASH_SALT ??= 's'.repeat(32)
   // Pinned, not defaulted: a developer running with EMAIL_PROVIDER=resend in
   // their local .env would otherwise have the suite attempt real provider
   // sends on every sign-up — and fail the assertions that read the offline

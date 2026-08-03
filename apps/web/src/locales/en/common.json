@@ -24,8 +24,42 @@
       "invalid": "Incorrect email or password.",
       "unverified": "Confirm your email before signing in. Check your inbox.",
       "genericError": "Could not sign in. Please try again.",
+      "locked": "Too many sign-in attempts. Wait a few minutes and try again.",
       "noAccount": "New here?",
       "registerLink": "Create account"
+    },
+    "forgot": {
+      "title": "Forgot your password?",
+      "description": "Enter your account email and we'll send you a link to create a new password.",
+      "emailLabel": "Email",
+      "submit": "Send recovery link",
+      "submitting": "Sending…",
+      "backToLogin": "Back to sign in",
+      "sentTitle": "Link sent.",
+      "sentDescription": "If an account exists for {{email}}, you'll receive a link to reset your password.",
+      "sentHint": "The link expires in 1 hour. Check spam / promotions.",
+      "useAnotherEmail": "Use another email",
+      "errors": {
+        "emailInvalid": "Enter a valid email address."
+      }
+    },
+    "reset": {
+      "title": "Create a new password.",
+      "description": "Choose a new password for your account. It replaces the previous one immediately.",
+      "passwordLabel": "New password",
+      "passwordHint": "At least 10 characters. Use something memorable.",
+      "submit": "Reset password",
+      "submitting": "Resetting…",
+      "expiredTitle": "Invalid or expired link.",
+      "expiredDescription": "This reset link is no longer valid. Request a new one to continue.",
+      "requestNewLink": "Request a new link",
+      "doneTitle": "Password reset.",
+      "doneDescription": "Your password has been changed and every previous session was signed out. Sign in again with the new password.",
+      "goToLogin": "Go to sign in",
+      "errors": {
+        "passwordTooShort": "The password must be at least 10 characters long.",
+        "generic": "Could not reset the password. Please try again."
+      }
     },
     "register": {
       "title": "Forge your table.",

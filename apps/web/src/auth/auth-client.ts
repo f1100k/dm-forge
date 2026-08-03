@@ -13,4 +13,15 @@ export const authClient = createAuthClient({
   plugins: [inferAdditionalFields({ user: { locale: { type: 'string' } } })],
 })
 
-export const { useSession, signIn, signUp, signOut, sendVerificationEmail } = authClient
+export const {
+  useSession,
+  signIn,
+  signUp,
+  signOut,
+  sendVerificationEmail,
+  // Password recovery (card US2, Spec Story 2 cenário 3). `requestPasswordReset`
+  // always resolves successfully — the server never reveals whether the address
+  // exists.
+  requestPasswordReset,
+  resetPassword,
+} = authClient

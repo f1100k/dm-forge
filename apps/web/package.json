@@ -11,7 +11,9 @@
     "./routes/index": "./src/routes/index.tsx",
     "./routes/login": "./src/routes/login.tsx",
     "./routes/register": "./src/routes/register.tsx",
-    "./routes/verify-email": "./src/routes/verify-email.tsx"
+    "./routes/verify-email": "./src/routes/verify-email.tsx",
+    "./routes/forgot-password": "./src/routes/forgot-password.tsx",
+    "./routes/reset-password": "./src/routes/reset-password.tsx"
   },
   "scripts": {
     "dev": "vite",

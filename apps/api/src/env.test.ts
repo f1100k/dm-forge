@@ -8,6 +8,7 @@ const validBase = {
   DATABASE_URL: 'postgresql://u:p@localhost:5432/db?schema=public',
   BETTER_AUTH_SECRET: 'x'.repeat(32),
   ENCRYPTION_KEY: 'encryption-key',
+  IP_HASH_SALT: 's'.repeat(32),
 }
 
 describe('ApiEnvSchema email provider validation', () => {
@@ -65,5 +66,29 @@ describe('ApiEnvSchema email provider validation', () => {
       expect(paths).toContain('RESEND_API_KEY')
       expect(paths).toContain('EMAIL_FROM')
     }
+  })
+})
+
+describe('ApiEnvSchema IP_HASH_SALT validation', () => {
+  it('rejects boot without the login rate-limit salt', () => {
+    // Arrange
+    const { IP_HASH_SALT: _omitted, ...withoutSalt } = validBase
+
+    // Act
+    const result = ApiEnvSchema.safeParse(withoutSalt)
+
+    // Assert — a missing salt must fail at boot, not at the first sign-in.
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.map((issue) => issue.path.join('.'))).toContain('IP_HASH_SALT')
+    }
+  })
+
+  it('rejects a salt shorter than 32 characters', () => {
+    // Act
+    const result = ApiEnvSchema.safeParse({ ...validBase, IP_HASH_SALT: 'too-short' })
+
+    // Assert
+    expect(result.success).toBe(false)
   })
 })
