@@ -3,8 +3,11 @@ import {
   ConsentTypeSchema,
   DisplayNameSchema,
   EmailSchema,
+  ListConsentsInputSchema,
   LocaleSchema,
   PasswordSchema,
+  RecordConsentInputSchema,
+  RequestDeletionInputSchema,
   SignUpInputSchema,
   UpdateProfileInputSchema,
 } from './schemas.js'
@@ -252,5 +255,95 @@ describe('UpdateProfileInputSchema', () => {
     expect(UpdateProfileInputSchema.parse({ name: 'Kael', email: 'new@example.com' })).toEqual({
       name: 'Kael',
     })
+  })
+})
+
+describe('RecordConsentInputSchema', () => {
+  it('accepts accepting the Terms', () => {
+    expect(RecordConsentInputSchema.parse({ type: 'TERMS', action: 'ACCEPT' })).toEqual({
+      type: 'TERMS',
+      action: 'ACCEPT',
+    })
+  })
+
+  it('accepts revoking telemetry', () => {
+    // LGPD Art. 8 §5: the optional consent is the one that can be withdrawn.
+    expect(RecordConsentInputSchema.parse({ type: 'TELEMETRY', action: 'REVOKE' })).toEqual({
+      type: 'TELEMETRY',
+      action: 'REVOKE',
+    })
+  })
+
+  it('rejects revoking the Terms', () => {
+    // Withdrawing consent to the Terms is account deletion, not a toggle.
+    expect(() => RecordConsentInputSchema.parse({ type: 'TERMS', action: 'REVOKE' })).toThrow()
+  })
+
+  it('rejects revoking the Privacy Policy', () => {
+    expect(() => RecordConsentInputSchema.parse({ type: 'PRIVACY', action: 'REVOKE' })).toThrow()
+  })
+
+  it('rejects an unknown consent type', () => {
+    expect(() => RecordConsentInputSchema.parse({ type: 'COOKIES', action: 'ACCEPT' })).toThrow()
+  })
+
+  it('drops a version the caller tried to name', () => {
+    // The version stamped on the record is the server's to decide, so a client
+    // cannot forge acceptance of a document the user never saw.
+    expect(
+      RecordConsentInputSchema.parse({ type: 'TERMS', action: 'ACCEPT', version: '1999-01-01' }),
+    ).toEqual({ type: 'TERMS', action: 'ACCEPT' })
+  })
+})
+
+describe('ListConsentsInputSchema', () => {
+  it('defaults to a page of 50', () => {
+    expect(ListConsentsInputSchema.parse({})).toEqual({ limit: 50 })
+  })
+
+  it('accepts the smallest and largest pages', () => {
+    expect(ListConsentsInputSchema.parse({ limit: 1 }).limit).toBe(1)
+    expect(ListConsentsInputSchema.parse({ limit: 100 }).limit).toBe(100)
+  })
+
+  it('rejects a page beyond the cap', () => {
+    expect(() => ListConsentsInputSchema.parse({ limit: 101 })).toThrow()
+  })
+
+  it('rejects a page of zero', () => {
+    expect(() => ListConsentsInputSchema.parse({ limit: 0 })).toThrow()
+  })
+
+  it('carries a cursor when given one', () => {
+    expect(ListConsentsInputSchema.parse({ cursor: 'rec_1' }).cursor).toBe('rec_1')
+  })
+})
+
+describe('RequestDeletionInputSchema', () => {
+  it('accepts a password confirmation', () => {
+    expect(
+      RequestDeletionInputSchema.parse({ confirmation: { password: 'correct horse' } }),
+    ).toEqual({ confirmation: { password: 'correct horse' } })
+  })
+
+  it('accepts an OAuth re-authentication', () => {
+    expect(RequestDeletionInputSchema.parse({ confirmation: { reAuthOAuth: true } })).toEqual({
+      confirmation: { reAuthOAuth: true },
+    })
+  })
+
+  it('rejects an empty password', () => {
+    expect(() => RequestDeletionInputSchema.parse({ confirmation: { password: '' } })).toThrow()
+  })
+
+  it('rejects an OAuth flag set to false', () => {
+    // "I did not re-authenticate" is not a confirmation.
+    expect(() =>
+      RequestDeletionInputSchema.parse({ confirmation: { reAuthOAuth: false } }),
+    ).toThrow()
+  })
+
+  it('rejects a request with no confirmation at all', () => {
+    expect(() => RequestDeletionInputSchema.parse({ confirmation: {} })).toThrow()
   })
 })

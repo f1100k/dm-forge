@@ -4,7 +4,7 @@
 // faithfully to the design. Default theme is Obsidian dark, editorial type.
 
 import type { ButtonHTMLAttributes, CSSProperties, InputHTMLAttributes, ReactNode } from 'react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CheckIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.js'
 
 // ── Logo / wordmark ──────────────────────────────────────────────
@@ -628,6 +628,153 @@ export function CheckRow({
       </span>
       <span>{children}</span>
     </label>
+  )
+}
+
+// ── Switch (on/off preference) ───────────────────────────────────
+// A native checkbox wearing the design's track-and-knob: the role, the state
+// and the keyboard behaviour come free and correct, which no div can claim
+// (Spec NFR-006). The input is visually hidden behind the styled track, the
+// same technique CheckRow uses.
+export function Switch({
+  id,
+  checked,
+  onChange,
+  disabled,
+  label,
+}: {
+  id: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+  label: string
+}) {
+  return (
+    <label
+      htmlFor={id}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.55 : 1,
+      }}
+    >
+      <input
+        id={id}
+        type="checkbox"
+        role="switch"
+        className="dmf-check-input"
+        checked={checked}
+        disabled={disabled}
+        aria-label={label}
+        onChange={(event) => onChange(event.target.checked)}
+        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, margin: 0 }}
+      />
+      <span
+        aria-hidden="true"
+        style={{
+          width: 40,
+          height: 22,
+          borderRadius: 999,
+          padding: 2,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: checked ? 'flex-end' : 'flex-start',
+          background: checked ? 'var(--accent)' : 'var(--surface-hi)',
+          border: `1px solid ${checked ? 'var(--accent)' : 'var(--border-hi)'}`,
+          transition: 'all 140ms',
+        }}
+      >
+        <span
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: 999,
+            background: checked ? '#0E0F12' : 'var(--text-muted)',
+            display: 'block',
+          }}
+        />
+      </span>
+    </label>
+  )
+}
+
+// ── Modal dialog ─────────────────────────────────────────────────
+// Used by the destructive flows, where the design deliberately takes the screen
+// away to make the decision deliberate. Escape closes it, the backdrop closes
+// it, and focus moves into the panel on open so a keyboard user is not left
+// behind on the page underneath (Spec NFR-006).
+export function Dialog({
+  open,
+  onClose,
+  labelledBy,
+  children,
+}: {
+  open: boolean
+  onClose: () => void
+  labelledBy: string
+  children: ReactNode
+}) {
+  const panel = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    panel.current?.focus()
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open, onClose])
+
+  if (!open) return null
+
+  return (
+    <div
+      // The backdrop is a click target, not a control: the same dismissal is
+      // on Escape and on the dialog's own cancel button, so it needs no role.
+      // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard dismissal is handled by the Escape listener above
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose()
+      }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        background: 'rgba(6, 7, 9, 0.72)',
+        backdropFilter: 'blur(2px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+      }}
+    >
+      <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={labelledBy}
+        tabIndex={-1}
+        style={{
+          width: 520,
+          maxWidth: '100%',
+          maxHeight: '90dvh',
+          overflowY: 'auto',
+          background: 'var(--surface)',
+          border: '1px solid var(--border-hi)',
+          borderRadius: 10,
+          padding: 28,
+          boxShadow: '0 24px 64px rgba(0, 0, 0, 0.55)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+          outline: 'none',
+        }}
+      >
+        {children}
+      </div>
+    </div>
   )
 }
 

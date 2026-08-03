@@ -99,6 +99,7 @@ If an ADR conflicts with the current Constitution and doesn't propose a Constitu
 
 (Add ADRs here as they get accepted — newest first.)
 
+- [0009 — Account deletion: 30-day window, in-process scheduler, hashed audit](0009-account-deletion-policy.md)
 - [0008 — Frontend internationalization with react-i18next](0008-i18n-frontend.md)
 - [0007 — Transactional email provider: Resend](0007-transactional-email-provider.md)
 - [0006 — Diagrams as code with Mermaid (replacing the tldraw MCP)](0006-diagrams-as-code-mermaid.md) — _proposed_

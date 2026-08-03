@@ -11,6 +11,7 @@ import {
   SectionHeader,
   type SettingsSection,
   SettingsShell,
+  useSettingsSections,
 } from '../../components/account/SettingsShell.js'
 import { MailIcon } from '../../components/dmf/icons.js'
 import {
@@ -38,17 +39,7 @@ function ProfilePage() {
   // this screen's job any more — the sessionExpiryLink handles every 401 for
   // the whole app (apps/web/src/auth/session-expiry.ts).
   const profile = trpc.account.me.useQuery(undefined, { retry: false })
-
-  const sections: SettingsSection[] = [
-    {
-      id: 'profile',
-      label: t('account.nav.profile.label'),
-      sub: t('account.nav.profile.sub'),
-      to: '/account/profile',
-    },
-    { id: 'security', label: t('account.nav.security.label'), sub: t('account.nav.security.sub') },
-    { id: 'privacy', label: t('account.nav.privacy.label'), sub: t('account.nav.privacy.sub') },
-  ]
+  const sections = useSettingsSections()
 
   if (!profile.data) {
     return (

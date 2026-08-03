@@ -32,6 +32,11 @@ export const ApiEnvSchema = z
     // constrained to a bare email.
     RESEND_API_KEY: z.string().min(1).optional(),
     EMAIL_FROM: z.string().min(1).optional(),
+    // Shared secret for POST /api/internal/account/:id/restore (Tech Design
+    // §14.1). Optional: a deployment that has not issued one keeps the endpoint
+    // closed rather than open — see apps/api/src/account/routes.ts. Long enough
+    // that it cannot be guessed if it is set at all.
+    SUPPORT_API_KEY: z.string().min(32).optional(),
     // Google OAuth (card S1.1, ADR 0003). Optional: the provider is registered
     // only when both id and secret are present, so local dev and tests boot
     // without OAuth configured. Deployments that want social login supply the

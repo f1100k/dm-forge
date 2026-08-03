@@ -8,12 +8,15 @@
     ".": "./src/index.ts",
     "./server": "./src/server/app.ts",
     "./routers": "./src/trpc/routers/index.ts",
-    "./auth": "./src/auth/better-auth.ts"
+    "./auth": "./src/auth/better-auth.ts",
+    "./telemetry": "./src/telemetry/account-telemetry.ts",
+    "./account/*": "./src/account/*.ts"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
+    "audit:deletions": "tsx scripts/deletion-audit.ts",
     "test": "pnpm -w exec vitest run --project='unit:api'",
     "clean": "rm -rf .turbo coverage dist"
   },
@@ -25,6 +28,7 @@
     "@trpc/server": "catalog:",
     "better-auth": "catalog:",
     "hono": "^4.12.32",
+    "node-cron": "^4.6.0",
     "resend": "^6.18.1",
     "zod": "catalog:"
   },

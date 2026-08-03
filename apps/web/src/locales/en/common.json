@@ -25,6 +25,7 @@
       "unverified": "Confirm your email before signing in. Check your inbox.",
       "genericError": "Could not sign in. Please try again.",
       "locked": "Too many sign-in attempts. Wait a few minutes and try again.",
+      "pendingDeletion": "This account is scheduled for deletion and access is locked. Reply to the deletion email and support will restore it.",
       "noAccount": "New here?",
       "registerLink": "Create account",
       "sessionExpired": "Your session expired. Sign in again to continue."
@@ -157,6 +158,74 @@
       "language": {
         "label": "Interface language",
         "sub": "Applied right away and saved to your account."
+      }
+    },
+    "privacy": {
+      "title": "Privacy and data",
+      "subtitle": "Your data is yours. Take it with you, review what you consented to, and leave whenever you want.",
+      "data": {
+        "title": "Your data",
+        "sub": "Portability and optional consent."
+      },
+      "export": {
+        "label": "Export my data",
+        "sub": "A JSON file with your profile and your consent history.",
+        "request": "Export",
+        "requesting": "Preparing…",
+        "download": "Download my data",
+        "expiresAt": "The link expires on {{date}}. We also emailed it to you.",
+        "error": "Could not prepare the export. Try again."
+      },
+      "telemetry": {
+        "label": "Usage telemetry",
+        "sub": "Anonymous usage events. Turning it off stops collection immediately.",
+        "error": "Could not save."
+      },
+      "history": {
+        "title": "Consent history",
+        "sub": "An immutable record of what you accepted and withdrew.",
+        "label": "See the records",
+        "sub2": "Type, version and date of every decision.",
+        "show": "Show history",
+        "hide": "Hide",
+        "loading": "Loading history…",
+        "empty": "No records yet.",
+        "type": {
+          "TERMS": "Terms of Use",
+          "PRIVACY": "Privacy Policy",
+          "TELEMETRY": "Telemetry"
+        },
+        "action": {
+          "ACCEPT": "accepted",
+          "REVOKE": "withdrawn"
+        }
+      },
+      "danger": {
+        "title": "Delete account",
+        "sub": "Permanent once the 30-day window closes."
+      },
+      "delete": {
+        "label": "Delete my account",
+        "sub": "The account is locked immediately and erased after 30 days.",
+        "open": "Delete account",
+        "dialog": {
+          "title": "Delete your account?",
+          "warning": "Everything in your account — profile, campaigns and content — will be erased for good. There is no undo once the window closes.",
+          "grace": "Your account stays locked for 30 days before the data is erased. Support can still restore it during that period.",
+          "cancel": "Cancel",
+          "continue": "Continue",
+          "confirmPassword": "Type your password to confirm it is you.",
+          "confirmOAuth": "Your account signs in with Google. Confirm to go ahead with the deletion.",
+          "passwordLabel": "Current password",
+          "submit": "Delete my account",
+          "submitting": "Deleting…",
+          "error": "Could not confirm. Check your password and try again."
+        }
+      },
+      "pending": {
+        "title": "Account scheduled for deletion.",
+        "due": "Your data will be erased for good on {{date}}.",
+        "restore": "Access stays locked in the meantime. Changed your mind? Reply to the email we sent and support will restore your account before that date."
       }
     }
   }

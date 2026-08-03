@@ -1,6 +1,7 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { createAccountRoutes } from '../account/routes.js'
 import { auth } from '../auth/better-auth.js'
 import { getEnv } from '../env.js'
 import { createContext } from '../trpc/context.js'
@@ -24,6 +25,10 @@ export function createApp() {
 
   // Better Auth — mounts GET/POST at /api/auth/*.
   app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw))
+
+  // The account surface is tRPC except for two handlers that need HTTP
+  // semantics tRPC does not give (Tech Design §14.1).
+  app.route('/', createAccountRoutes())
 
   // tRPC.
   app.all('/trpc/*', async (c) => {

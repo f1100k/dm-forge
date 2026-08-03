@@ -8,13 +8,23 @@ export {
   TERMS_VERSION,
 } from './auth/constants.js'
 export {
+  type ConsentAction,
+  ConsentActionSchema,
   type ConsentType,
   ConsentTypeSchema,
+  type DeletionConfirmation,
+  DeletionConfirmationSchema,
   DisplayNameSchema,
   EmailSchema,
+  type ListConsentsInput,
+  ListConsentsInputSchema,
   type Locale,
   LocaleSchema,
   PasswordSchema,
+  type RecordConsentInput,
+  RecordConsentInputSchema,
+  type RequestDeletionInput,
+  RequestDeletionInputSchema,
   type SignUpInput,
   SignUpInputSchema,
   type UpdateProfileInput,
@@ -28,3 +38,14 @@ export {
 } from './errors/app-error.js'
 export { createId, isCuid } from './ids/ids.js'
 export { type EntityState, EntityStateSchema } from './schemas/entity-state.js'
+export {
+  ACCOUNT_TELEMETRY_EVENTS,
+  type AccountTelemetryEvent,
+  createConsoleTelemetrySink,
+  createTelemetry,
+  type Telemetry,
+  type TelemetryConsent,
+  type TelemetryDetails,
+  type TelemetryEvent,
+  type TelemetrySink,
+} from './telemetry/telemetry.js'
