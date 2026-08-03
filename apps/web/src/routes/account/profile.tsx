@@ -1,6 +1,6 @@
 import { LocaleSchema } from '@dm-forge/shared'
-import { createRoute, useNavigate } from '@tanstack/react-router'
-import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react'
+import { createRoute } from '@tanstack/react-router'
+import { type ChangeEvent, type FormEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { authClient } from '../../auth/auth-client.js'
 import { appCallbackUrl } from '../../auth/callback-url.js'
@@ -33,18 +33,11 @@ export const Route = createRoute({
 
 function ProfilePage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const profile = trpc.account.me.useQuery(undefined, { retry: false })
-
   // The procedure is `protected`, so an absent or expired session comes back as
-  // UNAUTHORIZED rather than as empty data. Card S4.2 generalises this into a
-  // client-wide 401 interceptor; until then the one authenticated screen that
-  // exists handles its own redirect.
-  useEffect(() => {
-    if (profile.error?.data?.code === 'UNAUTHORIZED') {
-      void navigate({ to: '/login' })
-    }
-  }, [profile.error, navigate])
+  // UNAUTHORIZED rather than as empty data. The redirect that follows is not
+  // this screen's job any more — the sessionExpiryLink handles every 401 for
+  // the whole app (apps/web/src/auth/session-expiry.ts).
+  const profile = trpc.account.me.useQuery(undefined, { retry: false })
 
   const sections: SettingsSection[] = [
     {
