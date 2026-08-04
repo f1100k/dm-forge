@@ -1,5 +1,9 @@
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
+
+const here = dirname(fileURLToPath(import.meta.url))
 
 // Root config: UNIT projects only. Integration tests live in the
 // @dm-forge/tests workspace package and use tests/vitest.config.ts.
@@ -41,6 +45,12 @@ export default defineConfig({
       },
       {
         plugins: [react()],
+        // apps/web's own vite.config.ts is not read by this root config, so the
+        // `@/` alias shadcn/ui components import each other through has to be
+        // repeated here.
+        resolve: {
+          alias: { '@': resolve(here, 'apps/web/src') },
+        },
         test: {
           name: 'unit:web',
           root: './apps/web',

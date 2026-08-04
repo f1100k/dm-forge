@@ -3,6 +3,13 @@
   "compilerOptions": {
     "noEmit": true,
     "jsx": "react-jsx",
+    // `@/` is the alias shadcn/ui generates its imports against (components.json).
+    // Keeping it means `npx shadcn add <component>` drops in a file that already
+    // compiles, instead of one that has to be rewritten by hand every time.
+    // Resolved relative to this file — `baseUrl` is deprecated in TS 6.
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node", "vite/client", "vitest/globals"]
   },

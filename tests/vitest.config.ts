@@ -1,4 +1,4 @@
-import { dirname } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
@@ -41,6 +41,13 @@ export default defineConfig({
       },
       {
         plugins: [react()],
+        // These tests render real apps/web screens, which reach shadcn/ui
+        // components through the `@/` alias declared in apps/web's tsconfig and
+        // vite config. This project resolves modules on its own, so it needs the
+        // same mapping.
+        resolve: {
+          alias: { '@': resolve(here, '../apps/web/src') },
+        },
         test: {
           name: 'integration:web',
           root: here,
