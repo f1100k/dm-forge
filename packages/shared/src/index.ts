@@ -3,6 +3,8 @@
 
 export {
   type AcceptedVersions,
+  type LegalDocumentType,
+  outdatedLegalDocuments,
   PRIVACY_VERSION,
   requiresTermsReAcceptance,
   TERMS_VERSION,
