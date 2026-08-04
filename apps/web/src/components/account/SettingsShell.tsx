@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Display, Eyebrow, Logo, OrnDivider } from '../dmf/index.js'
 import { AccountMenu } from './AccountMenu.js'
+import { TermsGate } from './TermsGate.js'
 
 // The design's nav column is 260px, four pixels wider than shadcn's default.
 const SIDEBAR_WIDTH = '260px'
@@ -172,6 +173,12 @@ export function SettingsShell({
       <SidebarInset className="bg-background">
         <main className="dmf-settings-main">{children}</main>
       </SidebarInset>
+
+      {/* Renders nothing until the account is behind on the Terms or the
+          Privacy Policy, and takes the screen away when it is (FR-016). It
+          lives here so every screen wearing this chrome is gated, rather than
+          each one remembering to mount it. */}
+      <TermsGate />
     </SidebarProvider>
   )
 }
