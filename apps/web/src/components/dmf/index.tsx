@@ -3,7 +3,13 @@
 // tokens (CSS variables defined in index.css), so the auth screens render
 // faithfully to the design. Default theme is Obsidian dark, editorial type.
 
-import type { ButtonHTMLAttributes, CSSProperties, InputHTMLAttributes, ReactNode } from 'react'
+import type {
+  ButtonHTMLAttributes,
+  CSSProperties,
+  InputHTMLAttributes,
+  KeyboardEvent as ReactKeyboardEvent,
+  ReactNode,
+} from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { CheckIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.js'
 
@@ -704,15 +710,23 @@ export function Switch({
 // away to make the decision deliberate. Escape closes it, the backdrop closes
 // it, and focus moves into the panel on open so a keyboard user is not left
 // behind on the page underneath (Spec NFR-006).
+//
+// `dismissible: false` drops both dismissals, for the one dialog the user has
+// to answer rather than escape (the terms re-acceptance gate, FR-016). Tab is
+// kept inside the panel either way: `aria-modal` promises the rest of the page
+// is unreachable, and without the containment below a keyboard user could tab
+// straight into the nav underneath.
 export function Dialog({
   open,
   onClose,
   labelledBy,
+  dismissible = true,
   children,
 }: {
   open: boolean
   onClose: () => void
   labelledBy: string
+  dismissible?: boolean
   children: ReactNode
 }) {
   const panel = useRef<HTMLDivElement>(null)
@@ -722,11 +736,11 @@ export function Dialog({
     panel.current?.focus()
 
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape' && dismissible) onClose()
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [open, onClose])
+  }, [open, onClose, dismissible])
 
   if (!open) return null
 
@@ -736,7 +750,7 @@ export function Dialog({
       // on Escape and on the dialog's own cancel button, so it needs no role.
       // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard dismissal is handled by the Escape listener above
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose()
+        if (dismissible && event.target === event.currentTarget) onClose()
       }}
       style={{
         position: 'fixed',
@@ -756,6 +770,7 @@ export function Dialog({
         aria-modal="true"
         aria-labelledby={labelledBy}
         tabIndex={-1}
+        onKeyDown={(event) => keepTabInside(event, panel.current)}
         style={{
           width: 520,
           maxWidth: '100%',
@@ -776,6 +791,35 @@ export function Dialog({
       </div>
     </div>
   )
+}
+
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+// Cycles Tab between the first and the last control of the open dialog. The
+// panel itself is the fallback anchor, since focus starts there on open.
+function keepTabInside(event: ReactKeyboardEvent<HTMLElement>, panel: HTMLElement | null) {
+  if (event.key !== 'Tab' || !panel) return
+
+  const focusable = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+
+  // A dialog with nothing focusable in it: hold the focus on the panel rather
+  // than hand it to the page behind.
+  if (!first || !last) {
+    event.preventDefault()
+    return
+  }
+
+  const active = document.activeElement
+  if (event.shiftKey && (active === first || active === panel)) {
+    event.preventDefault()
+    last.focus()
+  } else if (!event.shiftKey && active === last) {
+    event.preventDefault()
+    first.focus()
+  }
 }
 
 // ── Atmosphere (subtle grain + vignette) ─────────────────────────

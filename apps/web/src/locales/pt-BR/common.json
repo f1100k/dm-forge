@@ -227,6 +227,22 @@
         "due": "Seus dados serão apagados definitivamente em {{date}}.",
         "restore": "Enquanto isso, o acesso fica bloqueado. Mudou de ideia? Responda ao e-mail que enviamos e o suporte restaura sua conta antes dessa data."
       }
+    },
+    "terms": {
+      "title": "Atualizamos nossos termos.",
+      "description": "Publicamos uma nova versão dos documentos abaixo. Para continuar usando o DM Forge, confirme que leu e aceita a versão atual.",
+      "documents": {
+        "TERMS": "Termos de Uso",
+        "PRIVACY": "Política de Privacidade"
+      },
+      "version": "versão {{version}}",
+      "accept": "Li e aceito",
+      "accepting": "Registrando…",
+      "decline": "Sair",
+      "declining": "Saindo…",
+      "declineHint": "Sem o aceite não é possível continuar. Se preferir decidir depois, saia da conta e volte quando quiser.",
+      "error": "Não foi possível registrar seu aceite. Tente novamente.",
+      "signOutError": "Não foi possível sair agora. Tente novamente."
     }
   }
 }

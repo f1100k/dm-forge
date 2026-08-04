@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { PRIVACY_VERSION, requiresTermsReAcceptance, TERMS_VERSION } from './constants.js'
+import {
+  outdatedLegalDocuments,
+  PRIVACY_VERSION,
+  requiresTermsReAcceptance,
+  TERMS_VERSION,
+} from './constants.js'
 
 describe('legal document versions', () => {
   it('exposes non-empty current versions for terms and privacy', () => {
@@ -69,5 +74,52 @@ describe('requiresTermsReAcceptance', () => {
         acceptedPrivacyVersion: undefined,
       }),
     ).toBe(true)
+  })
+})
+
+describe('outdatedLegalDocuments', () => {
+  it('names nothing when both accepted versions are the ones in force', () => {
+    expect(
+      outdatedLegalDocuments({
+        acceptedTermsVersion: TERMS_VERSION,
+        acceptedPrivacyVersion: PRIVACY_VERSION,
+      }),
+    ).toEqual([])
+  })
+
+  it('names only the terms when that is the stale one', () => {
+    expect(
+      outdatedLegalDocuments({
+        acceptedTermsVersion: 'old-terms',
+        acceptedPrivacyVersion: PRIVACY_VERSION,
+      }),
+    ).toEqual(['TERMS'])
+  })
+
+  it('names only the privacy policy when that is the stale one', () => {
+    expect(
+      outdatedLegalDocuments({
+        acceptedTermsVersion: TERMS_VERSION,
+        acceptedPrivacyVersion: 'old-privacy',
+      }),
+    ).toEqual(['PRIVACY'])
+  })
+
+  it('names both when both are behind', () => {
+    expect(
+      outdatedLegalDocuments({
+        acceptedTermsVersion: 'old-terms',
+        acceptedPrivacyVersion: 'old-privacy',
+      }),
+    ).toEqual(['TERMS', 'PRIVACY'])
+  })
+
+  it('names both for an account that never accepted either document', () => {
+    expect(
+      outdatedLegalDocuments({
+        acceptedTermsVersion: null,
+        acceptedPrivacyVersion: null,
+      }),
+    ).toEqual(['TERMS', 'PRIVACY'])
   })
 })

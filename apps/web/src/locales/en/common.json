@@ -227,6 +227,22 @@
         "due": "Your data will be erased for good on {{date}}.",
         "restore": "Access stays locked in the meantime. Changed your mind? Reply to the email we sent and support will restore your account before that date."
       }
+    },
+    "terms": {
+      "title": "We updated our terms.",
+      "description": "A new version of the documents below is now in force. To keep using DM Forge, confirm that you have read and accept the current version.",
+      "documents": {
+        "TERMS": "Terms of Use",
+        "PRIVACY": "Privacy Policy"
+      },
+      "version": "version {{version}}",
+      "accept": "I have read and accept",
+      "accepting": "Recording…",
+      "decline": "Sign out",
+      "declining": "Signing out…",
+      "declineHint": "There is no way past this without accepting. To decide later, sign out and come back whenever you want.",
+      "error": "Could not record your acceptance. Try again.",
+      "signOutError": "Could not sign you out right now. Try again."
     }
   }
 }
