@@ -1,14 +1,37 @@
 // Chrome for the authenticated account screens, ported from the canonical
-// claude.ai/design project (sections "profile" / "security" / "privacy"). The
-// structural switch between the 1280px and 390px layouts lives in index.css
-// (.dmf-settings*), everything else mirrors the prototype's inline tokens like
-// the rest of components/dmf.
+// claude.ai/design project (sections "profile" / "security" / "privacy").
+//
+// The nav column is shadcn/ui's Sidebar (components/ui/sidebar.tsx) rather than
+// a hand-rolled grid: it is what makes the column stay put while the content
+// scrolls, and it brings the off-canvas drawer the mobile design asks for —
+// which the previous layout could only answer by hiding the nav outright. The
+// design's palette reaches it through the token bridge in index.css, so it
+// looks like the rest of the app rather than like stock shadcn.
+//
+// The remaining pieces (header, section header, rows) keep the prototype's
+// inline tokens, like the rest of components/dmf.
 
 import { Link } from '@tanstack/react-router'
 import type { CSSProperties, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
 import { Display, Eyebrow, Logo, OrnDivider } from '../dmf/index.js'
 import { AccountMenu } from './AccountMenu.js'
+
+// The design's nav column is 260px, four pixels wider than shadcn's default.
+const SIDEBAR_WIDTH = '260px'
 
 // One entry per settings section. Only the sections whose route exists are
 // navigable — "security" ships with the password/provider surface of FR-008 and
@@ -42,7 +65,19 @@ export function useSettingsSections(): SettingsSection[] {
   ]
 }
 
-export function AppHeader({ userName, right }: { userName: string; right?: ReactNode }) {
+// Fixed to the top across the full width, above the nav column — the design
+// puts the wordmark and the account menu on one bar that spans the page, not
+// inside the sidebar. The offset it occupies is `--app-header-h` (index.css),
+// which is also where the sidebar starts.
+export function AppHeader({
+  userName,
+  right,
+  left,
+}: {
+  userName: string
+  right?: ReactNode
+  left?: ReactNode
+}) {
   return (
     <header
       style={{
@@ -53,14 +88,21 @@ export function AppHeader({ userName, right }: { userName: string; right?: React
         borderBottom: '1px solid var(--border)',
         background: 'color-mix(in srgb, var(--bg) 80%, transparent)',
         backdropFilter: 'blur(8px)',
-        position: 'relative',
-        zIndex: 2,
+        position: 'fixed',
+        insetInline: 0,
+        top: 0,
+        height: 'var(--app-header-h)',
+        boxSizing: 'border-box',
+        zIndex: 20,
         gap: 16,
       }}
     >
-      <Link to="/" style={{ textDecoration: 'none' }}>
-        <Logo size={18} />
-      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {left}
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <Logo size={18} />
+        </Link>
+      </div>
       {/* The design's campaign nav (Codex / Arcos / Sessões) belongs to Specs
           that have not shipped. The account dropdown is here, since it carries
           the only way out of a session (Spec Story 4). */}
@@ -88,39 +130,53 @@ export function SettingsShell({
   children: ReactNode
 }) {
   return (
-    <div style={{ minHeight: '100dvh', background: 'var(--bg)', fontFamily: 'var(--font-body)' }}>
-      <AppHeader userName={userName} right={headerRight} />
-      <div className="dmf-settings">
-        <nav className="dmf-settings-nav" aria-label={eyebrow}>
-          <div style={{ padding: '0 12px 16px' }}>
-            <Eyebrow>{eyebrow}</Eyebrow>
-          </div>
-          {sections.map((section) => (
-            <SettingsNavItem
-              key={section.id}
-              section={section}
-              active={section.id === activeSection}
-            />
-          ))}
-        </nav>
+    <SidebarProvider
+      style={{ '--sidebar-width': SIDEBAR_WIDTH } as CSSProperties}
+      className="bg-background pt-(--app-header-h) font-[var(--font-body)]"
+    >
+      {/* Fixed, so it sits outside the provider's flex row. */}
+      <AppHeader
+        userName={userName}
+        right={headerRight}
+        left={<SidebarTrigger className="md:hidden" />}
+      />
+
+      <Sidebar
+        collapsible="offcanvas"
+        aria-label={eyebrow}
+        // Starts below the header instead of covering it, and stops at the
+        // bottom of the viewport — which is what keeps it in place while the
+        // content beside it scrolls.
+        className="top-(--app-header-h) h-[calc(100svh-var(--app-header-h))] border-r border-sidebar-border"
+      >
+        <SidebarHeader className="px-3 pt-5 pb-2">
+          <Eyebrow>{eyebrow}</Eyebrow>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {sections.map((section) => (
+                  <SettingsNavItem
+                    key={section.id}
+                    section={section}
+                    active={section.id === activeSection}
+                  />
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+
+      <SidebarInset className="bg-background">
         <main className="dmf-settings-main">{children}</main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
 
 function SettingsNavItem({ section, active }: { section: SettingsSection; active: boolean }) {
-  const style: CSSProperties = {
-    padding: '12px 14px',
-    borderRadius: 6,
-    background: active ? 'var(--surface-hi)' : 'transparent',
-    border: `1px solid ${active ? 'var(--border-hi)' : 'transparent'}`,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 3,
-    textDecoration: 'none',
-    opacity: section.to ? 1 : 0.45,
-  }
   const body = (
     <>
       <span style={{ fontSize: 13.5, color: 'var(--text)', fontWeight: active ? 500 : 400 }}>
@@ -130,18 +186,37 @@ function SettingsNavItem({ section, active }: { section: SettingsSection; active
     </>
   )
 
+  // "security" has no route yet (it ships with FR-008's password/provider
+  // surface). Rendering it dimmed and unclickable keeps the information
+  // architecture the design defines, instead of a nav that grows an item later.
   if (!section.to) {
     return (
-      <span aria-disabled="true" style={style}>
-        {body}
-      </span>
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          size="lg"
+          disabled
+          aria-disabled="true"
+          className="h-auto flex-col items-start gap-[3px] py-3 opacity-45"
+        >
+          {body}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
     )
   }
 
   return (
-    <Link to={section.to} style={style} aria-current={active ? 'page' : undefined}>
-      {body}
-    </Link>
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        asChild
+        size="lg"
+        isActive={active}
+        className="h-auto flex-col items-start gap-[3px] py-3 data-[active=true]:border data-[active=true]:border-(--border-hi)"
+      >
+        <Link to={section.to} aria-current={active ? 'page' : undefined}>
+          {body}
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   )
 }
 

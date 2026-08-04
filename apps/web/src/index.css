@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 /* DM Forge design tokens (card S1.4) — ported from the canonical claude.ai/design
    project. Default theme: "Obsidian" (dark), editorial type, gold accent. The
    design-tool's palette/type/intensity switcher is not part of the app; the
@@ -25,6 +27,60 @@
   --font-display: "Instrument Serif", "Newsreader", Georgia, serif;
   --font-body: "Geist", "Plus Jakarta Sans", system-ui, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  /* Height of the fixed app bar. The settings sidebar starts right below it, so
+     the two agree on one number instead of each carrying its own. */
+  --app-header-h: 65px;
+}
+
+/* Bridge from the Obsidian palette above to the token names shadcn/ui styles
+   itself with, so a component dropped in by `npx shadcn add` inherits this
+   design instead of the default neutral one. Mapped here rather than by
+   redefining the shadcn variables, because two of the names collide in
+   meaning: shadcn's `accent` is the hover surface, while ours is the gold —
+   which belongs on `primary`. Dark is the only theme the app ships (the
+   design-tool's switcher is not part of it), so there is no light variant. */
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--text);
+
+  --color-primary: var(--accent);
+  --color-primary-foreground: #0e0f12;
+  --color-secondary: var(--surface-alt);
+  --color-secondary-foreground: var(--text);
+
+  --color-muted: var(--surface-alt);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--surface-hi);
+  --color-accent-foreground: var(--text);
+
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: var(--text);
+
+  --color-border: var(--border);
+  --color-input: var(--border-hi);
+  --color-ring: var(--accent);
+
+  --color-sidebar: var(--surface);
+  --color-sidebar-foreground: var(--text);
+  --color-sidebar-primary: var(--accent);
+  --color-sidebar-primary-foreground: #0e0f12;
+  --color-sidebar-accent: var(--surface-hi);
+  --color-sidebar-accent-foreground: var(--text);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--accent);
+
+  /* The design's corner radii (6px controls, 10px cards), so shadcn's
+     rounded-md / rounded-lg land on the same geometry as the dmf components. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
 }
 
 @layer base {
@@ -71,26 +127,10 @@
   }
 }
 
-/* Account settings shell (card US3). The design ships two layouts for these
-   screens — a 1280px frame with a fixed sidebar and a 390px single column — and
-   media queries are the only way to express that switch, since the dmf
-   components style themselves with inline tokens. */
-.dmf-settings {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  align-items: start;
-}
-
-.dmf-settings-nav {
-  border-right: 1px solid var(--border);
-  background: var(--surface);
-  padding: 28px 16px;
-  min-height: calc(100dvh - 65px);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
+/* Account settings shell (card US3). The nav column and the desktop/mobile
+   switch are shadcn/ui's Sidebar now (components/account/SettingsShell.tsx);
+   what remains here is the content column and the row layout, which the dmf
+   components style with inline tokens. */
 .dmf-settings-main {
   padding: 40px 56px;
   min-width: 0;
@@ -106,16 +146,9 @@
   padding: 18px 24px;
 }
 
-@media (max-width: 860px) {
-  .dmf-settings {
-    grid-template-columns: 1fr;
-  }
-
-  /* The mobile design replaces the sidebar with a titled screen header. */
-  .dmf-settings-nav {
-    display: none;
-  }
-
+/* 768px, matching the breakpoint shadcn's useIsMobile hook switches the
+   sidebar into its drawer at — one number for one layout change. */
+@media (max-width: 767px) {
   .dmf-settings-main {
     padding: 18px;
   }
@@ -141,3 +174,4 @@
     opacity: 0.35;
   }
 }
+

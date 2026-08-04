@@ -64,6 +64,7 @@ Any dependency used in **more than one workspace** is pinned in the `catalog:` b
 - **TypeScript strict** (`strict`, `noUncheckedIndexedAccess`). No `any`. Use `unknown` and narrow when needed. `as` only at boundaries (parsing, third-party). `@ts-expect-error` requires a comment explaining why.
 - **ESM only** (`"type": "module"`).
 - **File names**: `kebab-case.ts`. React components and their files: `PascalCase.tsx`.
+  - **Exception:** `apps/web/src/components/ui/` holds shadcn/ui components copied in by `npx shadcn add`, plus the `@/lib/utils.ts` and `@/hooks/` files they import. They keep upstream's lowercase names and its `@/` import alias so the CLI can add and update them without a rename step. Everything we author ourselves stays PascalCase.
 - **Type names**: `PascalCase`, no `I` prefix. Hooks prefixed `use`. Zod schemas suffixed `Schema`.
 - **No default exports** in internal code.
 - **Language**: everything in the codebase in English — identifiers, comments, internal logs, and user-facing strings (error messages returned via tRPC/REST, UI copy).
