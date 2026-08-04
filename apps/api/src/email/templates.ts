@@ -20,6 +20,75 @@ export function renderEmail(message: EmailMessage): RenderedEmail {
       return passwordResetEmail(message.locale, message.resetUrl)
     case 'email_change':
       return emailChangeEmail(message.locale, message.verificationUrl, message.previousEmail)
+    case 'data_export_ready':
+      return dataExportReadyEmail(message.locale, message.downloadUrl, message.expiresAt)
+    case 'account_deletion_requested':
+      return accountDeletionRequestedEmail(message.locale, message.deletionDueAt)
+  }
+}
+
+// Dates in these two templates are shown as plain calendar days: the recipient
+// needs "until when", not an instant, and a timezone-accurate rendering would
+// need a preference the account does not store.
+function toCalendarDay(isoDate: string, locale: Locale): string {
+  return new Date(isoDate).toLocaleDateString(locale === 'pt-BR' ? 'pt-BR' : 'en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+function dataExportReadyEmail(locale: Locale, url: string, expiresAt: string): RenderedEmail {
+  const day = toCalendarDay(expiresAt, locale)
+  if (locale === 'pt-BR') {
+    return {
+      subject: 'Seus dados estão prontos para download — DM Forge',
+      html: layout(
+        'Seus dados estão prontos',
+        'Preparamos o arquivo com os dados da sua conta no DM Forge.',
+        'Baixar meus dados',
+        url,
+        `O link é pessoal e expira em ${day}. Se você não pediu esta exportação, troque sua senha.`,
+      ),
+    }
+  }
+  return {
+    subject: 'Your data export is ready — DM Forge',
+    html: layout(
+      'Your data is ready',
+      'We prepared the file with your DM Forge account data.',
+      'Download my data',
+      url,
+      `The link is personal and expires on ${day}. If you did not request this export, change your password.`,
+    ),
+  }
+}
+
+// No call to action: the way back is through support (Spec Story 5 cenário 2 —
+// restore is not self-service in the MVP), so the copy says what happens and
+// by when instead of offering a button that does not exist.
+function accountDeletionRequestedEmail(locale: Locale, deletionDueAt: string): RenderedEmail {
+  const day = toCalendarDay(deletionDueAt, locale)
+  if (locale === 'pt-BR') {
+    return {
+      subject: 'Sua conta será excluída — DM Forge',
+      html: [
+        '<h1>Sua conta entrou em processo de exclusão</h1>',
+        `<p>Recebemos seu pedido de exclusão. Sua conta ficou inacessível agora e todos os dados pessoais serão apagados definitivamente em ${day}.</p>`,
+        '<p>Mudou de ideia? Responda a este e-mail antes dessa data e o suporte restaura sua conta.</p>',
+        '<p>Se você não pediu esta exclusão, responda imediatamente.</p>',
+      ].join(''),
+    }
+  }
+  return {
+    subject: 'Your account is scheduled for deletion — DM Forge',
+    html: [
+      '<h1>Your account is scheduled for deletion</h1>',
+      `<p>We received your deletion request. Your account is now locked and every piece of personal data will be erased for good on ${day}.</p>`,
+      '<p>Changed your mind? Reply to this email before that date and support will restore your account.</p>',
+      '<p>If you did not request this deletion, reply immediately.</p>',
+    ].join(''),
   }
 }
 

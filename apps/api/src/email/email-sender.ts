@@ -47,6 +47,28 @@ export const EmailMessageSchema = z.discriminatedUnion('kind', [
     // Absolute URL built by Better Auth; carries a single-use token (24h TTL).
     verificationUrl: HttpUrlSchema,
   }),
+  // The export is ready to download (Spec FR-009, Story 5 cenário 1). Delivered
+  // by email because the promise is "we notify you when it is ready", which the
+  // user should not have to sit on the page to receive.
+  z.object({
+    kind: z.literal('data_export_ready'),
+    to: EmailSchema,
+    locale: LocaleSchema,
+    // Carries the raw download token (7-day TTL); only its digest is stored.
+    downloadUrl: HttpUrlSchema,
+    // ISO date the link stops working, rendered in the copy.
+    expiresAt: z.string().datetime(),
+  }),
+  // The account entered pending deletion (Spec FR-010, Story 5 cenário 2). This
+  // is the notice that makes an unrequested deletion noticeable while there is
+  // still time to reverse it.
+  z.object({
+    kind: z.literal('account_deletion_requested'),
+    to: EmailSchema,
+    locale: LocaleSchema,
+    // ISO date the data is erased for good.
+    deletionDueAt: z.string().datetime(),
+  }),
 ])
 
 export type EmailMessage = z.infer<typeof EmailMessageSchema>

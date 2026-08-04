@@ -1,4 +1,5 @@
 import { createRouter } from '@tanstack/react-router'
+import { Route as AccountPrivacyRoute } from './routes/account/privacy.js'
 import { Route as AccountProfileRoute } from './routes/account/profile.js'
 import { Route as RootRoute } from './routes/__root.js'
 import { Route as ForgotPasswordRoute } from './routes/forgot-password.js'
@@ -16,6 +17,7 @@ const routeTree = RootRoute.addChildren([
   ForgotPasswordRoute,
   ResetPasswordRoute,
   AccountProfileRoute,
+  AccountPrivacyRoute,
 ])
 
 export const router = createRouter({ routeTree })

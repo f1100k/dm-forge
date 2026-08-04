@@ -1,46 +1,18 @@
 import { prisma } from '@dm-forge/db'
 import {
-  PRIVACY_VERSION,
-  requiresTermsReAcceptance,
-  TERMS_VERSION,
+  ListConsentsInputSchema,
+  RecordConsentInputSchema,
+  RequestDeletionInputSchema,
   UpdateProfileInputSchema,
 } from '@dm-forge/shared'
 import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
+import { listConsents, recordConsent } from '../../account/consent.js'
+import { getDataExport, getLatestDataExport, requestDataExport } from '../../account/data-export.js'
+import { requestAccountDeletion } from '../../account/deletion.js'
+import { ACCOUNT_PROFILE_SELECT, toAccountProfile } from '../../account/profile.js'
+import { accountTelemetry } from '../../telemetry/account-telemetry.js'
 import { protectedProcedure, router } from '../init.js'
-
-// Columns that make up the account profile the web app hydrates at boot: base
-// identity plus the custom columns Better Auth's session user does not carry
-// (locale, accountStatus, accepted versions, telemetry consent).
-const ACCOUNT_PROFILE_SELECT = {
-  id: true,
-  name: true,
-  email: true,
-  emailVerified: true,
-  image: true,
-  locale: true,
-  accountStatus: true,
-  acceptedTermsVersion: true,
-  acceptedPrivacyVersion: true,
-  telemetryConsent: true,
-} as const
-
-type AccountProfileRow = {
-  acceptedTermsVersion: string | null
-  acceptedPrivacyVersion: string | null
-}
-
-// One payload shape for every procedure that returns the profile, so a client
-// can reuse the same cache entry after a mutation instead of refetching
-// (Tech Design §14.1 maps both account.me and account.updateProfile to
-// AccountMe).
-function toAccountProfile<T extends AccountProfileRow>(user: T) {
-  return {
-    ...user,
-    currentTermsVersion: TERMS_VERSION,
-    currentPrivacyVersion: PRIVACY_VERSION,
-    termsReAcceptanceRequired: requiresTermsReAcceptance(user),
-  }
-}
 
 export const accountRouter = router({
   // Bootstrap query (card S1.5, Tech Design §14.1). Returns the full account
@@ -80,5 +52,80 @@ export const accountRouter = router({
       })
 
       return toAccountProfile(user)
+    }),
+
+  // Consent decisions (card US5, Spec FR-011/FR-012). Every call appends to the
+  // immutable history and returns the refreshed profile, so a telemetry
+  // revocation is reflected in the client's cache in the same round trip that
+  // performed it — there is no window where the UI still shows consent the
+  // account no longer holds.
+  consent: protectedProcedure.input(RecordConsentInputSchema).mutation(({ ctx, input }) =>
+    recordConsent({
+      userId: ctx.user.id,
+      type: input.type,
+      action: input.action,
+      headers: ctx.headers,
+    }),
+  ),
+
+  // The audit trail behind FR-011, newest first. Scoped to the session's own
+  // rows; the cursor names a position, never another user's records.
+  listConsents: protectedProcedure.input(ListConsentsInputSchema).query(({ ctx, input }) =>
+    listConsents({
+      userId: ctx.user.id,
+      limit: input.limit,
+      ...(input.cursor ? { cursor: input.cursor } : {}),
+    }),
+  ),
+
+  // Portability (FR-009, Story 5 cenário 1). Idempotent: asking twice while an
+  // export is still valid returns the one already made.
+  requestDataExport: protectedProcedure.mutation(async ({ ctx }) => {
+    const now = new Date()
+    const view = await requestDataExport(ctx.user.id, now)
+    await accountTelemetry.emit('account.export.requested', ctx.user.id, now)
+    return view
+  }),
+
+  getDataExport: protectedProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .query(({ ctx, input }) => getDataExport(ctx.user.id, input.id, new Date())),
+
+  // What the privacy screen shows on load: the state of the most recent export,
+  // if any. Separate from getDataExport because the screen has no id to ask
+  // with until it has been told about one.
+  latestDataExport: protectedProcedure.query(({ ctx }) =>
+    getLatestDataExport(ctx.user.id, new Date()),
+  ),
+
+  // Erasure (FR-010, Story 5 cenário 2). Answers with the date the data is
+  // erased for good, which is what the screen and the email both promise.
+  requestDeletion: protectedProcedure
+    .input(RequestDeletionInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      const now = new Date()
+      const outcome = await requestAccountDeletion({
+        userId: ctx.user.id,
+        confirmation: input.confirmation,
+        now,
+      })
+
+      if (!outcome.ok) {
+        // Two distinct states, both the caller's own business: a wrong password
+        // and an account already on its way out.
+        if (outcome.reason === 'already_pending') {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'This account is already scheduled for deletion.',
+          })
+        }
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Confirmation failed. Check your password and try again.',
+        })
+      }
+
+      await accountTelemetry.emit('account.deletion.requested', ctx.user.id, now)
+      return { deletionDueAt: outcome.deletionDueAt }
     }),
 })

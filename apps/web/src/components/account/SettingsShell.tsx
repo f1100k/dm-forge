@@ -6,19 +6,40 @@
 
 import { Link } from '@tanstack/react-router'
 import type { CSSProperties, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Display, Eyebrow, Logo, OrnDivider } from '../dmf/index.js'
 import { AccountMenu } from './AccountMenu.js'
 
 // One entry per settings section. Only the sections whose route exists are
-// navigable — the remaining two ship with the slices that build them (US5
-// privacy, and the password/provider surface of FR-008) and are rendered
-// inert rather than omitted, so the shell keeps the information architecture
-// the design defines.
+// navigable — "security" ships with the password/provider surface of FR-008 and
+// is rendered inert rather than omitted, so the shell keeps the information
+// architecture the design defines.
 export type SettingsSection = {
   id: string
   label: string
   sub: string
   to?: string
+}
+
+// The nav every settings screen shows. Shared so a screen cannot end up
+// offering a different set of sections than its neighbour.
+export function useSettingsSections(): SettingsSection[] {
+  const { t } = useTranslation()
+  return [
+    {
+      id: 'profile',
+      label: t('account.nav.profile.label'),
+      sub: t('account.nav.profile.sub'),
+      to: '/account/profile',
+    },
+    { id: 'security', label: t('account.nav.security.label'), sub: t('account.nav.security.sub') },
+    {
+      id: 'privacy',
+      label: t('account.nav.privacy.label'),
+      sub: t('account.nav.privacy.sub'),
+      to: '/account/privacy',
+    },
+  ]
 }
 
 export function AppHeader({ userName, right }: { userName: string; right?: ReactNode }) {

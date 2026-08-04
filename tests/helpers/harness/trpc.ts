@@ -3,6 +3,10 @@ import { appRouter } from '@dm-forge/api/routers'
 
 export type TestCallerOptions = {
   session?: AuthSession
+  // Request headers for procedures that record request-scoped evidence (the
+  // consent audit trail). Defaults to an empty set, the same thing a caller
+  // with no HTTP request behind it would have.
+  headers?: Headers
 }
 
 // Builds a tRPC caller bound to a synthetic session. Bypasses Better Auth's
@@ -11,5 +15,5 @@ export type TestCallerOptions = {
 // path, use the Hono app via helpers/harness/app.ts and helpers/harness/auth.ts.
 export function createTestCaller(opts: TestCallerOptions = {}) {
   const session = opts.session ?? null
-  return appRouter.createCaller({ session })
+  return appRouter.createCaller({ session, headers: opts.headers ?? new Headers() })
 }

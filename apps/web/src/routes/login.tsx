@@ -34,7 +34,9 @@ function LoginPage() {
   const navigate = useNavigate()
   const { reason } = Route.useSearch()
   const [form, setForm] = useState({ email: '', password: '' })
-  const [error, setError] = useState<'invalid' | 'unverified' | 'locked' | 'generic' | null>(null)
+  const [error, setError] = useState<
+    'invalid' | 'unverified' | 'locked' | 'pendingDeletion' | 'generic' | null
+  >(null)
   const [submitting, setSubmitting] = useState(false)
 
   const update = (field: keyof typeof form) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -52,10 +54,14 @@ function LoginPage() {
     setSubmitting(false)
 
     if (signInError) {
-      // 403 = email not verified yet (Spec Story 1); 401 = bad credentials;
-      // 429 = the (IP, email) pair is rate-limited (Spec FR-005).
+      // An account on its way out is told apart by its code, not its status:
+      // the server's guard replaces the error body but not the status Better
+      // Auth had already chosen (Spec Story 5 cenário 2). 403 = address still
+      // unverified (Spec Story 1); 401 = bad credentials; 429 = the (IP, email)
+      // pair is rate-limited (Spec FR-005).
       const status = signInError.status
       if (status === 429) setError('locked')
+      else if (signInError.code === 'ACCOUNT_PENDING_DELETION') setError('pendingDeletion')
       else if (status === 403) setError('unverified')
       else if (status === 401) setError('invalid')
       else setError('generic')
@@ -115,6 +121,7 @@ function LoginPage() {
         >
           {error === 'unverified' && <ErrorNote>{t('auth.login.unverified')}</ErrorNote>}
           {error === 'locked' && <ErrorNote>{t('auth.login.locked')}</ErrorNote>}
+          {error === 'pendingDeletion' && <ErrorNote>{t('auth.login.pendingDeletion')}</ErrorNote>}
           {error === 'generic' && <ErrorNote>{t('auth.login.genericError')}</ErrorNote>}
 
           <Field label={t('auth.login.emailLabel')} htmlFor="email">

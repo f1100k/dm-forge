@@ -11,7 +11,8 @@ import {
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
-import { createEmailSender } from '../email/create-email-sender.js'
+import { assertAccountUsable, isUserPendingDeletion } from '../account/account-status.js'
+import { emailSender } from '../email/sender.js'
 import { getEnv } from '../env.js'
 import {
   assertSignInAllowed,
@@ -25,15 +26,6 @@ const env = getEnv()
 // Better Auth types the sign-in body loosely at the hook boundary; narrow to the
 // one field the rate limiter keys on.
 type SignInBody = { email?: unknown } | undefined
-
-// Transactional sender resolved once at boot from EMAIL_PROVIDER (noop offline,
-// Resend in staging/prod — F4/F5, ADR 0007). The verification and reset hooks
-// below hand their messages to it.
-const emailSender = createEmailSender({
-  provider: env.EMAIL_PROVIDER,
-  resendApiKey: env.RESEND_API_KEY,
-  from: env.EMAIL_FROM,
-})
 
 // Register Google only when its credential pair is present (Tech Design §3.1,
 // card S1.1). Configuring half a pair is a deployment mistake we'd rather
@@ -143,6 +135,19 @@ export const auth = betterAuth({
     },
   },
   databaseHooks: {
+    session: {
+      create: {
+        // Last line of defence for FR-010: an account awaiting deletion never
+        // gets a session, whichever door it came through. The password path
+        // also produces a typed 403 in the after-hook below, but this one
+        // covers OAuth callbacks and any future sign-in route for free —
+        // returning false aborts the insert.
+        before: async (session) => {
+          if (await isUserPendingDeletion(session.userId)) return false
+          return
+        },
+      },
+    },
     user: {
       create: {
         before: async (user) => {
@@ -216,14 +221,35 @@ export const auth = betterAuth({
       }
     }),
     // Advance or clear the brute-force counter once the sign-in outcome is
-    // known. `ctx.context.returned` is the endpoint's result — an APIError for
-    // any rejection (bad password, unverified address), a response otherwise.
+    // known, and answer a pending-deletion account with its own code.
+    // `ctx.context.returned` is the endpoint's result — an APIError for any
+    // rejection (bad password, unverified address), a response otherwise.
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path !== '/sign-in/email') return
-      const key = signInAttemptKey(ctx.headers ?? new Headers(), (ctx.body as SignInBody)?.email)
-      if (!key) return
+      const email = (ctx.body as SignInBody)?.email
+      const key = signInAttemptKey(ctx.headers ?? new Headers(), email)
+      const returned = ctx.context.returned
+      const rejected = returned instanceof APIError
 
-      if (ctx.context.returned instanceof APIError) {
+      // Better Auth refuses to finish a sign-in whose session the hook above
+      // declined — which it does for exactly one reason. Reaching that point
+      // means the password was already accepted, so the caller holds the
+      // account and the state of that account is theirs to know (Spec Story 5
+      // cenário 2). Anyone who merely guessed wrong gets the ordinary
+      // invalid-credentials answer below and learns nothing about the address.
+      //
+      // Throwing here swaps the error *body* for ours but not the status
+      // Better Auth already settled on (401) — so the typed `code` is what the
+      // login screen matches on, which is the more robust contract anyway.
+      if (rejected && errorCode(returned) === 'FAILED_TO_CREATE_SESSION') {
+        if (typeof email === 'string') await assertAccountUsable(email)
+        // Any other cause of a failed session is a genuine server fault; leave
+        // it as it is rather than dressing it up as an account state.
+        return
+      }
+
+      if (!key) return
+      if (rejected) {
         await registerSignInFailure(key, new Date())
         return
       }
@@ -238,6 +264,15 @@ export const auth = betterAuth({
 })
 
 export type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>
+
+// The symbolic code Better Auth put in the error body (INVALID_EMAIL_OR_PASSWORD,
+// FAILED_TO_CREATE_SESSION, …). Read defensively — the error crosses a
+// third-party boundary, and the status alone does not tell these apart: a
+// refused session and a wrong password are both answered 401.
+function errorCode(error: APIError): string | null {
+  const body = (error as { body?: { code?: unknown } }).body
+  return typeof body?.code === 'string' ? body.code : null
+}
 
 // The email hooks are awaited (not fire-and-forget) so a provider outage surfaces
 // to the caller as a failed request instead of a silent no-send that leaves the

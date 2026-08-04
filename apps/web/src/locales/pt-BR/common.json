@@ -25,6 +25,7 @@
       "unverified": "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.",
       "genericError": "Não foi possível entrar. Tente novamente.",
       "locked": "Muitas tentativas de acesso. Aguarde alguns minutos e tente novamente.",
+      "pendingDeletion": "Esta conta está em processo de exclusão e o acesso está bloqueado. Responda ao e-mail de exclusão para o suporte restaurá-la.",
       "noAccount": "Novo por aqui?",
       "registerLink": "Criar conta",
       "sessionExpired": "Sua sessão expirou. Entre novamente para continuar."
@@ -157,6 +158,74 @@
       "language": {
         "label": "Idioma da interface",
         "sub": "Aplicado na hora e salvo na sua conta."
+      }
+    },
+    "privacy": {
+      "title": "Privacidade e dados",
+      "subtitle": "Seus dados são seus. Leve-os com você, veja o que você consentiu e saia quando quiser.",
+      "data": {
+        "title": "Seus dados",
+        "sub": "Portabilidade e consentimentos opcionais."
+      },
+      "export": {
+        "label": "Exportar meus dados",
+        "sub": "Arquivo JSON com seu perfil e o histórico de consentimentos.",
+        "request": "Exportar",
+        "requesting": "Preparando…",
+        "download": "Baixar meus dados",
+        "expiresAt": "O link expira em {{date}}. Também enviamos por e-mail.",
+        "error": "Não foi possível preparar a exportação. Tente novamente."
+      },
+      "telemetry": {
+        "label": "Telemetria de uso",
+        "sub": "Eventos anônimos de uso. Desligar interrompe a coleta imediatamente.",
+        "error": "Não foi possível salvar."
+      },
+      "history": {
+        "title": "Histórico de consentimentos",
+        "sub": "Registro imutável do que você aceitou e revogou.",
+        "label": "Ver registros",
+        "sub2": "Tipo, versão e data de cada decisão.",
+        "show": "Ver histórico",
+        "hide": "Ocultar",
+        "loading": "Carregando histórico…",
+        "empty": "Nenhum registro ainda.",
+        "type": {
+          "TERMS": "Termos de Uso",
+          "PRIVACY": "Política de Privacidade",
+          "TELEMETRY": "Telemetria"
+        },
+        "action": {
+          "ACCEPT": "aceito",
+          "REVOKE": "revogado"
+        }
+      },
+      "danger": {
+        "title": "Excluir conta",
+        "sub": "Ação definitiva depois do prazo de 30 dias."
+      },
+      "delete": {
+        "label": "Excluir minha conta",
+        "sub": "A conta é bloqueada na hora e apagada em 30 dias.",
+        "open": "Excluir conta",
+        "dialog": {
+          "title": "Excluir sua conta?",
+          "warning": "Tudo que está na sua conta — perfil, campanhas e conteúdo — será apagado definitivamente. Não há como desfazer depois do prazo.",
+          "grace": "Sua conta fica bloqueada por 30 dias antes do apagamento. Nesse período o suporte ainda consegue restaurá-la.",
+          "cancel": "Cancelar",
+          "continue": "Continuar",
+          "confirmPassword": "Digite sua senha para confirmar que é você.",
+          "confirmOAuth": "Sua conta usa login com Google. Confirme para prosseguir com a exclusão.",
+          "passwordLabel": "Senha atual",
+          "submit": "Excluir minha conta",
+          "submitting": "Excluindo…",
+          "error": "Não foi possível confirmar. Verifique a senha e tente novamente."
+        }
+      },
+      "pending": {
+        "title": "Conta em processo de exclusão.",
+        "due": "Seus dados serão apagados definitivamente em {{date}}.",
+        "restore": "Enquanto isso, o acesso fica bloqueado. Mudou de ideia? Responda ao e-mail que enviamos e o suporte restaura sua conta antes dessa data."
       }
     }
   }

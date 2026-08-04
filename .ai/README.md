@@ -25,6 +25,7 @@ docs/
 ├── state-isolation.md            ← Zustand store, per-campaign scoping
 ├── resilience-observability.md   ← logs, errors, SSE, rate limits
 ├── implementation-checklist.md   ← pre-PR checklist
+├── runbooks/                     ← operator procedures (account deletion, …)
 └── adr/                          ← Architecture Decision Records
 
 .claude/skills/                   ← Claude Code thin adapters (point to .ai/skills/)

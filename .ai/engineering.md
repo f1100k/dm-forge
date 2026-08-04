@@ -118,4 +118,5 @@ Load these only when the task touches their topic.
 | Logging policy, error contracts, SSE cancellation, rate limits, retries | `docs/resilience-observability.md` |
 | Test pyramid layout, Testcontainers harness, MSW patterns, what to mock | `docs/testing.md` |
 | Writing a good test — E.B.C.D. flow, mock discipline, AAA, anti-patterns | `docs/test-practices.md` |
+| Operating account deletion, restores, or the monthly LGPD audit | `docs/runbooks/account-deletion.md` |
 | Before opening a PR | `docs/implementation-checklist.md` |
