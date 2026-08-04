@@ -4,7 +4,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals"],
+    // The web integration tests pull real apps/web screens into this program,
+    // and those reach shadcn/ui through `@/`. Same mapping as apps/web's own
+    // tsconfig and the alias declared for the integration:web vitest project.
+    "paths": {
+      "@/*": ["../apps/web/src/*"]
+    }
   },
   "include": ["helpers/**/*", "integration/**/*", "vitest.config.ts"]
 }
