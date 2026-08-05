@@ -224,14 +224,14 @@ Two deliberate limits:
 `master`. It is the only test job wired up so far — the axe files need
 neither Docker nor a database, so the job is a plain install-and-run.
 
-The job installs with `--ignore-scripts`. It does not need the Prisma
-client, and `packages/db`'s `prisma generate` postinstall currently
-crashes with `ERR_REQUIRE_ESM` on the Node version `.nvmrc` pins
-(v22.11.0 — `require(ESM)` only landed unflagged in 22.12). Local dev
-misses it because developers run newer Node than the pin.
+This job was the first thing in the repo to run `pnpm install` in CI,
+and it surfaced a latent break: `packages/db`'s `prisma generate`
+postinstall crashes with `ERR_REQUIRE_ESM` under Node v22.11.0, the
+version `.nvmrc` used to pin — `require(ESM)` only landed unflagged in
+22.12. Local dev never hit it because developers run newer Node than the
+pin. `.nvmrc` now pins v22.20.0. Keep it at or above 22.12.
 
-Still to be added — **each of these needs that postinstall fixed first**
-(bump `.nvmrc`, or bump prisma), since they do need a generated client:
+Still to be added:
 
 - `pnpm test:unit` on every PR (no Docker needed).
 - `pnpm test:integration` on every PR on a Docker-enabled runner.
