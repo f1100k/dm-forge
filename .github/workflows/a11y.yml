@@ -24,8 +24,14 @@ jobs:
           node-version-file: '.nvmrc'
           cache: pnpm
 
+      # --ignore-scripts skips packages/db's `prisma generate` postinstall,
+      # which these tests do not need — they never reach the database. It also
+      # sidesteps a latent break: that postinstall crashes with ERR_REQUIRE_ESM
+      # on the Node version .nvmrc pins (v22.11.0, before require(ESM) landed
+      # unflagged in 22.12). Any future job that *does* need the Prisma client
+      # will have to fix that first — bump .nvmrc or bump prisma.
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       # The a11y files run under happy-dom + MSW, so this job needs no Docker
       # and no database — unlike the rest of the integration suite. A failure
