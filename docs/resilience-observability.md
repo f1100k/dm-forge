@@ -19,6 +19,53 @@ What you may log:
 
 Format: structured JSON. Levels: `debug` (dev only), `info` (normal flow), `warn` (recoverable problem), `error` (request-level failure). No `trace`/`fatal` — they don't earn their keep yet.
 
+## Emitting a log line
+
+Log through `logger` from `@dm-forge/shared` — never `console.*` directly:
+
+```ts
+import { logger } from '@dm-forge/shared'
+
+logger.info('account.deletion.requested', { userId, status: 'ok' })
+```
+
+The first argument is the `action`; the second is the fields. The logger
+serialises `{ level, action, ...fields }` as one JSON line.
+
+### Automatic scrubbing
+
+Every payload passes through `scrubLogValue` on the way out (`packages/shared/src/logging/scrub.ts`).
+That is what makes NFR-003 — "logs de auth NUNCA contêm senha, token de sessão ou
+token de reset" — a property of the pipeline instead of a rule each author has to
+remember. The leak that matters is the accidental one: a caught Prisma error
+carrying the `DATABASE_URL` password, a reset URL logged with its `?token=` still
+attached.
+
+Two rules and one exemption:
+
+- **By key** — a field named like a credential (`password`, `sessionToken`,
+  `apiKey`, `authorization`, `cookie`, …) is replaced with `[REDACTED]` whatever
+  it holds.
+- **By value** — JWTs, `Bearer` headers, long hex tokens (32+ chars), URL
+  credentials, `token=…`/`"password": "…"` pairs, and the provider key formats we
+  handle (`sk-`, `re_`, `ghp_`, `GOCSPX-`) are masked anywhere they appear,
+  including inside free text.
+- **Digests stay legible** — a field ending in `Hash`/`Digest`/`Prefix`, plus
+  `ipEmailKey`, is left as-is. Those are the correlation keys the audit and
+  brute-force trails are read by, and a hash is not the secret it came from.
+
+If a payload cannot be scrubbed or serialised (a throwing getter, a `BigInt`),
+the line is **aborted** and replaced with a `log.scrub_failed` record carrying the
+`SCRUB_FAILED` flag and the action name — never a payload that was not checked.
+
+The rules are unit-tested in `packages/shared/src/logging/scrub.test.ts` and run
+on every PR through the `unit` job in `.github/workflows/ci.yml`. Loosening a
+pattern until a secret slips through fails the PR that loosened it.
+
+Scrubbing is a backstop, not a licence: it does not make it acceptable to pass a
+password or a prompt into a log call and let the regex catch it. The rules above
+still bind the call site.
+
 ## Error contracts
 
 Errors returned to the client (tRPC or REST) are **typed and stable**. Use a discriminated union:
