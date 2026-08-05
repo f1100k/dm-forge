@@ -119,6 +119,7 @@ pnpm test:watch            # unit projects in watch mode
 # Filter the integration suite:
 pnpm --filter @dm-forge/tests test:backend
 pnpm --filter @dm-forge/tests test:web
+pnpm --filter @dm-forge/tests test:a11y   # the axe files only — what CI runs
 ```
 
 ## Integration testing — backend pattern
@@ -174,6 +175,30 @@ server.use(
 `onUnhandledRequest: 'error'` — any request without a handler fails the
 test. This forces tests to be explicit about every boundary they touch.
 
+## Accessibility checks
+
+`integration/web/a11y-*.test.tsx` runs [axe-core](https://github.com/dequelabs/axe-core)
+over the screens the Spec holds to WCAG 2.1 AA. The helper
+`helpers/harness/a11y.ts` returns one string per violated rule — rule id,
+impact, offending selectors, and the Deque docs URL — so a CI failure says
+what broke and where without anyone re-running the suite locally:
+
+```ts
+const violations = await a11yViolations(container)
+expect(violations).toEqual([])
+```
+
+Two deliberate limits:
+
+- **Scope is the WCAG tags**, not axe's full catalogue. `wcag2a`,
+  `wcag2aa`, `wcag21a`, `wcag21aa` — the standard the Spec commits to.
+  Best-practice rules stay off so the suite gates on the agreed bar.
+- **Contrast is not checked.** happy-dom parses CSS but never lays out or
+  paints, so the design system's custom properties (`var(--text)`,
+  `color-mix(…)`) never resolve to the pixels a contrast ratio needs.
+  The rule is disabled rather than left to report noise; contrast
+  remains a design-review item.
+
 ## What to mock, what to keep real
 
 | Layer | Database | tRPC/Hono | React/Router/Query | LLM (`@dm-forge/ai`) | OAuth (Better Auth providers) | OpenRouter HTTP |
@@ -195,8 +220,16 @@ test. This forces tests to be explicit about every boundary they touch.
 
 ## CI
 
-There is no CI pipeline yet (see `.github/workflows/`). When it is added:
+`.github/workflows/a11y.yml` runs `test:a11y` on every PR against
+`master`. It is the only test job wired up so far — the axe files need
+neither Docker nor a database, so the job is a plain install-and-run.
 
-- `pnpm test:unit` runs on every PR (no Docker needed).
-- `pnpm test:integration` runs on every PR on a Docker-enabled runner.
-- `pnpm test:coverage` produces an artifact, not a gate (yet).
+Still to be added:
+
+- `pnpm test:unit` on every PR (no Docker needed).
+- `pnpm test:integration` on every PR on a Docker-enabled runner.
+- `pnpm test:coverage` producing an artifact, not a gate (yet).
+
+> A workflow failing marks the PR red but does not block the merge until
+> an admin adds the check to `master`'s ruleset — see
+> `docs/devex/branch-protection.md`.
