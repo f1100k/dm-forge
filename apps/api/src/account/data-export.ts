@@ -198,7 +198,10 @@ export async function getLatestDataExport(
 }
 
 export type DownloadOutcome =
-  | { ok: true; payload: unknown; filename: string }
+  // `userId` names the owner of the file, not the caller — the emailed link
+  // authenticates without a session, so this is the only place the delivery can
+  // learn whose data was handed over (Tech Design §5.3).
+  | { ok: true; payload: unknown; filename: string; userId: string }
   | { ok: false; reason: 'not_found' | 'expired' }
 
 export type DownloadRequest = {
@@ -241,5 +244,6 @@ export async function resolveDownload(
     ok: true,
     payload: request.payload,
     filename: `dm-forge-data-${request.id}.json`,
+    userId: request.userId,
   }
 }

@@ -1,6 +1,7 @@
 import { Prisma, prisma } from '@dm-forge/db'
 import { createId } from '@dm-forge/shared'
 import { getEnv } from '../env.js'
+import { accountTelemetry, type TelemetrySubject } from '../telemetry/account-telemetry.js'
 import { ACCOUNT_STATUS_PENDING_DELETION } from './account-status.js'
 import { ACCOUNT_DELETION_GRACE_DAYS, addDays, hashUserId } from './privacy-policy.js'
 
@@ -24,10 +25,19 @@ export type MaintenanceReport = {
 }
 
 export async function runAccountMaintenance(now: Date): Promise<MaintenanceReport> {
+  const purged = await purgeDueAccounts(now)
   const report = {
-    purgedAccounts: await purgeDueAccounts(now),
+    purgedAccounts: purged.length,
     expiredExports: await expireDueExports(now),
     prunedLoginAttempts: await pruneLoginAttempts(now),
+  }
+
+  // Reported once the transaction has committed, from the consent that was read
+  // inside it. Both halves matter: after the commit the row is gone, so the gate
+  // would have nothing left to read; and before it, an event could announce an
+  // erasure that a rollback then undid.
+  for (const subject of purged) {
+    accountTelemetry.emitFor('account.deletion.executed', subject, now)
   }
 
   console.info(JSON.stringify({ level: 'info', action: 'account.maintenance.ran', ...report }))
@@ -39,19 +49,23 @@ export async function runAccountMaintenance(now: Date): Promise<MaintenanceRepor
 // instead of blocking on — or duplicating — this one, and the whole claim,
 // audit and delete happens in one transaction: a crash halfway leaves the
 // account exactly as it was, still due, and the next tick picks it up.
-async function purgeDueAccounts(now: Date): Promise<number> {
+// Returns the accounts it erased, carrying the consent each one held. The flag
+// is claimed here, alongside the id, because this transaction is the last moment
+// it exists to be read (Tech Design §14.3 — the gate reads stored consent, and
+// after the delete there is no row to read it from).
+async function purgeDueAccounts(now: Date): Promise<TelemetrySubject[]> {
   const cutoff = addDays(now, -ACCOUNT_DELETION_GRACE_DAYS)
   const salt = getEnv().IP_HASH_SALT
 
   return prisma.$transaction(async (tx) => {
-    const due = await tx.$queryRaw<{ id: string }[]>`
-      SELECT "id" FROM "user"
+    const due = await tx.$queryRaw<{ id: string; telemetryConsent: boolean }[]>`
+      SELECT "id", "telemetryConsent" FROM "user"
       WHERE "accountStatus" = ${ACCOUNT_STATUS_PENDING_DELETION}
         AND "pendingDeletionAt" IS NOT NULL
         AND "pendingDeletionAt" < ${cutoff}
       FOR UPDATE SKIP LOCKED
     `
-    if (due.length === 0) return 0
+    if (due.length === 0) return []
     const ids = due.map((row) => row.id)
 
     // The only trace left behind (Tech Design §4.5): a salted digest, so the
@@ -79,7 +93,7 @@ async function purgeDueAccounts(now: Date): Promise<number> {
         count: ids.length,
       }),
     )
-    return ids.length
+    return due.map((row) => ({ userId: row.id, telemetryConsent: row.telemetryConsent }))
   })
 }
 
