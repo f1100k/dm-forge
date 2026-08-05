@@ -24,7 +24,13 @@ jobs:
           node-version-file: '.nvmrc'
           cache: pnpm
 
+      # packages/db runs `prisma generate` as a postinstall, and its
+      # prisma.config.ts resolves DATABASE_URL eagerly. Generation never opens a
+      # connection — the value only has to parse — so a placeholder is enough
+      # to keep the install from failing on a runner with no .env.
       - name: Install dependencies
+        env:
+          DATABASE_URL: postgresql://localhost:5432/dm_forge_ci
         run: pnpm install --frozen-lockfile
 
       # The a11y files run under happy-dom + MSW, so this job needs no Docker
