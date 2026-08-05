@@ -11,7 +11,7 @@ import type {
   ReactNode,
 } from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { CheckIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.js'
+import { AlertIcon, CheckIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.js'
 
 // ── Logo / wordmark ──────────────────────────────────────────────
 export function Logo({ size = 20 }: { size?: number }) {
@@ -705,6 +705,36 @@ export function Switch({
   )
 }
 
+// ── Danger note (boxed message on the danger surface) ────────────
+// The design's treatment for anything that went wrong or is about to: the
+// sign-up conflict, the delete-account warning, the pending-deletion notice.
+// `role="alert"` when the box appears in response to an action — an empty role
+// keeps a static warning out of the live region.
+export function DangerNote({ children, role }: { children: ReactNode; role?: 'alert' }) {
+  return (
+    <div
+      role={role}
+      style={{
+        padding: '12px 14px',
+        borderRadius: 6,
+        background: 'var(--danger-surface)',
+        border: '1px solid color-mix(in srgb, var(--danger) 35%, transparent)',
+        fontSize: 13,
+        color: 'var(--text)',
+        display: 'flex',
+        gap: 10,
+        alignItems: 'flex-start',
+        lineHeight: 1.55,
+      }}
+    >
+      <span style={{ color: 'var(--danger)', flexShrink: 0, marginTop: 1 }}>
+        <AlertIcon size={14} />
+      </span>
+      <span>{children}</span>
+    </div>
+  )
+}
+
 // ── Modal dialog ─────────────────────────────────────────────────
 // Used by the destructive flows, where the design deliberately takes the screen
 // away to make the decision deliberate. Escape closes it, the backdrop closes
@@ -721,12 +751,16 @@ export function Dialog({
   onClose,
   labelledBy,
   dismissible = true,
+  width = 520,
   children,
 }: {
   open: boolean
   onClose: () => void
   labelledBy: string
   dismissible?: boolean
+  /** Panel width in px. The design draws 520 for the delete flow, 560 for the
+   *  terms gate, which carries the document text. */
+  width?: number
   children: ReactNode
 }) {
   const panel = useRef<HTMLDivElement>(null)
@@ -756,8 +790,8 @@ export function Dialog({
         position: 'fixed',
         inset: 0,
         zIndex: 50,
-        background: 'rgba(6, 7, 9, 0.72)',
-        backdropFilter: 'blur(2px)',
+        background: 'var(--overlay)',
+        backdropFilter: 'blur(4px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -772,18 +806,18 @@ export function Dialog({
         tabIndex={-1}
         onKeyDown={(event) => keepTabInside(event, panel.current)}
         style={{
-          width: 520,
+          width,
           maxWidth: '100%',
           maxHeight: '90dvh',
           overflowY: 'auto',
           background: 'var(--surface)',
           border: '1px solid var(--border-hi)',
-          borderRadius: 10,
-          padding: 28,
-          boxShadow: '0 24px 64px rgba(0, 0, 0, 0.55)',
+          borderRadius: 12,
+          padding: 36,
+          boxShadow: '0 40px 100px -20px rgba(0, 0, 0, 0.6)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 20,
+          gap: 24,
           outline: 'none',
         }}
       >

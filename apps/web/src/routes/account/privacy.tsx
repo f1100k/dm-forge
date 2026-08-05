@@ -1,6 +1,6 @@
 import { ConsentActionSchema, ConsentTypeSchema } from '@dm-forge/shared'
 import { createRoute } from '@tanstack/react-router'
-import { type ChangeEvent, type FormEvent, type ReactNode, useState } from 'react'
+import { type ChangeEvent, type FormEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Row,
@@ -9,9 +9,10 @@ import {
   SettingsShell,
   useSettingsSections,
 } from '../../components/account/SettingsShell.js'
-import { AlertIcon, LockIcon } from '../../components/dmf/icons.js'
+import { LockIcon } from '../../components/dmf/icons.js'
 import {
   Button,
+  DangerNote,
   Dialog,
   Display,
   Field,
@@ -455,30 +456,6 @@ function PendingDeletionNotice({ dueAt }: { dueAt: Date }) {
       <p style={{ margin: 0, fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>
         {t('account.privacy.pending.restore')}
       </p>
-    </div>
-  )
-}
-
-function DangerNote({ children }: { children: ReactNode }) {
-  return (
-    <div
-      style={{
-        padding: '12px 14px',
-        borderRadius: 6,
-        background: 'var(--danger-surface)',
-        border: '1px solid color-mix(in srgb, var(--danger) 35%, transparent)',
-        fontSize: 13,
-        color: 'var(--text)',
-        display: 'flex',
-        gap: 10,
-        alignItems: 'flex-start',
-        lineHeight: 1.55,
-      }}
-    >
-      <span style={{ color: 'var(--danger)', flexShrink: 0, marginTop: 1 }}>
-        <AlertIcon size={14} />
-      </span>
-      <span>{children}</span>
     </div>
   )
 }

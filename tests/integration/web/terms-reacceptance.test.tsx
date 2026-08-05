@@ -111,6 +111,16 @@ function renderApp() {
   )
 }
 
+// Accepting is two gestures, as the design draws it: tick the box for every
+// document the account is behind on, then confirm.
+async function acceptEverything() {
+  const boxes = await screen.findAllByRole('checkbox')
+  for (const box of boxes) {
+    fireEvent.click(box)
+  }
+  fireEvent.click(screen.getByRole('button', { name: /aceitar e continuar/i }))
+}
+
 beforeEach(async () => {
   // i18next is a module singleton; a test that switches language must not
   // decide it for the next one.
@@ -128,8 +138,78 @@ describe('terms re-acceptance gate', () => {
     // Assert — Story 6 cenário 2: the new versions are named, not just asked for.
     expect(await screen.findByRole('dialog')).toBeTruthy()
     expect(screen.getByText(/atualizamos nossos termos/i)).toBeTruthy()
-    expect(screen.getByText(/Termos de Uso/)).toBeTruthy()
-    expect(screen.getByText(/Política de Privacidade/)).toBeTruthy()
+    expect(screen.getByRole('checkbox', { name: /termos de uso/i })).toBeTruthy()
+    expect(screen.getByRole('checkbox', { name: /política de privacidade/i })).toBeTruthy()
+  })
+
+  it('puts the document itself in front of the person, scrollable', async () => {
+    // Arrange — only the privacy policy moved, so there is one document panel.
+    server.use(meReturns(behindOn({ privacy: true })))
+
+    // Act
+    renderApp()
+    await screen.findByRole('dialog')
+
+    // Assert — the design's terms-d: what changed, then the text to scroll. An
+    // aceite given over a name and a version number is not an informed one.
+    expect(screen.getByText(/reaceite necessário/i)).toBeTruthy()
+    expect(screen.getByText('O QUE MUDOU')).toBeTruthy()
+    const text = screen.getByLabelText(/texto de política de privacidade/i)
+    expect(text.textContent).toMatch(/quem trata os seus dados/i)
+    // Focusable, or a keyboard user cannot scroll what they must read.
+    expect(text.getAttribute('tabindex')).toBe('0')
+  })
+
+  it('says on screen that the text still awaits legal review', async () => {
+    // Arrange
+    server.use(meReturns(behindOn({ terms: true, privacy: true })))
+
+    // Act
+    renderApp()
+    await screen.findByRole('dialog')
+
+    // Assert — the published text is a draft written against what the Spec
+    // already states about the product, not text approved by legal (Spec §6
+    // keeps the redaction out of scope). Asking someone to accept it without
+    // saying so would misrepresent what they are agreeing to, so the notice
+    // rides on every document whose `draft` flag is still set — one per panel.
+    expect(screen.getAllByText(/rascunho · sujeito a revisão jurídica/i)).toHaveLength(2)
+  })
+
+  it('names the version being left behind', async () => {
+    // Arrange
+    server.use(meReturns(behindOn({ terms: true })))
+
+    // Act
+    renderApp()
+    await screen.findByRole('dialog')
+
+    // Assert — the badge the design puts in the header: what was accepted, and
+    // what is now in force.
+    expect(screen.getByText('v2025-01-01 → v2026-01-01')).toBeTruthy()
+  })
+
+  it('will not record an acceptance nobody ticked', async () => {
+    // Arrange
+    const sent: Record<string, unknown>[] = []
+    const profile = behindOn({ terms: true, privacy: true })
+    server.use(meReturns(profile), consentAccepts(sent, profile))
+    renderApp()
+    await screen.findByRole('dialog')
+
+    // Act — confirm without ticking anything.
+    const submit = screen.getByRole('button', { name: /aceitar e continuar/i })
+    fireEvent.click(submit)
+
+    // Assert — the consent is the tick, not the button (Spec Story 6, FR-011).
+    expect((submit as HTMLButtonElement).disabled).toBe(true)
+    expect(sent).toEqual([])
+
+    // Act — ticking only one of the two is still not enough.
+    fireEvent.click(screen.getByRole('checkbox', { name: /termos de uso/i }))
+
+    // Assert
+    expect((submit as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('stays out of the way when the account is on the current versions', async () => {
@@ -168,7 +248,7 @@ describe('terms re-acceptance gate', () => {
     renderApp()
 
     // Act
-    fireEvent.click(await screen.findByRole('button', { name: /li e aceito/i }))
+    await acceptEverything()
 
     // Assert
     await waitFor(() => {
@@ -187,7 +267,7 @@ describe('terms re-acceptance gate', () => {
     renderApp()
 
     // Act
-    fireEvent.click(await screen.findByRole('button', { name: /li e aceito/i }))
+    await acceptEverything()
 
     // Assert — FR-011: a record the user did not make would be a lie in the
     // audit trail.
@@ -203,7 +283,7 @@ describe('terms re-acceptance gate', () => {
     renderApp()
 
     // Act
-    fireEvent.click(await screen.findByRole('button', { name: /li e aceito/i }))
+    await acceptEverything()
 
     // Assert — the gate follows what the server stored, not what the click
     // assumed.
@@ -219,7 +299,7 @@ describe('terms re-acceptance gate', () => {
     renderApp()
 
     // Act
-    fireEvent.click(await screen.findByRole('button', { name: /li e aceito/i }))
+    await acceptEverything()
 
     // Assert
     expect(await screen.findByText(/não foi possível registrar seu aceite/i)).toBeTruthy()

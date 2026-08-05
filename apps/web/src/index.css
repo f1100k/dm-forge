@@ -112,6 +112,41 @@
     color: #0E0F12;
   }
 
+  /* The platform scrollbar is a light, chunky bar that lands on these dark
+     surfaces as a foreign object — most obviously inside the dialogs, which
+     scroll their own content and the legal document within it. Thin, drawn in
+     the theme's own border token, and it fades into the surface until there is
+     something to grab. Chrome 121+ honours the standard properties and ignores
+     the ::-webkit rules below; older WebKit does the reverse. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-hi) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track,
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* The transparent border plus background-clip is what keeps the thumb from
+     touching the edges — a 4px bar inside a 10px gutter. */
+  *::-webkit-scrollbar-thumb {
+    background: var(--border-hi);
+    background-clip: padding-box;
+    border: 3px solid transparent;
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--text-dim);
+    background-clip: padding-box;
+  }
+
   /* Keyboard focus ring for the custom-styled consent checkboxes: the native
      input is visually hidden, so surface focus on its adjacent custom box. */
   .dmf-check-input:focus-visible + span {
