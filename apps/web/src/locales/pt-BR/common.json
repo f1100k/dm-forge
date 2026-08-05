@@ -229,18 +229,31 @@
       }
     },
     "terms": {
+      "eyebrow": "Reaceite necessário",
       "title": "Atualizamos nossos termos.",
-      "description": "Publicamos uma nova versão dos documentos abaixo. Para continuar usando o DM Forge, confirme que leu e aceita a versão atual.",
+      "description": "Publicamos uma nova versão de <strong>{{documents}}</strong>. Para continuar usando o DM Forge, leia o resumo, confira o texto e aceite a versão atual.",
       "documents": {
         "TERMS": "Termos de Uso",
         "PRIVACY": "Política de Privacidade"
       },
-      "version": "versão {{version}}",
-      "accept": "Li e aceito",
+      "documentsInline": {
+        "TERMS": "os Termos de Uso",
+        "PRIVACY": "a Política de Privacidade"
+      },
+      "documentLabel": "Texto de {{document}} — role para ler",
+      "draftNotice": "RASCUNHO · SUJEITO A REVISÃO JURÍDICA",
+      "versionTransition": "v{{from}} → v{{to}}",
+      "versionCurrent": "v{{version}}",
+      "changesTitle": "O QUE MUDOU",
+      "highlightsTitle": "NESTA VERSÃO",
+      "acceptLabel": {
+        "TERMS": "Li e aceito os novos Termos de Uso (versão {{version}}).",
+        "PRIVACY": "Li e aceito a nova Política de Privacidade (versão {{version}})."
+      },
+      "submit": "Aceitar e continuar",
       "accepting": "Registrando…",
       "decline": "Sair",
       "declining": "Saindo…",
-      "declineHint": "Sem o aceite não é possível continuar. Se preferir decidir depois, saia da conta e volte quando quiser.",
       "error": "Não foi possível registrar seu aceite. Tente novamente.",
       "signOutError": "Não foi possível sair agora. Tente novamente."
     }

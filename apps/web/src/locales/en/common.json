@@ -229,18 +229,31 @@
       }
     },
     "terms": {
+      "eyebrow": "Re-acceptance required",
       "title": "We updated our terms.",
-      "description": "A new version of the documents below is now in force. To keep using DM Forge, confirm that you have read and accept the current version.",
+      "description": "We published a new version of <strong>{{documents}}</strong>. To keep using DM Forge, read the summary, go through the text and accept the current version.",
       "documents": {
         "TERMS": "Terms of Use",
         "PRIVACY": "Privacy Policy"
       },
-      "version": "version {{version}}",
-      "accept": "I have read and accept",
+      "documentsInline": {
+        "TERMS": "the Terms of Use",
+        "PRIVACY": "the Privacy Policy"
+      },
+      "documentLabel": "{{document}} text — scroll to read",
+      "draftNotice": "DRAFT · PENDING LEGAL REVIEW",
+      "versionTransition": "v{{from}} → v{{to}}",
+      "versionCurrent": "v{{version}}",
+      "changesTitle": "WHAT CHANGED",
+      "highlightsTitle": "IN THIS VERSION",
+      "acceptLabel": {
+        "TERMS": "I have read and accept the new Terms of Use (version {{version}}).",
+        "PRIVACY": "I have read and accept the new Privacy Policy (version {{version}})."
+      },
+      "submit": "Accept and continue",
       "accepting": "Recording…",
       "decline": "Sign out",
       "declining": "Signing out…",
-      "declineHint": "There is no way past this without accepting. To decide later, sign out and come back whenever you want.",
       "error": "Could not record your acceptance. Try again.",
       "signOutError": "Could not sign you out right now. Try again."
     }

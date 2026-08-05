@@ -4,11 +4,12 @@ import { type ChangeEvent, type FormEvent, type ReactNode, useMemo, useState } f
 import { useTranslation } from 'react-i18next'
 import { signIn, signUp } from '../auth/auth-client.js'
 import { appCallbackUrl } from '../auth/callback-url.js'
-import { AlertIcon, GoogleIcon, MailIcon } from '../components/dmf/icons.js'
+import { GoogleIcon, MailIcon } from '../components/dmf/icons.js'
 import {
   AuthShell,
   Button,
   CheckRow,
+  DangerNote,
   Display,
   Field,
   Input,
@@ -291,26 +292,8 @@ function RegisterPage() {
   )
 }
 
+// The sign-up form's errors are answers to something the person just did, so
+// the boxed note announces itself.
 function ErrorNote({ children }: { children: ReactNode }) {
-  return (
-    <div
-      style={{
-        padding: '12px 14px',
-        borderRadius: 6,
-        background: 'var(--danger-surface)',
-        border: '1px solid color-mix(in srgb, var(--danger) 35%, transparent)',
-        fontSize: 13,
-        color: 'var(--text)',
-        display: 'flex',
-        gap: 10,
-        alignItems: 'flex-start',
-      }}
-      role="alert"
-    >
-      <span style={{ color: 'var(--danger)', flexShrink: 0, marginTop: 1 }}>
-        <AlertIcon size={14} />
-      </span>
-      <span>{children}</span>
-    </div>
-  )
+  return <DangerNote role="alert">{children}</DangerNote>
 }

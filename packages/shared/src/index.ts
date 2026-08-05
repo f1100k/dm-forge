@@ -39,6 +39,12 @@ export {
   AppErrorCodeSchema,
 } from './errors/app-error.js'
 export { createId, isCuid } from './ids/ids.js'
+export {
+  type LegalDocument,
+  legalDocument,
+  type LegalDocumentSection,
+  legalDocumentVersion,
+} from './legal/documents.js'
 export { type EntityState, EntityStateSchema } from './schemas/entity-state.js'
 export {
   ACCOUNT_TELEMETRY_EVENTS,
