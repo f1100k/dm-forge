@@ -1,3 +1,5 @@
+import { logger } from '../logging/logger.js'
+
 // Consent-gated telemetry wrapper (Tech Design §14.3, Spec FR-012 / NFR-005).
 //
 // Scope: this module owns *whether* an event may be emitted and *what shape* it
@@ -66,7 +68,7 @@ export function createTelemetry(sink: TelemetrySink): Telemetry {
         // A counter, not a detail line: knowing that call sites are firing
         // without consent is useful for finding bugs, but the drop itself must
         // not become the leak the gate exists to prevent.
-        console.info(JSON.stringify({ level: 'debug', action: 'telemetry.dropped' }))
+        logger.debug('telemetry.dropped')
         return false
       }
 
@@ -88,7 +90,7 @@ export function createConsoleTelemetrySink(nodeEnv: string): TelemetrySink {
   return {
     record(event) {
       if (nodeEnv === 'production') return
-      console.info(JSON.stringify({ level: 'info', action: 'telemetry.event', ...event }))
+      logger.info('telemetry.event', { ...event })
     },
   }
 }

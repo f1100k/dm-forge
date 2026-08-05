@@ -72,7 +72,11 @@ describe('better-auth email + password', () => {
       .map(([arg]) => (typeof arg === 'string' ? safeParse(arg) : null))
       .filter((event) => event?.action === 'email:noop:queued')
     infoSpy.mockRestore()
-    expect(queued).toContainEqual({ action: 'email:noop:queued', kind: 'email_verification' })
+    expect(queued).toContainEqual({
+      level: 'info',
+      action: 'email:noop:queued',
+      kind: 'email_verification',
+    })
   })
 
   it('blocks sign-in with valid credentials until the email is verified', async () => {

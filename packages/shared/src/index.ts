@@ -45,6 +45,17 @@ export {
   type LegalDocumentSection,
   legalDocumentVersion,
 } from './legal/documents.js'
+export {
+  createConsoleLogSink,
+  createLogger,
+  type LogFields,
+  type Logger,
+  type LogLevel,
+  type LogSink,
+  logger,
+  SCRUB_FAILED,
+} from './logging/logger.js'
+export { REDACTED, scrubLogValue, scrubText } from './logging/scrub.js'
 export { type EntityState, EntityStateSchema } from './schemas/entity-state.js'
 export {
   ACCOUNT_TELEMETRY_EVENTS,

@@ -1,3 +1,4 @@
+import { logger } from '@dm-forge/shared'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -38,14 +39,7 @@ export function createApp() {
       router: appRouter,
       createContext: ({ req }) => createContext({ req }),
       onError({ error, path }) {
-        console.error(
-          JSON.stringify({
-            level: 'error',
-            msg: 'trpc.error',
-            path,
-            code: error.code,
-          }),
-        )
+        logger.error('trpc.error', { path, code: error.code })
       },
     })
   })

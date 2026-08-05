@@ -1,3 +1,4 @@
+import { logger } from '@dm-forge/shared'
 import type { EmailMessage, EmailSender } from './email-sender.js'
 
 // Notified for every message the noop sender "delivers". Tests inject a
@@ -21,5 +22,5 @@ export function createNoopEmailSender(observe: NoopEmailObserver = logKindOnly):
 }
 
 function logKindOnly(message: EmailMessage): void {
-  console.info(JSON.stringify({ action: 'email:noop:queued', kind: message.kind }))
+  logger.info('email:noop:queued', { kind: message.kind })
 }

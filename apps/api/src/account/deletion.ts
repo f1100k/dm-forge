@@ -1,5 +1,5 @@
 import { prisma } from '@dm-forge/db'
-import type { DeletionConfirmation } from '@dm-forge/shared'
+import { type DeletionConfirmation, logger } from '@dm-forge/shared'
 import { auth } from '../auth/better-auth.js'
 import { emailSender } from '../email/sender.js'
 import { ACCOUNT_STATUS_ACTIVE, ACCOUNT_STATUS_PENDING_DELETION } from './account-status.js'
@@ -62,9 +62,7 @@ export async function requestAccountDeletion({
     deletionDueAt: dueAt.toISOString(),
   })
 
-  console.info(
-    JSON.stringify({ level: 'info', action: 'account.deletion.requested', userId, status: 'ok' }),
-  )
+  logger.info('account.deletion.requested', { userId, status: 'ok' })
 
   return { ok: true, deletionDueAt: dueAt }
 }
@@ -119,9 +117,7 @@ export async function restoreAccount(userId: string, now: Date): Promise<Restore
     data: { accountStatus: ACCOUNT_STATUS_ACTIVE, pendingDeletionAt: null },
   })
 
-  console.info(
-    JSON.stringify({ level: 'info', action: 'account.deletion.restored', userId, status: 'ok' }),
-  )
+  logger.info('account.deletion.restored', { userId, status: 'ok' })
 
   return { ok: true }
 }

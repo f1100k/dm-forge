@@ -1,3 +1,4 @@
+import { logger } from '@dm-forge/shared'
 import { Hono } from 'hono'
 import { auth } from '../auth/better-auth.js'
 import { getEnv } from '../env.js'
@@ -66,7 +67,7 @@ export function createAccountRoutes() {
     // Without a configured key the endpoint stays closed — an unset secret must
     // never read as "no authentication required".
     if (!expected || !provided || !matchesSupportKey(provided, expected)) {
-      console.warn(JSON.stringify({ level: 'warn', action: 'account.restore.unauthorized' }))
+      logger.warn('account.restore.unauthorized')
       return c.json({ code: 'UNAUTHORIZED', message: 'Invalid support credentials.' }, 401)
     }
 

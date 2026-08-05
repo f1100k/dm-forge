@@ -1,5 +1,5 @@
 import { Prisma, prisma } from '@dm-forge/db'
-import { createId } from '@dm-forge/shared'
+import { createId, logger } from '@dm-forge/shared'
 import { getEnv } from '../env.js'
 import { accountTelemetry, type TelemetrySubject } from '../telemetry/account-telemetry.js'
 import { ACCOUNT_STATUS_PENDING_DELETION } from './account-status.js'
@@ -40,7 +40,7 @@ export async function runAccountMaintenance(now: Date): Promise<MaintenanceRepor
     accountTelemetry.emitFor('account.deletion.executed', subject, now)
   }
 
-  console.info(JSON.stringify({ level: 'info', action: 'account.maintenance.ran', ...report }))
+  logger.info('account.maintenance.ran', { ...report })
   return report
 }
 
@@ -86,13 +86,7 @@ async function purgeDueAccounts(now: Date): Promise<TelemetrySubject[]> {
     // with it through onDelete: Cascade.
     await tx.user.deleteMany({ where: { id: { in: ids } } })
 
-    console.info(
-      JSON.stringify({
-        level: 'info',
-        action: 'account.deletion.executed',
-        count: ids.length,
-      }),
-    )
+    logger.info('account.deletion.executed', { count: ids.length })
     return due.map((row) => ({ userId: row.id, telemetryConsent: row.telemetryConsent }))
   })
 }

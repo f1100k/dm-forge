@@ -1,5 +1,5 @@
 import { prisma } from '@dm-forge/db'
-import { createId } from '@dm-forge/shared'
+import { createId, logger } from '@dm-forge/shared'
 import { APIError } from 'better-auth/api'
 import { getEnv } from '../env.js'
 import { resolveClientIp } from './client-ip.js'
@@ -66,13 +66,9 @@ export async function clearSignInAttempts(key: string): Promise<void> {
 // Structured log carrying only the hashed key and the counter — never the email
 // or the IP (NFR-003, Tech Design §6.3).
 function logAttempt(action: string, key: string, state: AttemptState): void {
-  console.info(
-    JSON.stringify({
-      level: 'info',
-      action,
-      ipEmailKey: key,
-      attemptCount: state.attemptCount,
-      blocked: state.blockedUntil != null,
-    }),
-  )
+  logger.info(action, {
+    ipEmailKey: key,
+    attemptCount: state.attemptCount,
+    blocked: state.blockedUntil != null,
+  })
 }
