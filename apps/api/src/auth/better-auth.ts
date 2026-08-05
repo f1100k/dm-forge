@@ -14,6 +14,8 @@ import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { assertAccountUsable, isUserPendingDeletion } from '../account/account-status.js'
 import { emailSender } from '../email/sender.js'
 import { getEnv } from '../env.js'
+import { accountTelemetry } from '../telemetry/account-telemetry.js'
+import { type SignInResult, signInTelemetryFor } from '../telemetry/signin-telemetry.js'
 import {
   assertSignInAllowed,
   clearSignInAttempts,
@@ -70,6 +72,7 @@ export const auth = betterAuth({
       console.info(
         JSON.stringify({ level: 'info', action: 'auth.password.reset', userId: user.id }),
       )
+      await accountTelemetry.emit('account.password.reset.completed', user.id, new Date())
     },
   },
   emailVerification: {
@@ -169,6 +172,13 @@ export const auth = betterAuth({
         // user and does not fire user.create, so no duplicate records.
         after: async (user) => {
           await recordSignupConsent(user.id)
+          // Gated like every other event. A brand-new account has
+          // `telemetryConsent = false` (opt-in, not opt-out) and nothing in the
+          // sign-up flow collects that switch, so today this always drops —
+          // which is the correct answer, not a gap to work around. The call
+          // site is here so the event starts reporting the day consent can be
+          // given at sign-up, rather than being retrofitted then.
+          await accountTelemetry.emit('account.signup.completed', user.id, new Date())
         },
       },
     },
@@ -230,6 +240,20 @@ export const auth = betterAuth({
       const key = signInAttemptKey(ctx.headers ?? new Headers(), email)
       const returned = ctx.context.returned
       const rejected = returned instanceof APIError
+      const now = new Date()
+
+      // Report the attempt before acting on it. `newSession` is set by Better
+      // Auth whenever it issues a session cookie, so it names the account that
+      // actually got in — the request body only names the one that asked.
+      await emitSignInTelemetry(
+        {
+          rejected,
+          errorCode: rejected ? errorCode(returned) : null,
+          sessionUserId: newSessionUserId(ctx.context),
+        },
+        email,
+        now,
+      )
 
       // Better Auth refuses to finish a sign-in whose session the hook above
       // declined — which it does for exactly one reason. Reaching that point
@@ -250,7 +274,7 @@ export const auth = betterAuth({
 
       if (!key) return
       if (rejected) {
-        await registerSignInFailure(key, new Date())
+        await registerSignInFailure(key, now)
         return
       }
       await clearSignInAttempts(key)
@@ -272,6 +296,51 @@ export type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>
 function errorCode(error: APIError): string | null {
   const body = (error as { body?: { code?: unknown } }).body
   return typeof body?.code === 'string' ? body.code : null
+}
+
+// The account Better Auth just issued a session for, if it issued one. Read
+// defensively: `newSession` crosses a third-party boundary and is null on every
+// path that did not mint a cookie (engineering.md — casts only at boundaries).
+function newSessionUserId(context: unknown): string | undefined {
+  const session = (context as { newSession?: { user?: { id?: unknown } } | null }).newSession
+  return typeof session?.user?.id === 'string' ? session.user.id : undefined
+}
+
+// Emits the sign-in event the outcome calls for (Tech Design §5.3). The success
+// side already knows its account; the failure side has only the address that was
+// typed, so it resolves the account to find both the subject and its consent.
+//
+// An address with no account behind it emits nothing: there is no subject, and
+// therefore nobody whose consent could permit the record. That also keeps a
+// failed sign-in from becoming a way to observe which addresses are registered.
+async function emitSignInTelemetry(
+  result: SignInResult,
+  email: unknown,
+  occurredAt: Date,
+): Promise<void> {
+  const telemetry = signInTelemetryFor(result)
+  if (!telemetry) return
+
+  if (telemetry.event === 'account.signin.success') {
+    await accountTelemetry.emit(telemetry.event, telemetry.userId, occurredAt)
+    return
+  }
+
+  const parsed = EmailSchema.safeParse(email)
+  if (!parsed.success) return
+
+  const user = await prisma.user.findUnique({
+    where: { email: parsed.data },
+    select: { id: true, telemetryConsent: true },
+  })
+  if (!user) return
+
+  accountTelemetry.emitFor(
+    telemetry.event,
+    { userId: user.id, telemetryConsent: user.telemetryConsent },
+    occurredAt,
+    telemetry.code ?? undefined,
+  )
 }
 
 // The email hooks are awaited (not fire-and-forget) so a provider outage surfaces

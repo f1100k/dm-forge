@@ -14,27 +14,77 @@ import { getEnv } from '../env.js'
 // switch, and FR-012 requires a revocation to bite immediately — including for
 // the very next event in the request that performed it.
 
+// A subject whose consent the caller already holds. Two call sites need this:
+// the purge, which reads the flag inside the transaction that erases the row
+// (afterwards there is nothing left to read), and the sign-in hook, which had
+// to resolve the account to know who failed. Passing the flag forward beats a
+// second lookup that could disagree with the first.
+export type TelemetrySubject = {
+  userId: string
+  telemetryConsent: boolean
+}
+
 export type AccountTelemetry = {
   emit(event: AccountTelemetryEvent, userId: string, occurredAt: Date, code?: string): Promise<void>
+  emitFor(
+    event: AccountTelemetryEvent,
+    subject: TelemetrySubject,
+    occurredAt: Date,
+    code?: string,
+  ): void
 }
 
 export function createAccountTelemetry(sink: TelemetrySink): AccountTelemetry {
   const telemetry = createTelemetry(sink)
 
-  return {
-    async emit(event, userId, occurredAt, code) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { telemetryConsent: true },
-      })
-
+  function emitFor(
+    event: AccountTelemetryEvent,
+    subject: TelemetrySubject,
+    occurredAt: Date,
+    code?: string,
+  ): void {
+    try {
       telemetry.track(
         event,
-        { telemetryConsent: user?.telemetryConsent ?? false },
-        { userId, occurredAt, ...(code === undefined ? {} : { code }) },
+        { telemetryConsent: subject.telemetryConsent },
+        { userId: subject.userId, occurredAt, ...(code === undefined ? {} : { code }) },
       )
+    } catch {
+      reportEmissionFailure(event)
+    }
+  }
+
+  return {
+    emitFor,
+
+    async emit(event, userId, occurredAt, code) {
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { telemetryConsent: true },
+        })
+
+        emitFor(
+          event,
+          { userId, telemetryConsent: user?.telemetryConsent ?? false },
+          occurredAt,
+          code,
+        )
+      } catch {
+        reportEmissionFailure(event)
+      }
     },
   }
+}
+
+// Telemetry is observational: it reports what the product did, it is never part
+// of doing it. So a sink that throws, or a database that blinks while the gate
+// reads consent, must not turn a completed sign-in or a finished erasure into a
+// failed request. The failure is logged as a bare counter — the event name says
+// which call site to look at, and putting the payload here would write the very
+// data the gate may have just refused into a line nothing gated.
+function reportEmissionFailure(event: AccountTelemetryEvent): void {
+  console.warn(JSON.stringify({ level: 'warn', action: 'telemetry.failed', event }))
 }
 
 // The instance the app uses. The sink stays local (prints in dev, drops in

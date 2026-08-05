@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { auth } from '../auth/better-auth.js'
 import { getEnv } from '../env.js'
+import { accountTelemetry } from '../telemetry/account-telemetry.js'
 import { resolveDownload } from './data-export.js'
 import { restoreAccount } from './deletion.js'
 import { matchesSupportKey } from './privacy-policy.js'
@@ -41,6 +42,10 @@ export function createAccountRoutes() {
       const code = outcome.reason === 'expired' ? 'EXPORT_EXPIRED' : 'EXPORT_NOT_FOUND'
       return c.json({ code, message: exportErrorMessage(outcome.reason) }, status)
     }
+
+    // The export is delivered at the moment the bytes are handed over, which is
+    // here — the request that built the file only promised one (Tech Design §5.3).
+    await accountTelemetry.emit('account.export.delivered', outcome.userId, new Date())
 
     c.header('content-type', 'application/json; charset=utf-8')
     c.header('content-disposition', `attachment; filename="${outcome.filename}"`)
