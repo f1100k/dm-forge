@@ -5,6 +5,7 @@ import {
   EmailSchema,
   type Locale,
   LocaleSchema,
+  logger,
   PRIVACY_VERSION,
   TERMS_VERSION,
 } from '@dm-forge/shared'
@@ -69,9 +70,7 @@ export const auth = betterAuth({
     revokeSessionsOnPasswordReset: true,
     onPasswordReset: async ({ user }) => {
       // Metadata only — never the token or the new password (NFR-003).
-      console.info(
-        JSON.stringify({ level: 'info', action: 'auth.password.reset', userId: user.id }),
-      )
+      logger.info('auth.password.reset', { userId: user.id })
       await accountTelemetry.emit('account.password.reset.completed', user.id, new Date())
     },
   },

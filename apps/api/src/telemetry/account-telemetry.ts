@@ -3,6 +3,7 @@ import {
   type AccountTelemetryEvent,
   createConsoleTelemetrySink,
   createTelemetry,
+  logger,
   type TelemetrySink,
 } from '@dm-forge/shared'
 import { getEnv } from '../env.js'
@@ -84,7 +85,7 @@ export function createAccountTelemetry(sink: TelemetrySink): AccountTelemetry {
 // which call site to look at, and putting the payload here would write the very
 // data the gate may have just refused into a line nothing gated.
 function reportEmissionFailure(event: AccountTelemetryEvent): void {
-  console.warn(JSON.stringify({ level: 'warn', action: 'telemetry.failed', event }))
+  logger.warn('telemetry.failed', { event })
 }
 
 // The instance the app uses. The sink stays local (prints in dev, drops in

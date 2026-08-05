@@ -1,4 +1,5 @@
 import { serve } from '@hono/node-server'
+import { logger } from '@dm-forge/shared'
 import { startAccountScheduler } from './account/scheduler.js'
 import { getEnv } from './env.js'
 import { createApp } from './server/app.js'
@@ -16,14 +17,7 @@ serve(
     port: env.API_PORT,
   },
   ({ port }) => {
-    console.info(
-      JSON.stringify({
-        level: 'info',
-        msg: 'api.started',
-        port,
-        env: env.NODE_ENV,
-      }),
-    )
+    logger.info('api.started', { port, env: env.NODE_ENV })
   },
 )
 

@@ -97,7 +97,11 @@ describe('password reset', () => {
       .filter((event) => event?.action === 'email:noop:queued')
     infoSpy.mockRestore()
     expect(res.status).toBe(200)
-    expect(queued).toContainEqual({ action: 'email:noop:queued', kind: 'password_reset' })
+    expect(queued).toContainEqual({
+      level: 'info',
+      action: 'email:noop:queued',
+      kind: 'password_reset',
+    })
   })
 
   it('signs the new password in and locks the old one out', async () => {

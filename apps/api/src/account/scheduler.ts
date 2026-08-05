@@ -1,3 +1,4 @@
+import { logger } from '@dm-forge/shared'
 import cron from 'node-cron'
 import { runAccountMaintenance } from './maintenance.js'
 
@@ -24,21 +25,18 @@ export function startAccountScheduler(): AccountScheduler {
       // take the API process down with it — the job failing is not a reason for
       // the app to stop serving requests.
       void runAccountMaintenance(new Date()).catch((error: unknown) => {
-        console.error(
-          JSON.stringify({
-            level: 'error',
-            action: 'account.maintenance.failed',
-            error: error instanceof Error ? error.message : 'unknown',
-          }),
-        )
+        // The message crosses a boundary we do not own — a Prisma failure can
+        // carry the connection string, password included. The logger scrubs it
+        // (NFR-003); this call site does not have to know how.
+        logger.error('account.maintenance.failed', {
+          error: error instanceof Error ? error.message : 'unknown',
+        })
       })
     },
     { timezone: 'UTC' },
   )
 
-  console.info(
-    JSON.stringify({ level: 'info', action: 'account.scheduler.started', cron: DAILY_AT_0315 }),
-  )
+  logger.info('account.scheduler.started', { cron: DAILY_AT_0315 })
 
   return { stop: () => void task.stop() }
 }
