@@ -9,6 +9,7 @@
     "test": "pnpm -w exec vitest run --config tests/vitest.config.ts",
     "test:backend": "pnpm -w exec vitest run --config tests/vitest.config.ts --project='integration:backend'",
     "test:web": "pnpm -w exec vitest run --config tests/vitest.config.ts --project='integration:web'",
+    "test:a11y": "pnpm -w exec vitest run --config tests/vitest.config.ts --project='integration:web' integration/web/a11y-",
     "clean": "rm -rf .turbo coverage"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "catalog:",
+    "axe-core": "^4.12.1",
     "happy-dom": "catalog:",
     "msw": "catalog:",
     "react": "^19.2.8",
