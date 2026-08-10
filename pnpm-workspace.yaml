@@ -12,7 +12,7 @@ catalog:
   typescript: ^6.0.3
   vitest: ^4.1.10
   tsx: ^4.23.1
-  "@types/node": ^25.9.2
+  "@types/node": ^26.1.2
   # Plugin used by both apps/web and the root vitest workspace (unit:web /
   # integration:web projects). Catalog the version so they cannot drift.
   "@vitejs/plugin-react": ^6.0.2
