@@ -9,7 +9,7 @@ packages:
 # every package.json at "catalog:". Single-use deps stay local to their package.
 catalog:
   # Toolchain (devDeps)
-  typescript: ^6.0.3
+  typescript: ^7.0.2
   vitest: ^4.1.10
   tsx: ^4.23.1
   "@types/node": ^25.9.2
