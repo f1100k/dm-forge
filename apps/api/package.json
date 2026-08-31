@@ -24,12 +24,12 @@
     "@dm-forge/ai": "workspace:*",
     "@dm-forge/db": "workspace:*",
     "@dm-forge/shared": "workspace:*",
-    "@hono/node-server": "^2.0.12",
+    "@hono/node-server": "^2.1.1",
     "@trpc/server": "catalog:",
     "better-auth": "catalog:",
-    "hono": "^4.12.32",
+    "hono": "^4.13.5",
     "node-cron": "^4.6.0",
-    "resend": "^6.18.1",
+    "resend": "^6.24.0",
     "zod": "catalog:"
   },
   "devDependencies": {
