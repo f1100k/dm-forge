@@ -10,7 +10,7 @@ packages:
 catalog:
   # Toolchain (devDeps)
   typescript: ^6.0.3
-  vitest: ^4.1.10
+  vitest: ^4.1.11
   tsx: ^4.23.1
   "@types/node": ^25.9.2
   # Plugin used by both apps/web and the root vitest workspace (unit:web /
