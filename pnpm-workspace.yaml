@@ -11,22 +11,22 @@ catalog:
   # Toolchain (devDeps)
   typescript: ^6.0.3
   vitest: ^4.1.10
-  tsx: ^4.23.1
+  tsx: ^4.23.13
   "@types/node": ^25.9.2
   # Plugin used by both apps/web and the root vitest workspace (unit:web /
   # integration:web projects). Catalog the version so they cannot drift.
-  "@vitejs/plugin-react": ^6.0.2
+  "@vitejs/plugin-react": ^6.1.1
 
   # Validation + types
-  zod: ^4.4.3
+  zod: ^4.6.2
   zod-prisma-types: ^3.2.4
 
   # Database
-  prisma: ^7.9.1
-  "@prisma/client": ^7.9.1
+  prisma: ^7.10.0
+  "@prisma/client": ^7.10.0
 
   # Auth
-  better-auth: ^1.6.25
+  better-auth: ^1.7.4
 
   # tRPC (the 11.18.0 stable line co-versions server + client + react-query)
   "@trpc/server": ^11.18.0
@@ -38,9 +38,9 @@ catalog:
   dotenv-expand: ^13.0.0
 
   # Test helpers (owned by the new @dm-forge/tests package)
-  "@testcontainers/postgresql": ^12.0.4
-  testcontainers: ^12.0.4
-  "@faker-js/faker": ^10.5.0
+  "@testcontainers/postgresql": ^12.1.0
+  testcontainers: ^12.1.0
+  "@faker-js/faker": ^10.6.0
   msw: ^2.15.0
-  happy-dom: ^20.11.1
-  "@testing-library/react": ^16.1.0
+  happy-dom: ^20.14.3
+  "@testing-library/react": ^16.3.3
