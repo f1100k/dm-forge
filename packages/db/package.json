@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@dm-forge/shared": "workspace:*",
-    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "catalog:",
     "zod": "catalog:"
   },
